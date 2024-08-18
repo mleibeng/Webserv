@@ -2,12 +2,14 @@ Considerations regarding this project:
 
 First off: Decide which poll equivalent to use!.
 Since we are coding on MacOS I would prefer we go with Kqueue since it is the most efficient on a BSD system.
+(Scalability and performance)
 
 Second: Info necessary to be able to understand what we do:
 1. Crash Course on Containers, explicitly vectors and unordered maps.
 2. Crash Course on memory pointer types to make memory management easier(weak, shared, unique pointers)
-3. Crash Course on regex library, chrono time library, also maybe multithreading library like <thread>?
-4. Basic structure of webservers including:
+3. Crash Course on new keywords like noexcept, auto, override, nullptr, enum class, constexpr, explicit
+4. Crash Course on regex library, chrono time library, also maybe multithreading library like <thread>?
+5. Basic structure of webservers including:
 
 -> config, fds, connections(accept, close, states(alive, timeout handling etc..)),
    kqueue, sockets(listen), port handling, event handlers, server_blocks, mime_types, file uploads, error handling
@@ -23,6 +25,12 @@ Second: Info necessary to be able to understand what we do:
 -> Maybe also load balancing because of this requirement: Stress tests your server. It must stay available at all cost!
 
 -> CGI: Common Gateway Interface handling.
+
+Additional Considerations:
+-> Network Protocols like TCP and UDP
+-> TLS
+-> firewall
+-> protection against different network attack types including but not limited to: DDoS, XSS injections, CSRF attacks.
 
 Bonus:
 
