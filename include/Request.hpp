@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:04 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 03:10:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/20 07:09:32 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,5 +20,21 @@ Handles: Parsing, storage, handling of incoming HTTP requests and methods (GET,P
 
 #include <string>
 #include <unordered_map>
+
+enum class Method { GET, POST, DELETE};
+class Request
+{
+	private:
+	Method method;
+	public:
+
+	Method getMethod();
+	// getPath(); probably string
+	// getQuery(); probably string
+	// getBody(); probably string
+	// getHeaders(); probably unordered_map of string/string
+
+	void parse(); //dont know what to return yet (definitely not void)
+};
 
 #endif

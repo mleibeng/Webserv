@@ -1,0 +1,7 @@
+Step 1:
+Write a Parser reads out the data of the config file and saves the values in Config.
+-> Save Routes in unordered_map<string,string>
+-> Save string for error pages;
+-> Save vector<string> for server_names
+-> Save string for host;
+// Add more as necessary for ex. ports, max_body_size for responses etc...
