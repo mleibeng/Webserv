@@ -13,6 +13,13 @@ For Firefox run this command:
 
 Step 2. Profit??? (maybe write me a message as thanks :D)
 
+Also if you want to compare behaviour and files to nginx install it using <brew install nginx>!
+If you want to find file examples like mime.types or a nginx.conf default go to <User/{YourUserName}/.brew/etc/nginx>
+-> Useful to see how it handles redirects to error pages for example and also alot of other stuff!!!!
+-------------------------------------------------------------------------------------------------------------------------
+
+Starting on CPP FILES:
+
 First off: Decide which poll equivalent to use!.
 Since we are coding on MacOS I would prefer we go with Kqueue since it is the most efficient on a BSD system.
 (Scalability and performance)
@@ -50,10 +57,9 @@ Bonus:
 -> Cookies + Session Management
 
 -> multiple CGI
-
 ---------------------------------------------------------------------------------------------------------------------
 
-Watch this Video as an introduction:
+Watch this Video as a introduction to NGINX:
 <open -a /Applications/Firefox.app -g https://www.youtube.com/watch?v=9t9Mp0BGnyI> !!!
 (For real)
 
