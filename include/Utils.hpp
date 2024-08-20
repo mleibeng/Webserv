@@ -6,11 +6,13 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:10 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/18 02:45:28 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/20 02:36:20 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef UTILS_HPP
 #define UTILS_HPP
+
+#include <string>
 
 #endif

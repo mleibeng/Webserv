@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:04 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/18 05:02:21 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/20 02:36:41 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,5 +38,8 @@
 
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
+
+#include <string>
+#include <unordered_map>
 
 #endif

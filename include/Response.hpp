@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/18 05:08:10 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/20 02:36:12 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,5 +30,9 @@
 
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
+
+#include <string>
+#include <unordered_map>
+
 
 #endif
