@@ -1,0 +1,59 @@
+global:
+  max_connections: 1024
+  client_timeout: 60  # in seconds
+
+servers:
+  - host: 127.0.0.1
+    port: 8080
+    server_names:
+      - example.com
+      - www.example.com
+    client_max_body_size: 10M  # 10 megabytes
+    error_pages:
+      404: /errors/404.html
+      500: /errors/500.html
+    routes:
+      /:
+        root: /var/www/html
+        index: index.html
+        methods: [GET, POST]
+        directory_listing: off
+      /upload:
+        root: /var/www/uploads
+        methods: [POST]
+        client_max_body_size: 20M  # Override for this route
+      /downloads:
+        root: /var/www/downloads
+        methods: [GET]
+        directory_listing: on
+      /redirect:
+        redirect: https://www.example.com
+      /cgi-bin:
+        root: /var/www/cgi-bin
+        methods: [GET, POST]
+        cgi_extensions: [.php, .py]
+
+  - host: 127.0.0.1
+    port: 8081
+    server_names:
+      - api.example.com
+    client_max_body_size: 5M
+    routes:
+      /:
+        root: /var/www/api
+        index: api.php
+        methods: [GET, POST, DELETE]
+      /uploads:
+        root: /var/www/api/uploads
+        methods: [POST]
+        client_max_body_size: 50M  # Override for this route
+
+  - host: 0.0.0.0  # Listen on all interfaces
+    port: 80
+    server_names:
+      - default_server
+    routes:
+      /:
+        root: /var/www/default
+        index: index.html
+        methods: [GET]

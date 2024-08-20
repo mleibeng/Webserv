@@ -1,5 +1,18 @@
 Considerations regarding this project:
 
+Watch this Video: (and only ctrl+c and ctrl+v without the < and >)
+
+CLI stands for Command line interface btw... that's your terminal.
+
+Step 1.
+If you are using Chrome as default browser
+-> run: <open -a Google\ Chrome "https://www.youtube.com/watch?v=dQw4w9WgXcQ"> in CLI as an introduction!
+
+For Firefox run this command:
+-> run: <open -a /Applications/Firefox.app -g "https://www.youtube.com/watch?v=dQw4w9WgXcQ"> in CLI as an introduction!
+
+Step 2. Profit??? (maybe write me a message as thanks :D)
+
 First off: Decide which poll equivalent to use!.
 Since we are coding on MacOS I would prefer we go with Kqueue since it is the most efficient on a BSD system.
 (Scalability and performance)
@@ -39,6 +52,10 @@ Bonus:
 -> multiple CGI
 
 ---------------------------------------------------------------------------------------------------------------------
+
+Watch this Video as an introduction:
+<open -a /Applications/Firefox.app -g https://www.youtube.com/watch?v=9t9Mp0BGnyI> !!!
+(For real)
 
 Explanation of WebServer POST Request handling with WebServer already running:
 
