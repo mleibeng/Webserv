@@ -8,11 +8,11 @@ Second: Info necessary to be able to understand what we do:
 1. Crash Course on Containers, explicitly vectors and unordered maps.
 2. Crash Course on memory pointer types to make memory management easier(weak, shared, unique pointers)
 3. Crash Course on new keywords like noexcept, auto, override, nullptr, enum class, constexpr, explicit
-4. Crash Course on regex library, chrono time library, also maybe multithreading library like <thread>?
+4. Crash Course on regex library, chrono time library, also maybe multithreading library like <thread> or <future>?
 5. Basic structure of webservers including:
 
 -> config, fds, connections(accept, close, states(alive, timeout handling etc..)),
-   kqueue, sockets(listen), port handling, event handlers, server_blocks, mime_types, file uploads, error handling
+	kqueue, sockets(listen), port handling, event handlers, server_blocks, mime_types, file uploads, error handling
 
 -> Request formatting including parsing of: method, http headers, body in ABNF (Augmented Backus-Naur Form: basically request syntax), clientside-GET, clientside-POST, clientside-DELETE
 
@@ -37,3 +37,59 @@ Bonus:
 -> Cookies + Session Management
 
 -> multiple CGI
+
+---------------------------------------------------------------------------------------------------------------------
+
+Explanation of WebServer POST Request handling with WebServer already running:
+
+WebServer:
+The Webserver is already running, listening on configured ports.
+When a new connection comes in, it accepts the connection and creates a new Connection object.
+
+Event loop:
+The new Connection's file descriptor is added to the event loop.
+The event loop is constantly running, using poll() to check for activity on all file descriptors.
+
+Connection:
+When data is available to read, the event loop calls the Connection's read() method.
+The Connection reads the incoming data into its buffer.
+
+Request:
+As data is read, the Connection passes it to an Request object for parsing.
+The Request object identifies this as a POST request and extracts relevant information like headers and the request body.
+
+Connection (processing):
+Once the full request is received, the Connection determines how to handle it based on the server configuration.
+For a POST request, it might involve saving an uploaded file or passing data to a CGI script.
+
+CGI Handler (if applicable):
+If the POST request is meant for a CGI script, the CGIHandler is invoked.
+The CGIHandler executes the appropriate script, passing along the POST data.
+The script's output is captured by the CGIHandler and returned.
+
+Response: (Look up ABNF for proper formatting)
+The Connection creates an Response object.
+It sets the appropriate status code (e.g., 200 OK if successful).
+It adds necessary headers (e.g., Content-Type, Content-Length).
+It sets the body of the response (either a success message or the CGI script output).
+
+Connection (sending):
+The Connection converts the Response to a string.
+It begins sending this data back to the client.
+
+Event loop:
+If the response can't be fully sent immediately, the event loop will notify when the socket is ready for more writing.
+The Connection's write() method will be called to continue sending data.
+
+Connection (cleanup):
+Once the full response is sent, the Connection might close if it's not a keep-alive connection.
+Otherwise, it resets its state and prepares for the next request.
+
+WebServer:
+If the connection is closed, the Webserver removes it from the event loop.
+
+Throughout this process:
+
+The event loop ensures that all operations are non-blocking.
+Error handling occurs at each step (e.g., if the POST data is too large or if a CGI script fails).
+Timeouts are managed to prevent connections from hanging indefinitely.

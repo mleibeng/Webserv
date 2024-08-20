@@ -1,26 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.hpp                                         :+:      :+:    :+:   */
+/*   Loop.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 03:28:08 by mleibeng         ###   ########.fr       */
+/*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
+/*   Updated: 2024/08/20 03:16:38 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /*
-Purpose: Handle parsing of config file
-Handles: configuration of hosts, ports and route structure on server-side.
+Purpose: Implement event handling
+Handles: I/O operations using kqueue, file descriptors, timers and async actions
 */
 
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
+#ifndef LOOP_HPP
+#define LOOP_HPP
 
-#include <string>
 #include <vector>
 #include <unordered_map>
-
+#include <chrono>
 
 #endif

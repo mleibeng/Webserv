@@ -1,26 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Config.hpp                                         :+:      :+:    :+:   */
+/*   FileDescriptor.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 03:28:08 by mleibeng         ###   ########.fr       */
+/*   Created: 2024/08/20 02:57:06 by mleibeng          #+#    #+#             */
+/*   Updated: 2024/08/20 03:08:39 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /*
-Purpose: Handle parsing of config file
-Handles: configuration of hosts, ports and route structure on server-side.
+Purpose: Base Class for handling of File Descriptors
+Handles: Interface for read/write operations and error handling, allows setting of FDs to non-blocking
 */
 
-#ifndef CONFIG_HPP
-#define CONFIG_HPP
-
-#include <string>
-#include <vector>
-#include <unordered_map>
-
+#ifndef FILEDESCRIPTOR_HPP
+#define FILEDESCRIPTOR_HPP
 
 #endif
