@@ -1,5 +1,23 @@
 Considerations regarding this project:
 
+Web Application Architecture Components
+
+Typically, a web application architecture diagram comprises three core components:
+
+1) Web Browser: The browser, client-side, or front-end component is the key component that interacts with the user, receives the input, and manages the presentation logic while controlling user interactions with the application. User inputs are validated as well if required.
+
+2) !!!!Web Server: The web server, also known as the backend or server-side component, handles the business logic and processes the user requests by routing the requests to the right component and managing the entire application operations. It can run and oversee requests from a wide variety of clients.
+
+3) Database Server: The database server provides the required data for the application. It handles data-related tasks. In a multi-tiered architecture, database servers can manage business logic with the help of stored procedures.
+
+https://images.clickittech.com/2020/wp-content/uploads/2022/03/10202347/Diagram-54-scaled.jpg
+
+https://images.clickittech.com/2020/wp-content/uploads/2022/03/10202353/Diagram-55-scaled.jpg
+
+What is a web server? Simply put, a web server runs one or more websites or web apps. The web server uses HyperText Transfer Protocol (HTTP) and other protocols to view user requests via a browser. It processes them by applying business logic and delivering the requested content to the end-user.
+
+NGINX is another popular web server called ‘Engine X.’ Developed by Igor Sysoev in 2004, NGINX quickly became popular. It operates on an event-driven model wherein thousands of requests are processed within a single thread, delivering more with minimal resources. It uses PHP to serve static resources and serves static content 2.5 times faster than Apache. Dynamic content is served via external processes. Regarding interpreting requests, Apache passes the file system location while NGINX passes the URI. This feature extends the NGINX capability as a load balancer, HTTP Cache, and proxy server.
+
 Watch this Video: (and only ctrl+c and ctrl+v without the < and >)
 
 CLI stands for Command line interface btw... that's your terminal.
@@ -43,6 +61,8 @@ Second: Info necessary to be able to understand what we do:
 -> Macroes like: FD_SET, FD_CLR, FD_ISSET, FD_ZERO
 
 -> Maybe also load balancing because of this requirement: Stress tests your server. It must stay available at all cost!
+	-> is going to be difficult, we would need to start multiple webservers and link them automatically based on demand.
+	-> probably better to just limit allowed connections to the server at one time!
 
 -> CGI: Common Gateway Interface handling.
 
