@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:56:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 07:08:46 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/20 09:53:43 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@ Handles: dynamic content and script execution/ output return
 class HandleCGI
 {
 	private:
-	std::string pathToString;
+	std::string path_to_string;
 
 	public:
-	HandleCGI();
-	void executeRequest(Request& request);
+	explicit HandleCGI(std::string& path_to_string);
+	std::string executeRequest(const Request& request) const;
 };
 
 #endif

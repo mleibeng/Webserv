@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:35 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 03:05:20 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 08:00:31 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,3 +31,27 @@
 
 
 #include "Response.hpp"
+
+void Response::setStatus(StatusCode status)
+{
+	// change Status to input
+	// and make check if it is even acceptable status as well?
+}
+
+void Response::setHeader(std::unordered_map<std::string,std::string>& header_set)
+{
+	// input the response header for client to receive
+	// including all the processed data meant for the header.
+}
+
+void Response::setBody(std::string& body_set)
+{
+	// input the response body for client to receive
+	// including all the processed data meant for the body.
+}
+
+std::string Response::toString()
+{
+	// process information like integers etc..
+	// into string format to send as response.
+}

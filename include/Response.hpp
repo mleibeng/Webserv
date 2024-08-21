@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 07:01:10 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/20 09:51:02 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,14 @@ enum class StatusCode {OK = 200, BAD_REQUEST = 400, NOT_FOUND = 404,};
 class Response
 {
 	private:
-	StatusCode status;
+	StatusCode status = StatusCode::OK;
+	std::unordered_map<std::string,std::string> header_set;
+	std::string body_set;
 
 	public:
-	void setStatus();
-	void setHeader();
-	void setBody();
+	void setStatus(StatusCode status);
+	void setHeader(std::unordered_map<std::string,std::string> header_set);
+	void setBody(std::string& body_set);
 
 	std::string toString();
 };

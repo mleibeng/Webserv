@@ -1,6 +1,6 @@
 NAME		:= webserv
 CC			:= c++
-CFLAGS		:= -Wall -Wextra -Werror
+CFLAGS		:= -Wall -Wextra -Werror -std=c++17
 HEADERS 	:= -I ./include
 
 # Directories

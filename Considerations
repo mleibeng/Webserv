@@ -136,3 +136,57 @@ Throughout this process:
 The event loop ensures that all operations are non-blocking.
 Error handling occurs at each step (e.g., if the POST data is too large or if a CGI script fails).
 Timeouts are managed to prevent connections from hanging indefinitely.
+---------------------------------------------------------------------------------------------------------------------
+Explanation of WebServer GET Request handling with WebServer already running:
+
+WebServer:
+The WebServer is already running, listening on configured ports.
+When a new connection comes in, it accepts the connection and creates a new Connection object.
+
+EventLoop:
+The new Connection's file descriptor is added to the EventLoop.
+The EventLoop is constantly running, using poll() to check for activity on all file descriptors.
+
+Connection:
+When data is available to read, the EventLoop calls the Connection's handleRead() method.
+The Connection reads the incoming data into its buffer.
+
+HttpRequest:
+As data is read, the Connection passes it to an HttpRequest object for parsing.
+The HttpRequest object identifies this as a GET request and extracts relevant information like the requested path and query parameters.
+
+Connection (processing):
+Once the full request is received, the Connection determines how to handle it based on the server configuration.
+For a GET request, it typically involves retrieving a file from the server's filesystem.
+
+File Retrieval:
+The Connection checks if the requested file exists and is accessible.
+If the file exists, it opens the file and prepares to send its contents.
+If it's a directory and directory listing is enabled, it generates a directory listing.
+If the file doesn't exist, it prepares to send a 404 Not Found response.
+
+CGIHandler (if applicable):
+If the GET request is for a CGI script (e.g., a .php file), the CGIHandler is invoked.
+The CGIHandler executes the appropriate script, passing along any query parameters.
+The script's output is captured by the CGIHandler and returned.
+
+HttpResponse:
+The Connection creates an HttpResponse object.
+It sets the appropriate status code (e.g., 200 OK if the file was found, 404 if not).
+It adds necessary headers (e.g., Content-Type based on the file type, Content-Length).
+It sets the body of the response (either the file contents, directory listing, or CGI output).
+
+Connection (sending):
+The Connection converts the HttpResponse to a string.
+It begins sending this data back to the client.
+
+EventLoop:
+If the response can't be fully sent immediately, the EventLoop will notify when the socket is ready for more writing.
+The Connection's handleWrite() method will be called to continue sending data.
+
+Connection (cleanup):
+Once the full response is sent, the Connection might close if it's not a keep-alive connection.
+Otherwise, it resets its state and prepares for the next request.
+
+WebServer:
+If the connection is closed, the WebServer removes it from the EventLoop.

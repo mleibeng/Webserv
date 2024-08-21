@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:57:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 07:05:25 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 07:29:40 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,19 @@ Handles: Interface for read/write operations and error handling, allows setting 
 #ifndef FILEDESCRIPTOR_HPP
 #define FILEDESCRIPTOR_HPP
 
+#include <memory>
+#include <functional>
+
+class Loop;
 class FileDescriptor
 {
+	protected:
+	Loop *loop;
+	int fd;
+
 	public:
-	FileDescriptor();
-	~FileDescriptor();
+	FileDescriptor(Loop *loop, int fd);
+	virtual ~FileDescriptor();
 
 	virtual void handleRead() = 0;
 	virtual void handleWrite() = 0;

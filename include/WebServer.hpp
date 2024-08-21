@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 06:53:24 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 07:47:02 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,16 +23,23 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include <unordered_map>
 #include <memory>
 #include <future>
+#include "Config.hpp"
 
+class Loop;
 class WebServer
 {
 	private:
+	std::vector<ServerConf> config;
+	std::unique_ptr<Loop> loop;
+	std::vector<int> fd_listeners;
+	std::future<void> server_threading;
 
 	public:
-	WebServer();
+	explicit WebServer(std::string &conf_file);
 	~WebServer();
 
-
+	void start();
+	void stop();
 };
 
 #endif

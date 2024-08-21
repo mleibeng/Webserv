@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:28 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 03:05:09 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 07:55:11 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,3 +38,33 @@
 
 
 #include "Request.hpp"
+
+Method Request::getMethod()
+{
+	return method;
+}
+
+std::string& Request::getPath()
+{
+	return path_name;
+}
+
+std::string& Request::getBody()
+{
+	return body_name;
+}
+
+std::string& Request::getQuery()
+{
+	return query_name;
+}
+
+std::unordered_map<std::string,std::string>& Request::getHeaders()
+{
+	return header_names;
+}
+
+void Request::parse()
+{
+	//read in the request and save the necessary information in the variables mentioned!!
+}
