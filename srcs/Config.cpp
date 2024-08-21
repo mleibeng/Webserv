@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/21 07:43:11 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 09:18:45 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,6 @@ std::vector<ServerConf> Config::parse()
 
 	//clean up keys and values by trimming;
 
-	//split up key search for settings: global, server, route, host, etc..
+	//split up key search for settings: global, server, route, host, body, error_pages etc..
 	//to fill out necessary data structs.
 }

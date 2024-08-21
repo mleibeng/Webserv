@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:04 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/21 07:55:44 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 09:15:59 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,8 @@ class Request
 	std::string query_name;
 	std::string body_name;
 	std::unordered_map<std::string,std::string> header_names;
-	public:
 
+	public:
 	Method			getMethod();
 	std::string&	getPath();
 	std::string&	getQuery();

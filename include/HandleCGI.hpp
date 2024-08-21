@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:56:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 09:53:43 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 09:14:36 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class HandleCGI
 	std::string path_to_string;
 
 	public:
-	explicit HandleCGI(std::string& path_to_string);
+	explicit HandleCGI(const std::string& path_to_string);
 	std::string executeRequest(const Request& request) const;
 };
 

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/21 07:47:02 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 09:17:28 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class WebServer
 	explicit WebServer(std::string &conf_file);
 	~WebServer();
 
-	void start();
+	void start(); //maybe return status for logging
 	void stop();
 };
 

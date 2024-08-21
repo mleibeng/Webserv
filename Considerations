@@ -32,6 +32,7 @@ For Firefox run this command:
 Step 2. Profit??? (maybe write me a message as thanks :D)
 
 Also if you want to compare behaviour and files to nginx install it using <brew install nginx>!
+Also if you wanto to compare behvaiour and files to telnet install is using <brew install telnet>!
 If you want to find file examples like mime.types or a nginx.conf default go to <User/{YourUserName}/.brew/etc/nginx>
 -> Useful to see how it handles redirects to error pages for example and also alot of other stuff!!!!
 -------------------------------------------------------------------------------------------------------------------------

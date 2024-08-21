@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/20 09:51:02 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 09:03:43 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,23 @@ Handles: Parsing, storage, handling of outgoing HTTP responses and methods (stat
 #include <string>
 #include <unordered_map>
 
-enum class StatusCode {OK = 200, BAD_REQUEST = 400, NOT_FOUND = 404,};
-//needs more like redirects some 300s and 500s as well etc.. for later
+enum class StatusCode
+{	OK = 200,
+	CREATED = 201,
+	ACCEPTRED = 202,
+	NOCONTENT = 204,
+	MOVED_PERM = 301,
+	FOUND = 302,
+	NOT_MODIFIED = 304,
+	BAD_REQUEST = 400,
+	UNAUTHORIZED = 401,
+	FORBIDDEN = 403,
+	NOT_FOUND = 404,
+	INTERNAL_SERV_ERR = 500,
+	NOT_IMPLEMENTED = 501,
+	BAD_GATEWAY = 502,
+	SERVICE_UNAVAIL = 503
+};
 
 class Response
 {
@@ -34,7 +49,7 @@ class Response
 
 	public:
 	void setStatus(StatusCode status);
-	void setHeader(std::unordered_map<std::string,std::string> header_set);
+	void setHeader(std::unordered_map<std::string,std::string>& header_set);
 	void setBody(std::string& body_set);
 
 	std::string toString();

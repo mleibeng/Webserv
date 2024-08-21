@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/21 07:49:30 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/08/21 09:44:26 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ class Loop
 	void run();
 	void stop();
 	void actTimer(std::chrono::milliseconds timeout, std::function<void()> callback);
+	//void rateLimit(std::chrono::milliseconds limit, std::function<void()> callback);
 };
 
 #endif
