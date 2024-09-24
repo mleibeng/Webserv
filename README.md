@@ -1,27 +1,84 @@
 
-Einleitung
+**1. Application Layer Protocols**
+The application layer is where communication between web clients (e.g., browsers) and web servers happens, using the following protocols:
+- **HTTP (Hypertext Transfer Protocol)**:
+  - A protocol for transferring web pages and resources in an unencrypted manner.
+  - Default port: 80.
+- **HTTPS (Hypertext Transfer Protocol Secure)**:
+  - The secure version of HTTP, using SSL/TLS encryption to protect data in transit.
+  - Default port: 443.
 
-Das **Hypertext Transfer Protocol (HTTP)** ist ein Anwendungsprotokoll, das für verteilte, kollaborative und hypermediale Informationssysteme verwendet wird.
+**2. Transport Layer Protocols**
+The transport layer is responsible for ensuring reliable or unreliable data delivery between systems.
+- **TCP (Transmission Control Protocol)**:
+  - Provides reliable, ordered, and error-checked delivery of data between applications. Most web traffic (HTTP/HTTPS) uses TCP.
+- **UDP (User Datagram Protocol)**:
+  - A connectionless protocol that allows for fast but unreliable transmission. It's used in situations where speed is more critical than reliability (e.g., live video streaming).
 
-Es bildet die Grundlage für die Datenkommunikation im **World Wide Web**, bei dem Hypertext-Dokumente Verweise (Hyperlinks) auf andere Ressourcen enthalten, die der Nutzer leicht durch Anklicken oder Tippen im Webbrowser aufrufen kann.
+**3. HTTP (Hypertext Transfer Protocol) Basics**
+HTTP is the protocol used for communication between web browsers and servers. It follows a client-server model and consists of requests and responses.
 
-**HTTP** wurde speziell entwickelt, um die Nutzung von Hypertext und die Entwicklung des World Wide Web zu unterstützen.
+**HTTP Request**
+- A client sends an HTTP request to the server, typically to retrieve or modify resources.
+Example HTTP Request (GET):
+GET /index.html HTTP/1.1
+Host: www.example.com
 
-Eine der Hauptaufgaben eines Webservers besteht darin, Webinhalte (z. B. Webseiten) zu speichern, zu verarbeiten und an die Clients auszuliefern. Die Kommunikation zwischen Client (oft ein Webbrowser) und Server erfolgt über das Hypertext Transfer Protocol. Die ausgelieferten Seiten sind dabei meist **HTML-Dokumente**, die zusätzlich zu Text auch Bilder, Stylesheets und Skripte enthalten können.
+Parts of the HTTP Request:
+1. Method: Specifies the action to be performed. Common methods include:
+   - GET: Request a resource.
+   - POST: Submit data to the server.
+   - DELETE: Delete a resource.
+2. Path: The specific location of the resource on the server (e.g., `/index.html`).
+3. Protocol/Version: Indicates the HTTP version being used (e.g., HTTP/1.1).
+4. Headers: Additional information about the request, sent as key-value pairs (e.g., `Host`, `User-Agent`, `Content-Type`).
 
-Für stark frequentierte Websites können **mehrere Webserver** eingesetzt werden, um die Last der Anfragen zu verteilen und die Performance zu verbessern.
+**HTTP Response**
+- The server responds with an HTTP response message after processing the client's request.
+Example HTTP Response:
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1234
+<html>
+  <body>...</body>
+</html>
 
-Ein **User-Agent** – oft ein Webbrowser oder ein Webcrawler (z.B. für Suchmaschinen) – startet die Kommunikation, indem er über HTTP eine bestimmte Ressource (z. B. eine Webseite) vom Server anfordert. Der Server antwortet entweder mit dem angeforderten Inhalt oder mit einer Fehlermeldung, wenn die Ressource nicht bereitgestellt werden kann. Diese angeforderte Ressource ist häufig eine reale Datei, die auf dem Speicher des Servers abgelegt ist. Es kann jedoch auch eine dynamisch erzeugte Antwort sein, abhängig davon, wie der Webserver implementiert ist.
+Parts of the HTTP Response:
+1. Status Line: Indicates the HTTP version, status code, and status message.
+   - Example: `HTTP/1.1 200 OK`
+   - Common status codes:
+     - 200: OK (successful request).
+     - 404: Not Found (resource not found).
+     - 500: Internal Server Error (server-side issue).
+2. Headers: Metadata about the response (e.g., `Content-Type`, `Content-Length`).
+3. Body: The actual content of the response (HTML, JSON, etc.).
 
-Obwohl die primäre Aufgabe des Servers darin besteht, Inhalte zu liefern, umfasst HTTP auch Mechanismen zur **Entgegennahme von Inhalten** seitens der Clients. Dies wird beispielsweise beim Absenden von Webformularen oder dem Hochladen von Dateien verwendet. Diese Funktion ist eine wichtige Erweiterung des Protokolls, da sie die Interaktion zwischen Nutzer und Website ermöglicht und dynamische Inhalte unterstützt.
+**4. URL Structure and Port Usage**
+A URL (Uniform Resource Locator) has different parts that determine the protocol, server, and port being accessed.
+Example: `http://127.0.0.1:80`
+- Part 1: Protocol (e.g., HTTP, HTTPS): Specifies the protocol used to communicate with the server.
+- Part 2: IP Address (e.g., 127.0.0.1): The server's address, which can be an IP or domain name.
+- Part 3: Port (e.g., 80, 443): Defines the port the server is listening on. Standard ports:
+  - HTTP: Port 80 (unencrypted).
+  - HTTPS: Port 443 (encrypted).
 
-Zusammengefasst bietet HTTP die **technische Grundlage**, um die Funktionalität des Internets, wie wir es heute kennen, zu ermöglichen. Es ist entscheidend für den Austausch von Informationen zwischen **Client** und **Server** und bildet die Basis für eine Vielzahl von Online-Interaktionen – von einfachen Webseiten bis hin zu komplexen Webanwendungen.
+**5. Telnet (For Testing Purposes)**
+Telnet is a simple command-line tool for testing basic network services. Though largely deprecated, it allows testing by connecting directly to servers via TCP.
+- Usage:
+  telnet <hostname> <port>
+  Example:
+  telnet 127.0.0.1 80
+  - Telnet can simulate raw HTTP requests to a server for testing purposes.
+- Alternatives: Tools like curl or netcat are more commonly used today for testing specific network services.
 
+**6. Additional Notes**
+- HTML (Hypertext Markup Language):
+  - Not a protocol, but the language used to structure web content that is sent by servers to browsers. Web servers often deliver HTML files as part of the HTTP response.
 
+- Ports and Encryption:
+  - http://127.0.0.1:80: Unencrypted HTTP communication over port 80.
+  - https://127.0.0.1:443: Encrypted HTTPS communication over port 443.
 
-telnet, curl, netcat
-Telnet was once used to connect directly to web servers, mail servers, and more for testing. Today, more specialized tools like curl and netcat are commonly used for testing specific network services.
-bash: telnet <hostname> <port>
+---
 
-
-TCP = Transmission Control Protocol
+https://www.youtube.com/watch?v=9J1nJOivdyw
