@@ -31,6 +31,42 @@ void Config::parseEventBlock(std::string& eventBlock)
         }
 }
 
+void Config::parseRouteBlock(std::string &routeBlock, RouteConf& routes, std::regex& directives)
+{
+	auto iter = std::sregex_iterator(routeBlock.begin(), routeBlock.end(), directives);
+	auto end = std::sregex_iterator();
+
+	while (iter != end)
+	{
+		std::string key = (*iter)[1].str();
+		std::string value = (*iter)[2].str();
+		if (key == "allow_methods")
+		{
+			std::istringstream input(value);
+			std::string name;
+			while (input >> name)
+				routes.methods.push_back(name);
+		}
+		else if (key == "return")
+			routes.redirect = value;
+		else if ("return")
+			routes.redirect = value;
+		else if ("root")
+			routes.root = value;
+		else if ("autoindex")
+			routes.dir_listing_active = (value == "on");
+		else if ("index")
+			routes.default_file = value;
+		else if ("cgi_pass")
+			routes.cgi_extension = value;
+		else if ("upload_store")
+			routes.upload_dir = value;
+		else
+			routes.directives[key] = value;
+		++iter;
+	}
+}
+
 void Config::parseServerBlock(std::string& block, ServerConf &server, std::regex& route_pattern, std::regex& directives)
 {
 	auto route_iter = std::sregex_iterator(block.begin(), block.end(), route_pattern);
@@ -60,9 +96,7 @@ void Config::parseServerBlock(std::string& block, ServerConf &server, std::regex
 			std::istringstream server_string(value);
 			std::string name;
 			while(server_string >> name)
-			{
 				server.server_names.push_back(name);
-			}
 		}
 		else if (key == "index")
 			server.index = value;
@@ -81,7 +115,12 @@ void Config::parseServerBlock(std::string& block, ServerConf &server, std::regex
 
 	while (route_iter != end)
 	{
-		//route parser here just like those before.
+		RouteConf routes;
+		routes.path = (*route_iter)[1].str();
+		std::string routeBlock = (*route_iter)[2].str();
+		parseRouteBlock(routeBlock, routes, directives);
+		server.routes[routes.path] = routes;
+		++route_iter;
 	}
 }
 

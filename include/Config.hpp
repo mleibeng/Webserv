@@ -73,7 +73,8 @@ class Config
 	void parseEventBlock(std::string& eventBlock);
 	void parseServerBlock(std::string& serverBlock, ServerConf& server, std::regex& route_pattern, std::regex& directives);
 	void parseHttpBlock(std::string& httpBlock, std::regex& server_pattern, std::regex& route_pattern, std::regex& directives);
-
+	void parseRouteBlock(std::string &routeBlock, RouteConf& routes, std::regex& route_pattern);
+	
 	public:
 	Config(const std::string& conf_file);
 	ServerConf parse();
