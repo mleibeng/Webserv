@@ -97,11 +97,6 @@ WebServer::WebServer(std::string &conf_file) : config(Config(conf_file).parse())
 	loop = std::make_unique<Loop>();
 }
 
-WebServer::~WebServer()
-{
-	stop();
-}
-
 void WebServer::start()
 {
 	//start listening on sockets/fds

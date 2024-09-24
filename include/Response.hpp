@@ -25,7 +25,7 @@ Handles: Parsing, storage, handling of outgoing HTTP responses and methods (stat
 enum class StatusCode
 {	OK = 200,
 	CREATED = 201,
-	ACCEPTRED = 202,
+	ACCEPTED = 202,
 	NOCONTENT = 204,
 	MOVED_PERM = 301,
 	FOUND = 302,

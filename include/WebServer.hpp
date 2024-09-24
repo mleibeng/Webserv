@@ -29,17 +29,19 @@ class Loop;
 class WebServer
 {
 	private:
-	std::vector<ServerConf> config;
+	Config config;
 	std::unique_ptr<Loop> loop;
 	std::vector<int> fd_listeners;
 	std::future<void> server_threading;
 
 	public:
+	WebServer() = default;
 	explicit WebServer(std::string &conf_file);
-	~WebServer();
+	~WebServer() = default;
 
 	void start(); //maybe return status for logging
 	void stop();
+
 };
 
 #endif
