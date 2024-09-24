@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/22 15:41:48 by mott              #+#    #+#             */
-/*   Updated: 2024/09/22 19:19:03 by mott             ###   ########.fr       */
+/*   Updated: 2024/09/22 19:36:59 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@
 #include <sys/socket.h>		// socket() + socket structs
 #include <netinet/in.h>		// Internet domain sockets structs
 #include <arpa/inet.h>		// htons()
-
 
 static void handle_error(const char* msg) {
 	perror(msg);
