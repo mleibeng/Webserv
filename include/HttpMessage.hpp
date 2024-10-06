@@ -5,6 +5,10 @@
 #define	RESET "\033[0m"
 
 #include <iostream>
+#include <string>
+#include <map>
+
+
 
 class HttpMessage
 {
@@ -12,9 +16,29 @@ class HttpMessage
 		HttpMessage();
 		HttpMessage(const HttpMessage &other);
 		HttpMessage& operator=(const HttpMessage &other);
-		~HttpMessage();
+		virtual ~HttpMessage();
+
+		//setters
+		void	setHttpVersion(const std::string& vers);
+		void	setHeader(const std::string& key, const std::string& val);
+		void	setBody(const std::string& body);
+
+
+
+		//getters
+		std::string		getHttpVersion() const;
+		std::string		getHeader(const std::string& key) const;
+		std::string		getBody() const;
+
 
 	private:
+
+
+	protected:
+		std::string							httpVersion;
+		std::map<std::string, std::string>	header;
+		std::string							body;
+
 
 };
 
