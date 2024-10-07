@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 00:15:03 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 00:30:09 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,18 +68,18 @@ class HttpRequest : public HttpMessage
 
 	private:
 		std::string	_uri; //Uniform Resource Identifier
-		std::string	_method;
+		Method		_method;
 
 		void		setMethod(Method method);
 		void		setUri(const std::string& uri);
 
 		//getters
-		std::string getMethod() const;
+		Method		getMethod() const;
 		std::string	getUri() const;
 
 		//utils
 		Method		strToMethod(const std::string& methodStr);
-
+		std::string	methodToStr() const;
 };
 
 #endif // HTTPREQUEST_H

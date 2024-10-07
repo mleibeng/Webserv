@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 00:12:45 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 00:28:45 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ HttpRequest::~HttpRequest()
 
 //GETTERS
 
-std::string HttpRequest::getMethod() const
+Method HttpRequest::getMethod() const
 {
 	return (_method);
 }
@@ -52,18 +52,7 @@ std::string	HttpRequest::getUri() const
 //SETTERS
 void	HttpRequest::setMethod(Method method)
 {
-	switch (method)
-	{
-		case Method::GET:
-			_method = "GET";
-			break;
-		case Method::POST:
-			_method = "POST";
-			break;
-		case Method::DELETE:
-			_method = "DELETE";
-			break;
-	}
+	_method = method;
 }
 void	HttpRequest::setUri(const std::string& uri)
 {
@@ -118,6 +107,21 @@ Method		HttpRequest::strToMethod(const std::string& method)
 		return (Method::DELETE);
 	else
 		throw (InvalidMethodException());
+}
+
+std::string	HttpRequest::methodToStr() const
+{
+	switch (_method)
+	{
+		case Method::GET:
+			return ("GET");
+		case Method::POST:
+			return ("POST");
+		case Method::DELETE:
+			return ("DELETE");
+		default:
+			throw (InvalidMethodException());
+	}
 }
 
 
