@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 00:28:45 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 00:40:34 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ Method		HttpRequest::strToMethod(const std::string& method)
 	else if (method == "DELETE")
 		return (Method::DELETE);
 	else
-		throw (InvalidMethodException());
+		throw (InvalidMethodException(method));
 }
 
 std::string	HttpRequest::methodToStr() const
@@ -120,12 +120,16 @@ std::string	HttpRequest::methodToStr() const
 		case Method::DELETE:
 			return ("DELETE");
 		default:
-			throw (InvalidMethodException());
+			throw (InvalidMethodException("Unknown Method"));
 	}
 }
 
+HttpRequest::InvalidMethodException::InvalidMethodException(const std::string& method) : _invalidMethod(method)
+{
+}
 
 const char*	HttpRequest::InvalidMethodException::what() const noexcept
 {
-	return ("Invalid Method");
+	static std::string	errorMsg = "Invalid method: " + _invalidMethod;
+	return (errorMsg.c_str());
 }

@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 00:30:09 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 00:35:07 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,10 @@ class HttpRequest : public HttpMessage
 
 		class InvalidMethodException : public std::exception
 		{
-			const char*	what() const noexcept override;
+			std::string	_invalidMethod;
+			public:
+				explicit InvalidMethodException(const std::string& method);
+				const char*	what() const noexcept override;
 		};
 
 	private:
