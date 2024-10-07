@@ -35,9 +35,9 @@ class HttpMessage
 
 
 	protected:
-		std::string							httpVersion;
-		std::map<std::string, std::string>	header;
-		std::string							body;
+		std::string							_httpVersion;
+		std::map<std::string, std::string>	_header;
+		std::string							_body;
 
 
 };

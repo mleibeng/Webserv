@@ -24,3 +24,31 @@ HttpMessage::~HttpMessage()
 {
 	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
+
+void	HttpMessage::setHttpVersion(const std::string& vers)
+{
+	_httpVersion = vers;
+}
+void	HttpMessage::setHeader(const std::string& key, const std::string& val)
+{
+	_header[key] = val;
+}
+void	HttpMessage::setBody(const std::string& body)
+{
+	_body = body;
+	setHeader("Content-Length", std::to_string(body.length()));
+}
+
+std::string		HttpMessage::getHttpVersion() const
+{
+	return (_httpVersion);
+}
+std::string		HttpMessage::getHeader(const std::string& key) const
+{
+	auto iter = (_header.find(key));
+	return (iter != _header.end() ? iter->second : "");
+}
+std::string		HttpMessage::getBody() const
+{
+	return (_body);
+}
