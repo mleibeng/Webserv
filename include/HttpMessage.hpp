@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:27 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/07 18:57:32 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 00:59:23 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 #include <string>
 #include <sstream>
 #include <map>
-
+#include <vector>
 
 
 class HttpMessage
