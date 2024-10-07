@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 01:00:41 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 01:04:37 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,5 +74,23 @@ bool	HttpResponse::parse(const std::string& rawmsg)
 	setStatus(static_cast<StatusCode>(code));
 	parseHeader(input);
 
-	// parse body
+	std::string	body;
+	std::string	cont_len_str = getHeader("Content-Length");
+
+	if (!cont_len_str.empty())
+	{
+		size_t	cont_len = std::stoul(cont_len_str);
+		std::vector<char>	body_buff(cont_len);
+		input.read(body_buff.data(), cont_len);
+		body.assign(body_buff.begin(), body_buff.end());
+	}
+	else
+	{
+		std::stringstream	body_stream;
+		body_stream << input.rdbuf();
+		body = body_stream.str();
+	}
+	setBody(body);
+
+	return (true);
 }
