@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:27 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/07 16:05:51 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/07 18:31:24 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <map>
 
 
@@ -40,6 +41,13 @@ class HttpMessage
 		std::string		getBody() const;
 		std::string		getHeader(const std::string& key) const;
 		const std::map<std::string, std::string>&	getAllHeaders() const;
+
+		//parse
+		void	parseHeader(std::istringstream& input);
+
+
+	private:
+		static std::string	trimStr(const std::string& str);
 
 	protected:
 		std::string							_httpVersion;
