@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/07 15:56:51 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/07 18:11:52 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,3 +36,11 @@ HttpResponse::~HttpResponse()
 {
 	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
+
+void HttpResponse::setStatus(StatusCode status)
+{
+	// change Status to input
+	// and make check if it is even acceptable status as well?
+}
+
+
