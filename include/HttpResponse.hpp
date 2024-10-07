@@ -1,15 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Response.cpp                                       :+:      :+:    :+:   */
+/*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/20 00:05:35 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/21 08:00:31 by mleibeng         ###   ########.fr       */
+/*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
+/*   Updated: 2024/10/08 00:59:40 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#ifndef HTTPRESPONSE_H
+#define HTTPRESPONSE_H
+
+#define	GREY  "\033[38;5;246m"
+#define	RESET "\033[0m"
+
+#include <iostream>
+#include "HttpMessage.hpp"
+
+/*
+Purpose: HTTP Response handling
+Handles: Parsing, storage, handling of outgoing HTTP responses and methods (status codes, headers, body),
+-> 		 as well as conversion to string for sending.
+*/
 
 // 	  Most HTTP communication consists of a retrieval request (GET) for a
 //    representation of some resource identified by a URI.  In the simplest
@@ -29,29 +43,41 @@
 //    "accelerator" caching, and to enable partitioning or load balancing
 //    of HTTP services across multiple machines.
 
+enum class StatusCode
+{	OK = 200,
+	CREATED = 201,
+	ACCEPTED = 202,
+	NOCONTENT = 204,
+	MOVED_PERM = 301,
+	FOUND = 302,
+	NOT_MODIFIED = 304,
+	BAD_REQUEST = 400,
+	UNAUTHORIZED = 401,
+	FORBIDDEN = 403,
+	NOT_FOUND = 404,
+	INTERNAL_SERV_ERR = 500,
+	NOT_IMPLEMENTED = 501,
+	BAD_GATEWAY = 502,
+	SERVICE_UNAVAIL = 503
+};
 
-#include "Response.hpp"
-
-void Response::setStatus(StatusCode status)
+class HttpResponse : public HttpMessage
 {
-	// change Status to input
-	// and make check if it is even acceptable status as well?
-}
+	public:
+		HttpResponse();
+		HttpResponse(const HttpResponse &other);
+		HttpResponse& operator=(const HttpResponse &other);
+		~HttpResponse();
 
-void Response::setHeader(std::unordered_map<std::string,std::string>& header_set)
-{
-	// input the response header for client to receive
-	// including all the processed data meant for the header.
-}
+		bool	parse(const std::string& rawmsg) override;
 
-void Response::setBody(std::string& body_set)
-{
-	// input the response body for client to receive
-	// including all the processed data meant for the body.
-}
+	private:
+		StatusCode _status = StatusCode::OK;
 
-std::string Response::toString()
-{
-	// process information like integers etc..
-	// into string format to send as response.
-}
+		//setters
+		void setStatus(StatusCode status);
+		//getters
+		StatusCode	getStatus() const;
+};
+
+#endif // HTTPRESPONSE_H
