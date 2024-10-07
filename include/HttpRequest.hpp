@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/07 19:31:24 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 00:15:03 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,16 +57,8 @@ class HttpRequest : public HttpMessage
 		HttpRequest& operator=(const HttpRequest &other);
 		~HttpRequest();
 
-
-		//getters
-		std::string getMethod() const;
-		std::string getPath() const;
-		std::string getQuery() const;
-		//setters
-
-
 		//parse
-		bool	parse(const std::string& rawmsg);
+		bool	parse(const std::string& rawmsg) override;
 
 
 		class InvalidMethodException : public std::exception
@@ -75,13 +67,15 @@ class HttpRequest : public HttpMessage
 		};
 
 	private:
-		std::string	_path_name;
-		std::string	_query_name;
-		std::string	_uri;
+		std::string	_uri; //Uniform Resource Identifier
 		std::string	_method;
 
 		void		setMethod(Method method);
 		void		setUri(const std::string& uri);
+
+		//getters
+		std::string getMethod() const;
+		std::string	getUri() const;
 
 		//utils
 		Method		strToMethod(const std::string& methodStr);
