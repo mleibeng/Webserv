@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:27 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/07 15:56:28 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/07 16:05:51 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,21 +35,16 @@ class HttpMessage
 		void	setHeader(const std::string& key, const std::string& val);
 		void	setBody(const std::string& body);
 
-
-
 		//getters
 		std::string		getHttpVersion() const;
-		std::string		getHeader(const std::string& key) const;
 		std::string		getBody() const;
-
-
-	private:
-
+		std::string		getHeader(const std::string& key) const;
+		const std::map<std::string, std::string>&	getAllHeaders() const;
 
 	protected:
 		std::string							_httpVersion;
-		std::map<std::string, std::string>	_header;
 		std::string							_body;
+		std::map<std::string, std::string>	_header;
 
 
 };
