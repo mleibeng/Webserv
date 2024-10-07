@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:27 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/07 18:31:24 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/07 18:57:32 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,8 +43,8 @@ class HttpMessage
 		const std::map<std::string, std::string>&	getAllHeaders() const;
 
 		//parse
-		void	parseHeader(std::istringstream& input);
-
+		void			parseHeader(std::istringstream& input);
+		virtual bool	parse(const std::string& rawMessage) = 0;
 
 	private:
 		static std::string	trimStr(const std::string& str);
