@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 00:35:07 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 02:26:09 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 #include <iostream>
 #include <string>
-#include "HttpMessage.hpp"
+#include "AHttpMessage.hpp"
 
 // The following example illustrates a typical message exchange for a
 //    GET request (Section 4.3.1 of [RFC7231]) on the URI in ABNF Format
@@ -46,10 +46,10 @@
 
 //      Hello World! My payload includes a trailing CRLF.
 
-enum class Method { GET, POST, DELETE };
+enum class Method { DEFAULT, GET, POST, DELETE };
 
 
-class HttpRequest : public HttpMessage
+class HttpRequest : public AHttpMessage
 {
 	public:
 		HttpRequest();

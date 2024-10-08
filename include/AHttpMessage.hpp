@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpMessage.hpp                                    :+:      :+:    :+:   */
+/*   AHttpMessage.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef HTTPMESSAGE_H
-#define HTTPMESSAGE_H
+#ifndef AHTTPMESSAGE_H
+#define AHTTPMESSAGE_H
 
 #define	GREY  "\033[38;5;246m"
 #define	RESET "\033[0m"
@@ -23,13 +23,13 @@
 #include <vector>
 
 
-class HttpMessage
+class AHttpMessage
 {
 	public:
-		HttpMessage();
-		HttpMessage(const HttpMessage &other);
-		HttpMessage& operator=(const HttpMessage &other);
-		virtual ~HttpMessage();
+		AHttpMessage();
+		AHttpMessage(const AHttpMessage &other);
+		AHttpMessage& operator=(const AHttpMessage &other);
+		virtual ~AHttpMessage();
 
 		//setters
 		void	setHttpVersion(const std::string& vers);
@@ -57,4 +57,4 @@ class HttpMessage
 
 };
 
-#endif // HTTPMESSAGE_H
+#endif // AHTTPMESSAGE_H

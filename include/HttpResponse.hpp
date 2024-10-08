@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 00:59:40 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 02:22:29 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #define	RESET "\033[0m"
 
 #include <iostream>
-#include "HttpMessage.hpp"
+#include "AHttpMessage.hpp"
 
 /*
 Purpose: HTTP Response handling
@@ -61,7 +61,7 @@ enum class StatusCode
 	SERVICE_UNAVAIL = 503
 };
 
-class HttpResponse : public HttpMessage
+class HttpResponse : public AHttpMessage
 {
 	public:
 		HttpResponse();
@@ -72,7 +72,7 @@ class HttpResponse : public HttpMessage
 		bool	parse(const std::string& rawmsg) override;
 
 	private:
-		StatusCode _status = StatusCode::OK;
+		StatusCode _status;
 
 		//setters
 		void setStatus(StatusCode status);

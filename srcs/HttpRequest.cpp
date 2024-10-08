@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 00:40:34 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/08 02:31:30 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 HttpRequest::HttpRequest()
 {
-	// std::cout << GREY << "Default constructor called" << RESET << std::endl;
+	setMethod(Method::DEFAULT);
+	setUri("");
 }
 
 HttpRequest::HttpRequest(const HttpRequest &other)
 {
-	// std::cout << GREY << "Copy constructor called" << RESET << std::endl;
 	*this = other;
 }
 
@@ -27,14 +27,15 @@ HttpRequest& HttpRequest::operator=(const HttpRequest &other)
 {
 	if (this != &other)
 	{
-		// std::cout << GREY << "Copy assignment operator called" << RESET << std::endl;
+		AHttpMessage::operator=(other);
+		setMethod(other.getMethod());
+		setUri(other.getUri());
 	}
-	return *this;
+	return (*this);
 }
 
 HttpRequest::~HttpRequest()
 {
-	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
 
 //GETTERS
