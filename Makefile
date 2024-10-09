@@ -6,7 +6,7 @@
 #    By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/20 13:55:42 by mott              #+#    #+#              #
-#    Updated: 2024/09/20 13:56:02 by mott             ###   ########.fr        #
+#    Updated: 2024/10/09 13:09:02 by mott             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,8 +18,8 @@ CPPFLAGS	+=	-std=c++17
 RM			=	rm -rf
 NAME		=	webserv
 
-SRCS		=	main.cpp
-
+SRCS		=	main.cpp \
+				HTTPServer.cpp
 OBJS		=	$(SRCS:.cpp=.o)
 DEPS		=	$(SRCS:.cpp=.d)
 
