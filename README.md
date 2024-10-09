@@ -1,4 +1,4 @@
 # Webserv
-Creating a selfwritten webserver in cpp
+Creating a selfwritten webserver in cpp17
 
-Since this webserver is very basic, even common security features are not implemented (yet), this includes but may not be limited to protection against CSRF attacks SQL injections, XSS Injections, DOS attacks and more...! Once again, run this at your own risk.
+3-Man project with mott and diggens
