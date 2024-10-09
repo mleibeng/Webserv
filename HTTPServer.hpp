@@ -6,18 +6,21 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 12:49:16 by mott              #+#    #+#             */
-/*   Updated: 2024/10/09 13:07:20 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/09 16:51:36 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPSERVER_H
 #define HTTPSERVER_H
 
+#include <iostream>
+#include <string>
+
 #include <sys/socket.h>		// socket()
 #include <netinet/in.h>		// sockaddr_in
 #include <arpa/inet.h>		// htons()
 #include <unistd.h>			// close()
-#include <iostream>
+#include <stdexcept>		// std::runtime_error
 
 class HTTPServer {
 	public:
@@ -30,8 +33,6 @@ class HTTPServer {
 		void run();
 
 	private:
-		static void handle_error(const char* msg);
-
 		int server_fd;
 		int client_fd;
 		struct sockaddr_in my_addr;

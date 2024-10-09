@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 12:49:13 by mott              #+#    #+#             */
-/*   Updated: 2024/10/09 13:07:09 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/09 17:13:58 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 HTTPServer::HTTPServer() : port(8080), backlog(3) {
 	server_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (server_fd == -1) {
-		handle_error("socket");
+		throw std::runtime_error("socket(): " + std::string(strerror(errno)));
 	}
 
 	std::memset(&my_addr, 0, sizeof(my_addr));
@@ -25,17 +25,18 @@ HTTPServer::HTTPServer() : port(8080), backlog(3) {
 	my_addr_size = sizeof(my_addr);
 
 	if (bind(server_fd, (struct sockaddr*)&my_addr, my_addr_size) == -1) {
-		handle_error("bind");
+		throw std::runtime_error("bind(): " + std::string(strerror(errno)));
 	}
 
 	if (listen(server_fd, backlog) == -1) {
-		handle_error("listen");
+		throw std::runtime_error("listen(): " + std::string(strerror(errno)));
 	}
-
 }
 
 HTTPServer::~HTTPServer() {
-	close(server_fd);
+	if (server_fd != -1) {
+		close(server_fd);
+	}
 }
 
 void HTTPServer::run() {
@@ -43,7 +44,7 @@ void HTTPServer::run() {
 
 	client_fd = accept(server_fd, (struct sockaddr*)&my_addr, &my_addr_size);
 	if (client_fd == -1) {
-		handle_error("accept");
+		throw std::runtime_error("accept(): " + std::string(strerror(errno)));
 	}
 
 	const char* http_response =
@@ -52,14 +53,12 @@ void HTTPServer::run() {
 		"Content-Length: 12\r\n"
 		"\r\n"
 		"Hello World!";
-	send(client_fd, http_response, strlen(http_response), 0);
+
+	if (send(client_fd, http_response, strlen(http_response), 0) == -1) {
+		throw std::runtime_error("send(): " + std::string(strerror(errno)));
+	}
 
 	std::cout << "HTTP response sent!" << std::endl;
 
 	close(client_fd);
-}
-
-void HTTPServer::handle_error(const char* msg) {
-	perror(msg);
-	exit(1);
 }
