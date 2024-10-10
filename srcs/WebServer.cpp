@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/10 15:16:05 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/10/10 19:42:23 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,13 +41,13 @@ void WebServer::setupListeners()
 	// for(const auto& server: config.getServerConfs())
 	// {
 	// 	std::string server_key = server.hostname + ":" + std::to_string(server.port);
-		
+
 	// 	int fd = createNonBlockingSocket();
 	// 	struct sockaddr_in addr;
 	// 	addr.sin_family = AF_INET;
 	// 	addr.sin_addr.s_addr = inet_addr(server.hostname.c_str());
 	// 	addr.sin_port = htons(server.port);
-	// 	//etc etc etc... now we bind ports and start the listen process etc.. 
+	// 	//etc etc etc... now we bind ports and start the listen process etc..
 	// 	//and then just pushback into server_listeners[server_key].pushback[fd] so we have a vector of running listening sockets.
 	// }
 }
@@ -81,78 +81,3 @@ void WebServer::stop()
 	// server_thread.wait();
 	// need to also close the listening sockets using their fd
 }
-
-
-/*	Not correct!!!! but basic graph! -> This doesnt show how the loops should take and pass info, not state management etc..
-    this is just for a basic request!
-    +---------------+
-	|   WebServer   |
-	+---------------+
-	| - ConfigParser |
-	| - EventLoop    |
-	| - listen_fds   |
-	+---------------+
-			|
-			|
-			v
-	+---------------+
-	|   EventLoop   |
-	+---------------+
-	| - kqueue_fd   |
-	| - fd_map      |
-	| - timers      |
-	| - run()       |
-	| - stop()      |
-	| - addFD()     |
-	| - removeFD()  |
-	| - updateKqueue()|
-	+---------------+
-			|
-			|
-			v
-	+---------------+
-	|   Connection  |
-	+---------------+
-	| - fd          |
-	| - request     |
-	| - response    |
-	| - buffer      |
-	| - handleRead()|
-	| - handleWrite()|
-	| - handleError()|
-	| - process_req()|
-	| - send_resp()  |
-	+---------------+
-			|
-			|
-			v
-	+---------------+
-	|   HttpRequest |
-	+---------------+
-	| - method      |
-	| - path        |
-	| - query       |
-	| - body        |
-	| - headers     |
-	| - parse()     |
-	+---------------+
-			|
-			|
-			v
-	+---------------+
-	|  HttpResponse |
-	+---------------+
-	| - status_code |
-	| - headers     |
-	| - body        |
-	| - toString()  |
-	+---------------+
-			|
-			|
-			v
-	+---------------+
-	|   CGIHandler  |
-	+---------------+
-	| - script_path |
-	| - execute()   |
-	+---------------+*/

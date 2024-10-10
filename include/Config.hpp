@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/10 03:47:12 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/10 19:58:18 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ struct GlobalConf
 struct RouteConf
 {
 	std::vector<std::string> methods; // Define a list of accepted HTTPS methods for the route
+	std::optional<int> port;
 	std::optional<std::string> redirect; // Define a HTTP redirection
 	std::string root; //Define a directory or a file from where the file should be searched
 	bool dir_listing_active = false; // turn on or off directory listing
@@ -65,16 +66,15 @@ class Config
 	private:
 	GlobalConf globuli;
 	std::vector<ServerConf> servers;
-	// std::vector<RouteConf> routes;
 
 	public:
 	Config() = default;
 	static Config parse(const std::string& conf_file);
 	const std::vector<ServerConf>& getServerConfs() const { return servers; }
-	static void parseServerBlock(ServerConf& conf, const std::string& key, const std::string& value);
-	static void parseRouteBlock(RouteConf& conf, const std::string& key, const std::string& value);
+	static void parseServerBlock(ServerConf& conf, const std::string& key, const std::vector<std::string>& value);
+	static void parseRouteBlock(RouteConf& conf, const std::string& key, const std::vector<std::string>& value);
 	static std::string trim(const std::string &s);
-	static void parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::string& value);
+	static void parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::vector<std::string>& value);
 	void print() const;
 };
 
