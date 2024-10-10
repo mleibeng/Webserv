@@ -89,7 +89,7 @@ void	AHttpMessage::parseHeader(std::istringstream& input)
 
 	while(std::getline(input, line) && line != "\r")
 	{
-		colPos = line.find('.');
+		colPos = line.find(':');
 		if (colPos != std::string::npos)
 		{
 			key = trimStr(line.substr(0, colPos));
