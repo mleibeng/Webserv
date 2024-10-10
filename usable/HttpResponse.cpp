@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 02:31:05 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/10 16:45:14 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,12 @@
 
 HttpResponse::HttpResponse()
 {
-	setStatus(StatusCode::OK);
+	// std::cout << GREY << "Default constructor called" << RESET << std::endl;
 }
 
 HttpResponse::HttpResponse(const HttpResponse &other)
 {
+	// std::cout << GREY << "Copy constructor called" << RESET << std::endl;
 	*this = other;
 }
 
@@ -26,24 +27,23 @@ HttpResponse& HttpResponse::operator=(const HttpResponse &other)
 {
 	if (this != &other)
 	{
-		AHttpMessage::operator=(other);
-		setStatus(other.getStatus());
+		// std::cout << GREY << "Copy assignment operator called" << RESET << std::endl;
 	}
-	return (*this);
+	return *this;
 }
 
 HttpResponse::~HttpResponse()
 {
+	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
 
 //SETTERS
 
-void HttpResponse::setStatus(StatusCode status)
-{
-	_status = status;
-	// change Status to input
-	// and make check if it is even acceptable status as well?
-}
+// void HttpResponse::setStatus(StatusCode status)
+// {
+// 	// change Status to input
+// 	// and make check if it is even acceptable status as well?
+// }
 
 //GETTERS
 

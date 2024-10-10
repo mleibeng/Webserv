@@ -6,185 +6,237 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/21 09:18:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/10 03:52:58 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include <algorithm>
 
-Config::Config(const std::string& conf_file) : conf_file(conf_file) {}
-
-
-void Config::parseEventBlock(std::string& eventBlock)
+size_t parseSizeNotation(const std::string& sizeStr)
 {
-	std::regex event_directives(R"((\w+)\s+([^;]+);)");
-	auto iter = std::sregex_iterator(eventBlock.begin(), eventBlock.end(), event_directives);
-        auto end = std::sregex_iterator();
-
-        while (iter != end) {
-            std::string key = (*iter)[1].str();
-            std::string value = (*iter)[2].str();
-            if (key == "worker_connections") {
-                events.worker_connects = std::stoi(value);
-            }
-            ++iter;
-        }
-}
-
-void Config::parseRouteBlock(std::string &routeBlock, RouteConf& routes, std::regex& directives)
-{
-	auto iter = std::sregex_iterator(routeBlock.begin(), routeBlock.end(), directives);
-	auto end = std::sregex_iterator();
-
-	while (iter != end)
+	std::unordered_map<char, size_t> multipliers =
 	{
-		std::string key = (*iter)[1].str();
-		std::string value = (*iter)[2].str();
-		if (key == "allow_methods")
+		{'K', 1024},
+		{'M', 1024 * 1024},
+		{'G', 1024 * 1024 * 1024}
+	};
+	size_t size = 0;
+	size_t currentNumber = 0;
+
+	for (char c : sizeStr)
+	{
+		if (std::isdigit(c))
+			currentNumber = currentNumber * 10 + (c - '0');
+		else if (std::isalpha(c))
 		{
-			std::istringstream input(value);
-			std::string name;
-			while (input >> name)
-				routes.methods.push_back(name);
+			char unit = std::toupper(c);
+			if (multipliers.find(unit) == multipliers.end())
+				throw std::runtime_error("Invalid size unit: " + std::string(1, c));
+			size += currentNumber * multipliers[unit];
+			currentNumber = 0;
 		}
-		else if (key == "return")
-			routes.redirect = value;
-		else if ("return")
-			routes.redirect = value;
-		else if ("root")
-			routes.root = value;
-		else if ("autoindex")
-			routes.dir_listing_active = (value == "on");
-		else if ("index")
-			routes.default_file = value;
-		else if ("cgi_pass")
-			routes.cgi_extension = value;
-		else if ("upload_store")
-			routes.upload_dir = value;
-		else
-			routes.directives[key] = value;
-		++iter;
+		else if (c != ' ' && c != '\t')
+			throw std::runtime_error("Invalid character in size notation: " + std::string(1, c));
 	}
+	if (currentNumber > 0) {
+		size += currentNumber;
+	}
+	return size;
 }
 
-void Config::parseServerBlock(std::string& block, ServerConf &server, std::regex& route_pattern, std::regex& directives)
+std::string Config::trim(const std::string &s)
 {
-	auto route_iter = std::sregex_iterator(block.begin(), block.end(), route_pattern);
-	auto directive_iter = std::sregex_iterator(block.begin(), block.end(), directives);
-	auto end = std::sregex_iterator();
+	auto wsfront = std::find_if_not(s.begin(), s.end(), [](int c) { return std::isspace(c); });
+	auto wsback = std::find_if_not(s.rbegin(), s.rend(), [](int c) { return std::isspace(c); }).base();
+	return (wsback <= wsfront ? std::string() : std::string(wsfront, wsback));
+}
 
-	while(directive_iter != end)
+void Config::parseServerBlock(ServerConf& conf, const std::string& key, const std::string& value)
+{
+	if (key == "hostname")
+		conf.hostname = value;
+	else if (key == "port")
+		conf.port = std::stoi(value);
+	else if (key == "server_name")
 	{
-		std::string key = (*directive_iter)[1].str();
-		std::string value = (*directive_iter)[2].str();
-		if (key == "listen")
+		std::istringstream iss(value);
+		std::string name;
+		while (iss >> name)
+			conf.server_names.push_back(value);
+	}
+	else if (key == "default_error_pages")
+		conf.default_error_pages = value;
+	else
+		throw std::runtime_error("Unknown Server Configuration key");
+}
+
+void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std::string& value)
+{
+	if (key == "methods")
+	{
+		std::istringstream iss(value);
+		std::string method;
+		while (iss >> method)
+			conf.methods.push_back(method);
+	}
+	else if (key == "redirect")
+		conf.redirect = value;
+	else if (key == "root")
+		conf.root = value;
+	else if (key == "dir_listing")
+		conf.dir_listing_active = (value == "on" || value == "true" || value == "1");
+	else if (key == "default_file")
+		conf.default_file = value;
+	else if (key == "cgi_extension")
+		conf.cgi_extension = value;
+	else if (key == "upload_dir")
+		conf.upload_dir = value;
+	else if (key == "max_body_size")
+		conf.max_body_size = parseSizeNotation(value);
+	else if (key == "max_header_size")
+		conf.max_header_size = parseSizeNotation(value);
+	else if (key == "timeout")
+		conf.timeout = std::stoi(value);
+	else if (key == "max_connects")
+		conf.max_connects = std::stoi(value);
+	else
+		throw std::runtime_error("Unknown Route Configuration key");
+}
+void Config::parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::string& value)
+{
+	if (key == "timeout")
+		conf.g_timeout = std::stoi(value);
+	else if (key == "max_connects")
+		conf.g_max_connects = std::stoi(value);
+	else if (key == "max_body_size")
+		conf.g_max_body_size = parseSizeNotation(value);
+	else if (key == "max_header_size")
+		conf.g_max_header_size = parseSizeNotation(value);
+	else
+		throw std::runtime_error("Unknown Global Configuration key");
+}
+
+Config Config::parse(const std::string& conf_file)
+{
+	Config config;
+	std::ifstream file(conf_file);
+	if (!file.is_open())
+		throw std::runtime_error("Unable to open config file!");
+
+	std::string line;
+	ServerConf current_server;
+	RouteConf current_route;
+	std::string current_route_path;
+	bool in_server_block = false;
+	bool in_route_block = false;
+	int line_number = 0;
+
+	while (std::getline(file, line))
+	{
+		line_number++;
+		line = trim(line);
+		if (line.empty() || line[0] == '#')
+			continue;
+		if (line == "server {")
 		{
-			server.listen = value;
-			auto pos = value.find(':');
-			if (pos != std::string::npos)
+			in_server_block = true;
+			current_server = ServerConf();
+		}
+		else if (line.substr(0,6) == "route " && line.back() == '{')
+		{
+			if (!in_server_block)
+				throw std::runtime_error("route block outside of server block at line: " + std::to_string(line_number));
+			in_route_block = true;
+			current_route = RouteConf();
+			current_route_path = trim(line.substr(6, line.find('{') - 7));
+		}
+		else if (line == "}")
+		{
+			if (in_route_block)
 			{
-				server.hostname = value.substr(0, pos);
-				server.port = std::stoi(value.substr(pos + 1));
+				in_route_block = false;
+				current_server.routes[current_route_path] = current_route;
+				current_route_path.clear();
+			}
+			else if (in_server_block)
+			{
+				in_server_block = false;
+				config.servers.push_back(current_server);
 			}
 			else
+				throw std::runtime_error("Unexpected closing brace at line: " + std::to_string(line_number));
+		}
+		else
+		{
+			std::istringstream iss(line);
+			std::string key, value;
+			if (iss >> key >> value)
 			{
-				server.port = std::stoi(value);
+				if (in_route_block)
+					parseRouteBlock(current_route, key, value);
+				else if (in_server_block)
+					parseServerBlock(current_server, key, value);
+				else
+					parseGlobalBlock(config.globuli, key, value);
+			}
+			else
+				throw std::runtime_error("invalid config line at: "  + std::to_string(line_number));
+		}
+	}
+	for (auto& server : config.servers)
+		{
+			for (auto& [path, route] : server.routes)
+			{
+				if (!route.max_header_size) route.max_header_size = config.globuli.g_max_header_size;
+				if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
+				if (!route.timeout) route.timeout = config.globuli.g_timeout;
+				if (!route.max_connects) route.max_connects = config.globuli.g_max_connects;
 			}
 		}
-		else if (key == "server_name") 
+	return config;
+}
+
+#include <iostream>
+
+void Config::print() const
+{
+	std::cout << "Global Configuration:\n";
+	std::cout << "  Max Header Size: " << globuli.g_max_header_size << "\n";
+	std::cout << "  Max Body Size: " << globuli.g_max_body_size << "\n";
+	std::cout << "  Timeout: " << globuli.g_timeout << "\n";
+	std::cout << "  Max Connects: " << globuli.g_max_connects << "\n\n";
+
+	for (const auto& server : servers)
+	{
+		std::cout << "Server Configuration:\n";
+		std::cout << "  Hostname: " << server.hostname << "\n";
+		std::cout << "  Port: " << server.port << "\n";
+		std::cout << "  Server Names: ";
+		for (const auto& name : server.server_names)
+			std::cout << name << " ";
+		std::cout << "\n";
+		std::cout << "  Default Error Pages: " << server.default_error_pages << "\n";
+
+		for (const auto& [path, route] : server.routes)
 		{
-			std::istringstream server_string(value);
-			std::string name;
-			while(server_string >> name)
-				server.server_names.push_back(name);
+			std::cout << "  Route: " << path << "\n";
+			std::cout << "    Methods: ";
+			for (const auto& method : route.methods)
+				std::cout << method << " ";
+			std::cout << "\n";
+			if (route.redirect)
+				std::cout << "    Redirect: " << *route.redirect << "\n";
+			std::cout << "    Root: " << route.root << "\n";
+			std::cout << "    Directory Listing: " << (route.dir_listing_active ? "On" : "Off") << "\n";
+			std::cout << "    Default File: " << route.default_file << "\n";
+			std::cout << "    CGI Extension: " << route.cgi_extension << "\n";
+			std::cout << "    Upload Directory: " << route.upload_dir << "\n";
+			std::cout << "    Max Header Size: " << *route.max_header_size << "\n";
+			std::cout << "    Max Body Size: " << *route.max_body_size << "\n";
+			std::cout << "    Timeout: " << *route.timeout << "\n";
+			std::cout << "    Max Connects: " << *route.max_connects << "\n";
 		}
-		else if (key == "index")
-			server.index = value;
-		else if (key == "error_page")
-			server.default_error_pages = value;
-		else if (key == "client_max_body_size")
-			server.max_body_size_client = std::stoull(value);
-		else if (key == "timeout")
-			server.timeout = std::stoi(value);
-		else if (key == "max_connections")
-			server.max_connects = std::stoi(value);
-		++directive_iter;
-		// might need more here depending on the config
-		// also maybe set default values here in case none are specified but it is necessary for utilisation !
-	}
-
-	while (route_iter != end)
-	{
-		RouteConf routes;
-		routes.path = (*route_iter)[1].str();
-		std::string routeBlock = (*route_iter)[2].str();
-		parseRouteBlock(routeBlock, routes, directives);
-		server.routes[routes.path] = routes;
-		++route_iter;
+		std::cout << "\n";
 	}
 }
-
-void Config::parseHttpBlock(std::string& httpBlock, std::regex& server_pattern, std::regex& route_pattern, std::regex& directives)
-{
-	auto server_iter = std::sregex_iterator(httpBlock.begin(), httpBlock.end(), server_pattern);
-	auto end = std::sregex_iterator();
-
-	auto directive_iter = std::sregex_iterator(httpBlock.begin(), httpBlock.end(), directives);
-	while(directive_iter != end)
-	{
-		std::string key = (*directive_iter)[1].str();
-		std::string value = (*directive_iter)[2].str();
-		http.directives[key] = value;
-		++directive_iter;
-	}
-
-	while(server_iter != end)
-	{
-		ServerConf server;
-		std::string block = (*server_iter)[1].str();
-		parseServerBlock(block, server, route_pattern, directives);
-		http.servers.push_back(server);
-		++server_iter;
-	}
-}
-
-ServerConf Config::parse()
-{
-	ServerConf server_confs;
-	std::ifstream file(conf_file);
-	if(!file.is_open())
-		throw std::runtime_error("Can't open conf file");
-	std::string line;
-	ServerConf current_serv;
-	RouteConf current_route;
-	bool in_serv = false;
-	bool in_route = false;
-
-	std::string content((std::istreambuf_iterator<char>(file)),
-	std::istreambuf_iterator<char>());
-
-	std::regex events_block_pattern(R"(events\s*\{([^}]*)\})");
-	std::regex http_block_pattern(R"(http\s*\{([^}]*)\})");
-	std::regex server_block_pattern(R"(server\s*\{([^}]*)\})");
-	std::regex route_block_pattern(R"(location\s+([^\s{]+)\s*\{([^}]*)\})");
-	std::regex directive_pattern(R"((\w+)(?:\s+([^;]+))?;)");
-
-	auto eventMatch = std::sregex_iterator(content.begin(), content.end(), events_block_pattern);
-	if (eventMatch != std::sregex_iterator())
-	{
-		std::string eventBlock = (*eventMatch)[1].str();
-		parseEventBlock(eventBlock);
-	}
-	auto httpMatch = std::sregex_iterator(content.begin(), content.end(), http_block_pattern);
-	if (httpMatch != std::sregex_iterator())
-	{
-		std::string httpBlock = (*httpMatch)[1].str();
-		parseHttpBlock(httpBlock, server_block_pattern, route_block_pattern, directive_pattern);
-	}
-	//clean up keys and values by trimming;
-
-	//split up key search for settings: global, server, route, host, body, error_pages etc..
-	//to fill out necessary data structs.
-}
-
-
