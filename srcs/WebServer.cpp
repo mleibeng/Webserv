@@ -6,9 +6,36 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/21 08:02:42 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/10 02:40:44 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include "WebServer.hpp"
+// #include "Loop.hpp"
+// #include "Connection.hpp"
+
+// Read in Config file
+// setup
+// start up loop
+
+WebServer::WebServer(std::string &conf_file) : config(Config::parse(conf_file))
+{
+	config.print();
+}
+// loop = std::make_unique<Loop>();
+
+void WebServer::start()
+{
+	//start listening on sockets/fds
+	//start async threads for I/O operations
+}
+
+void WebServer::stop()
+{
+	// loop->stop();
+	server_threading.wait();
+}
+
 
 /*	Not correct!!!! but basic graph! -> This doesnt show how the loops should take and pass info, not state management etc..
     this is just for a basic request!
@@ -83,28 +110,3 @@
 	| - script_path |
 	| - execute()   |
 	+---------------+*/
-
-#include "WebServer.hpp"
-#include "Loop.hpp"
-#include "Connection.hpp"
-
-// Read in Config file
-// setup
-// start up loop
-
-WebServer::WebServer(std::string &conf_file) : config(Config(conf_file).parse())
-{
-	loop = std::make_unique<Loop>();
-}
-
-void WebServer::start()
-{
-	//start listening on sockets/fds
-	//start async threads for I/O operations
-}
-
-void WebServer::stop()
-{
-	loop->stop();
-	server_threading.wait();
-}
