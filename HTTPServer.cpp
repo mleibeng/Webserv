@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 12:49:13 by mott              #+#    #+#             */
-/*   Updated: 2024/10/09 17:13:58 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/09 20:14:03 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,23 +42,47 @@ HTTPServer::~HTTPServer() {
 void HTTPServer::run() {
 	std::cout << "Wait for connection on port " << port << std::endl;
 
-	client_fd = accept(server_fd, (struct sockaddr*)&my_addr, &my_addr_size);
-	if (client_fd == -1) {
-		throw std::runtime_error("accept(): " + std::string(strerror(errno)));
+	while ("mastermind mott") {
+		client_fd = accept(server_fd, (struct sockaddr*)&my_addr, &my_addr_size);
+		if (client_fd == -1) {
+			throw std::runtime_error("accept(): " + std::string(strerror(errno)));
+		}
+
+		char buffer[1024] = {0};
+		recv(client_fd, buffer, sizeof(buffer), 0);
+		std::cout << "Request received:\n" << buffer << std::endl;
+
+		// const char* http_response =
+		// 	"HTTP/1.1 200 OK\r\n"
+		// 	"Content-Type: text/plain\r\n"
+		// 	"Content-Length: 12\r\n"
+		// 	"\r\n"
+		// 	"Hello World!";
+
+		const char* http_response =
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: text/html; charset=UTF-8\r\n"
+			"Content-Length: 152\r\n"
+			"Connection: close\r\n"
+			"\r\n"
+			"<!DOCTYPE html>\n"
+			"<html>\n"
+			"    <head>\n"
+			"        <meta charset=\"UTF-8\"/>\n"
+			"        <title>42 webserv</title>\n"
+			"        <link rel=\"stylesheet\" href=\"./style.css\">\n"
+			"    </head>\n"
+			"    <body>\n"
+			"        <h1>Hello World!!!</h1>\n"
+			"    </body>\n"
+			"</html>";
+
+		if (send(client_fd, http_response, strlen(http_response), 0) == -1) {
+			throw std::runtime_error("send(): " + std::string(strerror(errno)));
+		}
+
+		std::cout << "HTTP response sent!" << std::endl;
+
+		close(client_fd);
 	}
-
-	const char* http_response =
-		"HTTP/1.1 200 OK\r\n"
-		"Content-Type: text/plain\r\n"
-		"Content-Length: 12\r\n"
-		"\r\n"
-		"Hello World!";
-
-	if (send(client_fd, http_response, strlen(http_response), 0) == -1) {
-		throw std::runtime_error("send(): " + std::string(strerror(errno)));
-	}
-
-	std::cout << "HTTP response sent!" << std::endl;
-
-	close(client_fd);
 }

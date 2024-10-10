@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/22 15:41:48 by mott              #+#    #+#             */
-/*   Updated: 2024/09/22 19:36:59 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/10 14:41:04 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 // int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 // int listen(int sockfd, int backlog);
 // int accept(int sockfd, struct sockaddr *_Nullable restrict addr, socklen_t *_Nullable restrict addrlen);
+
+// ssize_t read(int fd, void buf[.count], size_t count);
+// ssize_t recv(int sockfd, void buf[.len], size_t len, int flags);
+
+// ssize_t write(int fd, const void buf[.count], size_t count);
 // ssize_t send(int sockfd, const void buf[.len], size_t len, int flags);
 
 // uint32_t htonl(uint32_t hostlong);
@@ -50,6 +55,9 @@
 #include <netinet/in.h>		// Internet domain sockets structs
 #include <arpa/inet.h>		// htons()
 
+#define RESET  "\033[0m"
+#define YELLOW "\033[33m"
+
 static void handle_error(const char* msg) {
 	perror(msg);
 	exit(1);
@@ -73,6 +81,10 @@ int main() {
 	my_addr.sin_port = htons(port);
 	my_addr_size = sizeof(my_addr);
 
+	std::cout << YELLOW << ">>>" << my_addr.sin_family << RESET << std::endl;
+	std::cout << YELLOW << ">>>" << my_addr.sin_addr.s_addr << RESET << std::endl;
+	std::cout << YELLOW << ">>>" << my_addr.sin_port << RESET << std::endl;
+
 	if (bind(server_fd, (struct sockaddr*)&my_addr, my_addr_size) == -1) {
 		handle_error("bind");
 	}
@@ -85,9 +97,19 @@ int main() {
 	std::cout << "Wait for connection on port " << port << std::endl;
 
 	client_fd = accept(server_fd, (struct sockaddr*)&my_addr, &my_addr_size);
+	// client_fd = accept(server_fd, NULL, NULL);
 	if (client_fd == -1) {
 		handle_error("accept");
 	}
+
+	std::cout << YELLOW << ">>>" << my_addr.sin_family << RESET << std::endl;
+	std::cout << YELLOW << ">>>" << my_addr.sin_addr.s_addr << RESET << std::endl;
+	std::cout << YELLOW << ">>>" << my_addr.sin_port << RESET << std::endl;
+
+	char buffer[1024] = {0};
+	// recv(client_fd, buffer, sizeof(buffer), 0);
+	read(client_fd, buffer, sizeof(buffer));
+	std::cout << "Request received:\n" << buffer << std::endl;
 
 	const char* http_response =
 		"HTTP/1.1 200 OK\r\n"
@@ -95,7 +117,8 @@ int main() {
 		"Content-Length: 12\r\n"
 		"\r\n"
 		"Hello World!";
-	send(client_fd, http_response, strlen(http_response), 0);
+	// send(client_fd, http_response, strlen(http_response), 0);
+	write(client_fd, http_response, strlen(http_response));
 
 	std::cout << "HTTP response sent!" << std::endl;
 
