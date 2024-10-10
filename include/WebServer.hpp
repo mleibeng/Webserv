@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/21 09:17:28 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/09 23:08:30 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ class WebServer
 {
 	private:
 	Config config;
-	std::unique_ptr<Loop> loop;
+	// std::unique_ptr<Loop> loop;
 	std::vector<int> fd_listeners;
 	std::future<void> server_threading;
 

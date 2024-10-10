@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 01:04:37 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/10 02:50:21 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,11 @@ HttpResponse::~HttpResponse()
 
 //SETTERS
 
-void HttpResponse::setStatus(StatusCode status)
-{
-	// change Status to input
-	// and make check if it is even acceptable status as well?
-}
+// void HttpResponse::setStatus(StatusCode status)
+// {
+// 	// change Status to input
+// 	// and make check if it is even acceptable status as well?
+// }
 
 //GETTERS
 
