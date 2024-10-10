@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/09 23:08:30 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/10 15:09:39 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,17 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #ifndef WEBSERVER_HPP
 #define WEBSERVER_HPP
 
+#include <unordered_map>
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <memory>
 #include <future>
+#include <atomic>
+#include <stdexcept>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "Config.hpp"
 
 class Loop;
@@ -30,18 +36,23 @@ class WebServer
 {
 	private:
 	Config config;
-	// std::unique_ptr<Loop> loop;
-	std::vector<int> fd_listeners;
-	std::future<void> server_threading;
+	std::unordered_map<std::string, std::vector<int>> server_listeners;
+	std::future<void> server_thread;
+	std::atomic<bool> running;
 
 	public:
 	WebServer() = default;
-	explicit WebServer(std::string &conf_file);
-	~WebServer() = default;
+	explicit WebServer(const std::string& conf_file);
+	~WebServer();
 
-	void start(); //maybe return status for logging
+	void initialize();
+	void start();
 	void stop();
 
+	private:
+	void setupListeners();
+	void acceptConnections();
+	int createNonBlockingSocket();
 };
 
 #endif
