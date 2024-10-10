@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/10 15:09:39 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/10/10 23:14:46 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,17 @@ class WebServer
 	private:
 	Config config;
 	std::unordered_map<std::string, std::vector<int>> server_listeners;
-	std::future<void> server_thread;
+	std::unordered_map<int, std::string> error_pages;
+	// int epoll_fd;
 	std::atomic<bool> running;
+
+	void setupListeners();
+	void acceptConnections();
+	int createNonBlockingSocket();
+	void serveErrorPage(int client_fd, int error_code);
+	void handleCGI(int client_fd, const std::string& cgi_path, const std::string& query);
+	void handleFileUpload(int client_fd, const std::string& upload_dir);
+	std::string getErrorPage(int error_code);
 
 	public:
 	WebServer() = default;
@@ -48,11 +57,6 @@ class WebServer
 	void initialize();
 	void start();
 	void stop();
-
-	private:
-	void setupListeners();
-	void acceptConnections();
-	int createNonBlockingSocket();
 };
 
 #endif
