@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/10 16:44:48 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/10 20:12:10 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 #include <iostream>
 #include <string>
-#include "HttpMessage.hpp"
+#include "AHttpMessage.hpp"
 
 // The following example illustrates a typical message exchange for a
 //    GET request (Section 4.3.1 of [RFC7231]) on the URI in ABNF Format
@@ -49,7 +49,7 @@
 enum class Method { GET, POST, DELETE };
 
 
-class HttpRequest : public HttpMessage
+class HttpRequest : public AHttpMessage
 {
 	public:
 		HttpRequest();
@@ -59,6 +59,10 @@ class HttpRequest : public HttpMessage
 
 		//parse
 		bool	parse(const std::string& rawmsg) override;
+		
+		//getters
+		Method		getMethod() const;
+		std::string	getUri() const;
 
 
 		class InvalidMethodException : public std::exception
@@ -76,9 +80,6 @@ class HttpRequest : public HttpMessage
 		void		setMethod(Method method);
 		void		setUri(const std::string& uri);
 
-		//getters
-		Method		getMethod() const;
-		std::string	getUri() const;
 
 		//utils
 		Method		strToMethod(const std::string& methodStr);
