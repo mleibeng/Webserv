@@ -6,27 +6,46 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/11 15:09:04 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/11 19:06:14 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client() {
-	std::cout << YELLOW << "Default constructor called" << RESET << std::endl;
-}
-
-Client::Client(const Client& other) {
-	std::cout << YELLOW << "Copy constructor called" << RESET << std::endl;
+Client::Client(int client_fd) : _client_fd(client_fd) {
+	// int flags = fcntl(_client_fd, F_GETFL, 0);
+	// fcntl(_client_fd, F_SETFL, flags | O_NONBLOCK);
 }
 
 Client::~Client() {
-	std::cout << YELLOW << "Destructor called" << RESET << std::endl;
+	if (_client_fd != -1) {
+		close(_client_fd);
+	}
 }
 
-Client& Client::operator=(const Client& other) {
-	if (this != &other) {
-		std::cout << YELLOW << "Copy assignment operator called" << RESET << std::endl;
+// ssize_t read(int fd, void buf[.count], size_t count);
+// ssize_t recv(int sockfd, void buf[.len], size_t len, int flags);
+ssize_t Client::read_request(std::vector<char>& buffer) {
+	ssize_t nbytes;
+	std::cout << _client_fd << std::endl;
+	nbytes = read(_client_fd, buffer.data(), buffer.size());
+	// nbytes = recv(_client_fd, buffer.data(), buffer.size(), 0);
+	if (nbytes == -1) {
+		// throw std::runtime_error("read(): " + std::string(strerror(errno)));
+		throw std::runtime_error("recv(): " + std::string(strerror(errno)));
+		// return 1;
 	}
-	return *this;
+
+	return nbytes;
+}
+
+// ssize_t write(int fd, const void buf[.count], size_t count);
+// ssize_t send(int sockfd, const void buf[.len], size_t len, int flags);
+ssize_t Client::send_response(const std::string& response) {
+	ssize_t nbytes;
+
+	nbytes = write(_client_fd, response.c_str(), response.size());
+	// nbytes = send(_client_fd, response.c_str(), response.size(), 0);
+
+	return nbytes;
 }

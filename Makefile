@@ -6,7 +6,7 @@
 #    By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/20 13:55:42 by mott              #+#    #+#              #
-#    Updated: 2024/10/11 14:29:22 by mott             ###   ########.fr        #
+#    Updated: 2024/10/11 16:48:54 by mott             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,10 +22,7 @@ NAME		=	webserv
 SRCDIR		=	src
 BUILDDIR	=	build
 
-SRCS		=	$(SRCDIR)/main.cpp \
-				$(SRCDIR)/Client.cpp \
-				$(SRCDIR)/Epoll.cpp \
-				$(SRCDIR)/Server.cpp \
+SRCS		=	$(wildcard $(SRCDIR)/*.cpp)
 OBJS		=	$(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SRCS))
 DEPS		=	$(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.d,$(SRCS))
 

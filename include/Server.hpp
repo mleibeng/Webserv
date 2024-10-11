@@ -6,28 +6,43 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:00 by mott              #+#    #+#             */
-/*   Updated: 2024/10/11 15:09:01 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/11 18:09:04 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <iostream>
+#include "Client.hpp"
+#include "Epoll.hpp"
+#include "external_functions.hpp"
 
-#define RESET  "\033[0m"
-#define YELLOW "\033[33m"
+#define MAX_EVENTS 10
 
 class Server {
 	public:
-		Server();
-		Server(const Server& other);
-
+		Server(int port);
 		~Server();
 
-		Server& operator=(const Server& other);
+		Server() = delete;
+		Server(const Server& other) = delete;
+		Server& operator=(const Server& other) = delete;
+
+		void start();
 
 	private:
+		void handle_new_connection();
+		void handle_client_request(int client_fd);
+
+		int _server_fd;
+		int _port;
+		Epoll _epoll;
+		const std::string _http_response =
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: text/plain\r\n"
+			"Content-Length: 12\r\n"
+			"\r\n"
+			"Hello World!";
 };
 
 #endif // SERVER_H

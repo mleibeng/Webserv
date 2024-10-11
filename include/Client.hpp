@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/10/11 15:08:56 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/11 17:39:43 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,27 @@
 #define CLIENT_H
 
 #include <iostream>
-
-#define RESET  "\033[0m"
-#define YELLOW "\033[33m"
+#include <vector>
+#include <string>
+#include <stdexcept>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/socket.h>
 
 class Client {
 	public:
-		Client();
-		Client(const Client& other);
-
+		Client(int client_fd);
 		~Client();
 
-		Client& operator=(const Client& other);
+		Client() = delete;
+		Client(const Client& other) = delete;
+		Client& operator=(const Client& other) = delete;
+
+		ssize_t read_request(std::vector<char>& buffer);
+		ssize_t send_response(const std::string& response);
 
 	private:
+		int _client_fd;
 };
 
 #endif // CLIENT_H
