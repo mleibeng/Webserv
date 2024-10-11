@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 01:00:32 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 01:17:31 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,34 +33,21 @@ WebServer::~WebServer()
 
 void WebServer::runLoop()
 {
-	while (running)
-	{
-		auto events = event_loop.wait();
-		for (const auto& [fd,event] : events)
-		{
-			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
-			{
-				close(fd);
-				event_loop.removeFd(fd);
-			}
-			else if (event & EPOLLIN_FLAG)
-			{
-				bool is_listening = false;
-				for (const auto& [_, fds] : server_listeners)
-				{
-					if (std::find(fds.begin(), fds.end(), fd) != fds.end())
-					{
-						acceptConnections(fd);
-						is_listening = true;
-						break;
-					}
-				}
-				if (!is_listening)
-				handleClientRequest(fd);
-			}
-		}
-	}
+// 	bool is_listening = false;
+// 	//need event_fds.
+// 	while (running)
+// 	{
+// 		if (fd is found)
+// 		{
+// 			acceptConnections(fd);
+// 			is_listening = true;
+// 			break;
+// 		}
+// 	}
+// 	if (!is_listening)
+// 		handleClientRequest(fd);
 }
+
 
 void WebServer::handleClientRequest(int client_fd)
 {
@@ -87,43 +74,6 @@ void WebServer::acceptConnections(int fd)
 	}
 	int flags = fcntl(client_fd, F_GETFL, 0);
 	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
-	addToEventSystem(client_fd, EVFILT_READ);
-}
-
-void WebServer::addToEventSystem(int fd, int events)
-{
-	(void)fd;
-	(void)events;
-// 	#ifdef __APPLE__
-// 	struct kevent ev;
-// 	EV_SET(&ev, fd, events, EV_ADD | EV_ENABLE, 0, 0, NULL);
-// 	if (kevent(event_loop, &ev, 1, NULL, 0, NULL) == -1) {
-// 		std::cerr << "Error adding event to kqueue: " << strerror(errno) << std::endl;
-// 	}
-// 	#elif __linux__
-// 	struct epoll_event ev;
-// 	ev.events = events | EPOLLET;
-// 	ev.data.fd = fd;
-// 	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &ev) == -1) {
-// 		std::cerr << "Error adding event to epoll: " << strerror(errno) << std::endl;
-// 	}
-// 	#endif
-}
-
-void WebServer::removeFromEventSystem(int fd)
-{
-	(void)fd;
-// 	#ifdef __APPLE__
-// 	struct kevent ev;
-// 	EV_SET(&ev, fd, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-// 	if (kevent(kq, &ev, 1, NULL, 0, NULL) == -1) {
-// 		std::cerr << "Error removing event from kqueue: " << strerror(errno) << std::endl;
-// 	}
-// 	#elif __linux__
-// 	if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL) == -1) {
-// 		std::cerr << "Error removing event from epoll: " << strerror(errno) << std::endl;
-// 	}
-// 	#endif
 }
 
 void WebServer::loadErrorPages()
@@ -207,7 +157,7 @@ void WebServer::start()
 	if (server_listeners.empty())
 		throw std::runtime_error("No listeners set up.");
 	running = true;
-	runLoop();
+	// runLoop();
 }
 
 void WebServer::stop()
