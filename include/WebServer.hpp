@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/11 17:56:10 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 00:32:41 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include <sys/wait.h>
 #include <errno.h>
 #include "Config.hpp"
+#include "Loop.hpp"
 
 class Loop;
 class WebServer
@@ -42,18 +43,21 @@ class WebServer
 	Config config;
 	std::unordered_map<std::string, std::vector<int>> server_listeners;
 	std::unordered_map<int, std::string> error_pages;
-	// int epoll_fd;
+	Loop event_loop;
 	std::atomic<bool> running;
 
 	void setupListeners();
-	// runLoop();
-	void acceptConnections();
+	void runLoop();
+	void loadErrorPages();
+	void acceptConnections(int listener_fd);
 	int createNonBlockingSocket();
-	// void handleClientRequest();
+	void handleClientRequest(int client_fd);
 	void serveErrorPage(int client_fd, int error_code);
 	void handleCGI(int client_fd, const std::string& cgi_path, const std::string& query);
 	void handleFileUpload(int client_fd, const std::string& upload_dir);
 	std::string getErrorPage(int error_code);
+	void addToEventSystem( int listener_fd, int event);
+	void removeFromEventSystem(int fd);
 
 	public:
 	WebServer() = default;

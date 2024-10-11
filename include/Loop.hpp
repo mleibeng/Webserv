@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/11 18:06:19 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 00:44:01 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,18 @@ Handles: I/O operations using kqueue, file descriptors, timers and async actions
 
 #ifdef __APPLE__
 #include <sys/event.h>
+#define EPOLLIN_FLAG EVFILT_READ
+#define EPOLLERR_FLAG EVFILT_EXCEPT
+#define EPOLLHUP_FLAG EVFILT_READ
+#define EPOLLOUT_FLAG EVFILT_WRITE
+#define EPOLLET_FLAG EV_CLEAR
 #elif __linux__
 #include <sys/epoll.h>
+#define EPOLLIN_FLAG EPOLLIN
+#define EPOLLERR_FLAG EPOLLERR
+#define EPOLLHUP_FLAG EPOLLHUP
+#define EPOLLOUT_FLAG EPOLLOUT
+#define EPOLLET_FLAG EPOLLET
 else
 #error "Unsupported platform"
 #endif
@@ -40,8 +50,8 @@ class Loop
 	int loop_fd;
 	static const int MAX_EVENTS = 10;
 #ifdef __APPLE__
-	std::vector<struct kevent> change_list;
-	struct kevent event_list[MAX_EVENTS];
+	// std::vector<struct kevent> change_list;
+	// struct kevent event_list[MAX_EVENTS];
 #elif __linux__
 	std::unordered_map<int, epoll_event> events;
 	epoll_event event_list[MAX_EVENTS];
