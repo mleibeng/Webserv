@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/11 15:56:58 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/12 01:00:35 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,13 +74,12 @@ class HttpResponse : public AHttpMessage
 
 		bool	parse(const std::string& rawmsg) override;
 
-	private:
-		StatusCode _status;
-
-		//setters
-		void setStatus(StatusCode status);
-		//getters
+		void		setStatus(StatusCode status);
 		StatusCode	getStatus() const;
+
+	private:
+		StatusCode	_status;
+
 
 		std::string	HttpResponse::statusCodeToStr() const;
 		int			HttpResponse::statusCodeToInt() const;

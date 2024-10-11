@@ -27,10 +27,23 @@ std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
 {
 	auto	iter = _getRequestHandlers.find(request.getUri());
 	if (iter != _getRequestHandlers.end())
-		return (iter->second(request));
+	{
+		std::string	content = iter->second(request);
+
+		HttpResponse	response;
+		response.setStatus(StatusCode::OK);
+		response.setHeader("Content-Type", "text/html");
+		response.setBody(content);
+		response.buildResponse();
+		return (response.buildResponse());
+	}
 	else
 	{
-		//handle error maybe try catch
+		HttpResponse	response;
+		response.setStatus(StatusCode::NOT_FOUND);
+		response.setHeader("Content-Type", "text/plain");
+		response.setBody("404 Not Found");
+		return (response.buildResponse());
 	}
 }
 

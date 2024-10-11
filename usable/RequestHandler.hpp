@@ -9,6 +9,7 @@
 #include <map>
 #include <string>
 #include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 
 class RequestHandler
 {

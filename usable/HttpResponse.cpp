@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/11 16:18:29 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/12 01:01:38 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,10 @@ HttpResponse::~HttpResponse()
 
 //SETTERS
 
-// void HttpResponse::setStatus(StatusCode status)
-// {
-// 	// change Status to input
-// 	// and make check if it is even acceptable status as well?
-// }
+void HttpResponse::setStatus(StatusCode status)
+{
+	_status = status;
+}
 
 //GETTERS
 
@@ -99,7 +98,7 @@ std::string	HttpResponse::buildResponse() const
 {
 	std::ostringstream	response;
 
-	response << "HTTP/1.1 " << statusCodeToInt() << " "<< statusCodeToStr() << "\r\n";
+	response << "HTTP/1.1 " << statusCodeToInt() << " " << statusCodeToStr() << "\r\n";
 
 	for (const auto& header : _header)
 	{
