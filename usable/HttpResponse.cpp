@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/11 16:06:07 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/11 16:18:29 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,18 @@ std::string	HttpResponse::buildResponse() const
 
 	response << "HTTP/1.1 " << statusCodeToInt() << " "<< statusCodeToStr() << "\r\n";
 
+	for (const auto& header : _header)
+	{
+		response << header.first << ": " << header.second << "\r\n";
+	}
+	if (_header.find("Content-Length") == _header.end())
+		response << "Content-Length: " << _body.size() << "\r\n";
+	if (_header.find("Content-Type") == _header.end());
+		response << "Content-Type: text/plain\r\n";
+	response << "\r\n";
+	response << _body;
+
+	return (response.str());
 }
 
 std::string	HttpResponse::statusCodeToStr() const
