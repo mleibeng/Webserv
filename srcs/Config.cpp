@@ -6,12 +6,13 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/10 03:52:58 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/10 21:06:31 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 #include <algorithm>
+#include <iostream>
 
 size_t parseSizeNotation(const std::string& sizeStr)
 {
@@ -52,67 +53,60 @@ std::string Config::trim(const std::string &s)
 	return (wsback <= wsfront ? std::string() : std::string(wsfront, wsback));
 }
 
-void Config::parseServerBlock(ServerConf& conf, const std::string& key, const std::string& value)
+void Config::parseServerBlock(ServerConf& conf, const std::string& key, const std::vector<std::string>& values)
 {
 	if (key == "hostname")
-		conf.hostname = value;
+		conf.hostname = values[0];
 	else if (key == "port")
-		conf.port = std::stoi(value);
+		conf.port = std::stoi(values[0]);
 	else if (key == "server_name")
-	{
-		std::istringstream iss(value);
-		std::string name;
-		while (iss >> name)
-			conf.server_names.push_back(value);
-	}
+		conf.server_names = values;
 	else if (key == "default_error_pages")
-		conf.default_error_pages = value;
+		conf.default_error_pages = values[0];
 	else
 		throw std::runtime_error("Unknown Server Configuration key");
 }
 
-void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std::string& value)
+void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std::vector<std::string>& values)
 {
 	if (key == "methods")
-	{
-		std::istringstream iss(value);
-		std::string method;
-		while (iss >> method)
-			conf.methods.push_back(method);
-	}
+		conf.methods = values;
 	else if (key == "redirect")
-		conf.redirect = value;
+		conf.redirect = values[0];
+	else if (key == "port")
+		conf.port = std::stoi(values[0]);
 	else if (key == "root")
-		conf.root = value;
+		conf.root = values[0];
 	else if (key == "dir_listing")
-		conf.dir_listing_active = (value == "on" || value == "true" || value == "1");
+		conf.dir_listing_active = (values[0] == "on" || values[0] == "true" || values[0] == "1");
 	else if (key == "default_file")
-		conf.default_file = value;
+		conf.default_file = values[0];
 	else if (key == "cgi_extension")
-		conf.cgi_extension = value;
+		conf.cgi_extension = values[0];
 	else if (key == "upload_dir")
-		conf.upload_dir = value;
+		conf.upload_dir = values[0];
 	else if (key == "max_body_size")
-		conf.max_body_size = parseSizeNotation(value);
+		conf.max_body_size = parseSizeNotation(values[0]);
 	else if (key == "max_header_size")
-		conf.max_header_size = parseSizeNotation(value);
+		conf.max_header_size = parseSizeNotation(values[0]);
 	else if (key == "timeout")
-		conf.timeout = std::stoi(value);
+		conf.timeout = std::stoi(values[0]);
 	else if (key == "max_connects")
-		conf.max_connects = std::stoi(value);
+		conf.max_connects = std::stoi(values[0]);
 	else
 		throw std::runtime_error("Unknown Route Configuration key");
 }
-void Config::parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::string& value)
+
+void Config::parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::vector<std::string>& values)
 {
 	if (key == "timeout")
-		conf.g_timeout = std::stoi(value);
+		conf.g_timeout = std::stoi(values[0]);
 	else if (key == "max_connects")
-		conf.g_max_connects = std::stoi(value);
+		conf.g_max_connects = std::stoi(values[0]);
 	else if (key == "max_body_size")
-		conf.g_max_body_size = parseSizeNotation(value);
+		conf.g_max_body_size = parseSizeNotation(values[0]);
 	else if (key == "max_header_size")
-		conf.g_max_header_size = parseSizeNotation(value);
+		conf.g_max_header_size = parseSizeNotation(values[0]);
 	else
 		throw std::runtime_error("Unknown Global Configuration key");
 }
@@ -170,15 +164,19 @@ Config Config::parse(const std::string& conf_file)
 		else
 		{
 			std::istringstream iss(line);
-			std::string key, value;
-			if (iss >> key >> value)
+			std::string key;
+			std::vector<std::string> values;
+			if (iss >> key)
 			{
+				std::string value;
+				while (iss >> value)
+					values.push_back(value);
 				if (in_route_block)
-					parseRouteBlock(current_route, key, value);
+					parseRouteBlock(current_route, key, values);
 				else if (in_server_block)
-					parseServerBlock(current_server, key, value);
+					parseServerBlock(current_server, key, values);
 				else
-					parseGlobalBlock(config.globuli, key, value);
+					parseGlobalBlock(config.globuli, key, values);
 			}
 			else
 				throw std::runtime_error("invalid config line at: "  + std::to_string(line_number));
@@ -192,12 +190,11 @@ Config Config::parse(const std::string& conf_file)
 				if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
 				if (!route.timeout) route.timeout = config.globuli.g_timeout;
 				if (!route.max_connects) route.max_connects = config.globuli.g_max_connects;
+				if (!route.port) route.port = server.port;
 			}
 		}
 	return config;
 }
-
-#include <iostream>
 
 void Config::print() const
 {
@@ -227,6 +224,7 @@ void Config::print() const
 			std::cout << "\n";
 			if (route.redirect)
 				std::cout << "    Redirect: " << *route.redirect << "\n";
+			std::cout << "    Route Port: " << *route.port << "\n";
 			std::cout << "    Root: " << route.root << "\n";
 			std::cout << "    Directory Listing: " << (route.dir_listing_active ? "On" : "Off") << "\n";
 			std::cout << "    Default File: " << route.default_file << "\n";
