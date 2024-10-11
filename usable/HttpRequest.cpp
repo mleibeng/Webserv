@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 02:31:30 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/11 15:22:39 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 HttpRequest::HttpRequest()
 {
-	setMethod(Method::DEFAULT);
-	setUri("");
 }
 
 HttpRequest::HttpRequest(const HttpRequest &other)

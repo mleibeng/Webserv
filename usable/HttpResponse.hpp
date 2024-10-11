@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/08 02:22:29 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/11 15:56:58 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #define	RESET "\033[0m"
 
 #include <iostream>
+#include <string>
 #include "AHttpMessage.hpp"
 
 /*
@@ -69,6 +70,8 @@ class HttpResponse : public AHttpMessage
 		HttpResponse& operator=(const HttpResponse &other);
 		~HttpResponse();
 
+		std::string	buildResponse() const;
+
 		bool	parse(const std::string& rawmsg) override;
 
 	private:
@@ -78,6 +81,9 @@ class HttpResponse : public AHttpMessage
 		void setStatus(StatusCode status);
 		//getters
 		StatusCode	getStatus() const;
+
+		std::string	HttpResponse::statusCodeToStr() const;
+		int			HttpResponse::statusCodeToInt() const;
 };
 
 #endif // HTTPRESPONSE_H
