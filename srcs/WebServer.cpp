@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/10 23:16:59 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/11 18:24:42 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_f
 	config.print();
 }
 
-/// @brief Stops the Server, cleaning up resources cleanly
+/// @brief Stops the Server, cleaning up resources
 WebServer::~WebServer()
 {
 	stop();
@@ -43,7 +43,6 @@ void WebServer::acceptConnections()
 /// @brief initializes epoll_fd and sets up the listening socket fds. Also loads the error pages into the WebServer class
 void WebServer::initialize()
 {
-	// set up epoll_fd using epoll_create here
 	setupListeners();
 
 	for (const auto& server : config.getServerConfs())
@@ -103,8 +102,7 @@ void WebServer::start()
 	if (server_listeners.empty())
 		throw std::runtime_error("No listeners set up.");
 	running = true;
-	// server_thread = std::async(std::launch::async, &WebServer::acceptConnections, this); -> this is the main thread running our connections
-	// so we can use stop here for example by waiting for command input using some kind of input request.
+	// runLoop();
 }
 
 void WebServer::stop()

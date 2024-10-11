@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/08/21 09:44:26 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/11 18:06:19 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,37 +18,42 @@ Handles: I/O operations using kqueue, file descriptors, timers and async actions
 #ifndef LOOP_HPP
 #define LOOP_HPP
 
+#ifdef __APPLE__
+#include <sys/event.h>
+#elif __linux__
+#include <sys/epoll.h>
+else
+#error "Unsupported platform"
+#endif
+
 #include <vector>
 #include <unordered_map>
 #include <chrono>
 #include <functional>
 #include <sys/types.h>
-#include <sys/event.h>
 #include <unistd.h>
-
-#define DEFAULT 64
 
 class FileDescriptor;
 class Loop
 {
 	private:
-	bool active;
-	int kqueue_fd;
-	std::vector<struct kevent> changes;
-	std::vector<struct kevent> events;
-	std::unordered_map<int,std::shared_ptr<FileDescriptor> > fd_map;
-	std::unordered_map<int,std::pair<std::chrono::steady_clock::time_point,std::function<void()> > > timer;
-	void updateKQueue(int fd, int filter, int flags, void *udata);
+	int loop_fd;
+	static const int MAX_EVENTS = 10;
+#ifdef __APPLE__
+	std::vector<struct kevent> change_list;
+	struct kevent event_list[MAX_EVENTS];
+#elif __linux__
+	std::unordered_map<int, epoll_event> events;
+	epoll_event event_list[MAX_EVENTS];
+#endif
 
 	public:
 	Loop();
 	~Loop();
-	void addFD(int fd, std::shared_ptr<FileDescriptor> fd_call_map);
-	void removeFD(int fd);
-	void run();
-	void stop();
-	void actTimer(std::chrono::milliseconds timeout, std::function<void()> callback);
-	//void rateLimit(std::chrono::milliseconds limit, std::function<void()> callback);
+	void addFd(int fd, uint32_t events);
+	void removeFd(int fd);
+	std::vector<std::pair<int, uint32_t>> wait( int timeout = -1);
+
 };
 
 #endif
