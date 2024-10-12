@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 01:17:31 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 02:27:22 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void WebServer::acceptConnections(int fd)
 
 void WebServer::loadErrorPages()
 {
-	const auto &server = config.getServerConfs();
+	for(const auto &server : config.getServerConfs())
 	{
 		if (!server.default_error_pages.empty())
 		{
@@ -115,7 +115,7 @@ int WebServer::createNonBlockingSocket()
 
 void WebServer::setupListeners()
 {
-	const auto& server = config.getServerConfs();
+	for (const auto& server : config.getServerConfs())
 	{
 		std::vector<int> ports = {server.port};
 		for (const auto& route : server.routes)
