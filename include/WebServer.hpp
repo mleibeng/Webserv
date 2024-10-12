@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/10 23:14:46 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 01:15:26 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,15 +21,20 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include <unordered_map>
 #include <string>
 #include <vector>
-#include <future>
 #include <atomic>
 #include <stdexcept>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <errno.h>
 #include "Config.hpp"
+// #include "Loop.hpp"
 
 class Loop;
 class WebServer
@@ -38,16 +43,21 @@ class WebServer
 	Config config;
 	std::unordered_map<std::string, std::vector<int>> server_listeners;
 	std::unordered_map<int, std::string> error_pages;
-	// int epoll_fd;
+	// Loop event_loop;
 	std::atomic<bool> running;
 
 	void setupListeners();
-	void acceptConnections();
+	void runLoop();
+	void loadErrorPages();
+	void acceptConnections(int listener_fd);
 	int createNonBlockingSocket();
+	void handleClientRequest(int client_fd);
 	void serveErrorPage(int client_fd, int error_code);
 	void handleCGI(int client_fd, const std::string& cgi_path, const std::string& query);
 	void handleFileUpload(int client_fd, const std::string& upload_dir);
 	std::string getErrorPage(int error_code);
+	void addToEventSystem( int listener_fd, int event);
+	void removeFromEventSystem(int fd);
 
 	public:
 	WebServer() = default;

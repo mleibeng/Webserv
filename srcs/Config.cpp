@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/10 21:06:31 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 02:21:01 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,18 +183,21 @@ Config Config::parse(const std::string& conf_file)
 		}
 	}
 	for (auto& server : config.servers)
+	{
+		for (auto& [path, route] : server.routes)
 		{
-			for (auto& [path, route] : server.routes)
-			{
-				if (!route.max_header_size) route.max_header_size = config.globuli.g_max_header_size;
-				if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
-				if (!route.timeout) route.timeout = config.globuli.g_timeout;
-				if (!route.max_connects) route.max_connects = config.globuli.g_max_connects;
-				if (!route.port) route.port = server.port;
-			}
+			if (!route.max_header_size) route.max_header_size = config.globuli.g_max_header_size;
+			if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
+			if (!route.timeout) route.timeout = config.globuli.g_timeout;
+			if (!route.max_connects) route.max_connects = config.globuli.g_max_connects;
+			if (!route.port) route.port = current_server.port;
 		}
+	}
 	return config;
 }
+
+const std::vector<ServerConf>& Config::getServerConfs() const
+{return servers;}
 
 void Config::print() const
 {
