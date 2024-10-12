@@ -19,7 +19,13 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 		//case Method::POST:	<--implement later
 		//case Method::DELETE:	<--implement later
 		default:
-			throw std::exception(); //implement custom exception later
+		{
+			HttpResponse response;
+			response.setStatus(StatusCode::NOT_IMPLEMENTED);
+			response.setHeader("Content-Type", "text/plain");
+			response.setBody("501 Not Implemented");
+			return (response.buildResponse());
+		}
 	}
 }
 
