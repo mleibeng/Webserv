@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/12 01:00:35 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/12 02:28:46 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,8 +81,8 @@ class HttpResponse : public AHttpMessage
 		StatusCode	_status;
 
 
-		std::string	HttpResponse::statusCodeToStr() const;
-		int			HttpResponse::statusCodeToInt() const;
+		std::string	statusCodeToStr() const;
+		int			statusCodeToInt() const;
 };
 
 #endif // HTTPRESPONSE_H
