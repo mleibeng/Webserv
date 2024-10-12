@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 02:26:37 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 02:33:56 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,6 +195,9 @@ Config Config::parse(const std::string& conf_file)
 	}
 	return config;
 }
+
+const std::vector<ServerConf>& Config::getServerConfs() const
+{return servers;}
 
 void Config::print() const
 {

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 02:27:22 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 02:32:13 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,28 @@ WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_f
 WebServer::~WebServer()
 {
 	stop();
+}
+
+void WebServer::start()
+{
+	if (server_listeners.empty())
+		throw std::runtime_error("No listeners set up.");
+	running = true;
+	// runLoop();
+}
+
+void WebServer::stop()
+{
+	running = false;
+	for (auto [_, fds] : server_listeners)
+	{
+		for (int fd : fds)
+		{
+			close(fd);
+			// event_loop.removeFd(fd);
+		}
+	}
+	server_listeners.clear();
 }
 
 void WebServer::runLoop()
@@ -78,7 +100,7 @@ void WebServer::acceptConnections(int fd)
 
 void WebServer::loadErrorPages()
 {
-	for(const auto &server : config.getServerConfs())
+	for (const auto &server : config.getServerConfs())
 	{
 		if (!server.default_error_pages.empty())
 		{
@@ -150,28 +172,6 @@ void WebServer::setupListeners()
 			// event_loop.addFd(fd, EPOLLIN_FLAG);
 		}
 	}
-}
-
-void WebServer::start()
-{
-	if (server_listeners.empty())
-		throw std::runtime_error("No listeners set up.");
-	running = true;
-	// runLoop();
-}
-
-void WebServer::stop()
-{
-	running = false;
-	for (auto [_, fds] : server_listeners)
-	{
-		for (int fd : fds)
-		{
-			close(fd);
-			// event_loop.removeFd(fd);
-		}
-	}
-	server_listeners.clear();
 }
 
 // HTTP Functionalities -> ErrorPages, FileUpload, CGIs
