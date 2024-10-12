@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 03:16:06 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 04:45:39 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,16 +30,14 @@ Loop::~Loop()
 		close(loop_fd);
 }
 
-void Loop::addFd(int fd, uint32_t events)
+void Loop::addFd(int fd, uint32_t event)
 {
-	(void)fd;
-	(void)events;
 	std::cout << "trying to add fd to epoll_event/kevent" << std::endl;
 #ifdef __APPLE__
 	//dont know yet
 #elif __linux__
-	epoll_event ev
-	ev.events = events;
+	epoll_event ev;
+	ev.events = event;
 	ev.data.fd = fd;
 	if (epoll_ctl(loop_fd, EPOLL_CTL_ADD, fd, &ev) == -1)
 		throw std::runtime_error("Couldn't add fd to epoll");
@@ -49,7 +47,6 @@ void Loop::addFd(int fd, uint32_t events)
 
 void Loop::removeFd(int fd)
 {
-	(void)fd;
 #ifdef __APPLE__
 	// don't know yet
 #elif __linux__
@@ -60,14 +57,17 @@ void Loop::removeFd(int fd)
 
 std::vector<std::pair<int, uint32_t>> Loop::wait(int timeout)
 {
-	(void)timeout;
 	std::vector<std::pair<int, uint32_t>> result;
 #ifdef __APPLE__
 	// don't know yet
 #elif __linux__
-	int nev = epoll_wait(loop_fd, event_list, MAX_EVENTS, timeout)
+	int nev = epoll_wait(loop_fd, event_list, MAX_EVENTS, timeout);
 	for (int i = 0; i < nev; ++i)
-		result.emplace_back(event_list[i].data.fd, event_list[i].events);
+	{
+		int fd = event_list[i].data.fd;
+		uint32_t events = event_list[i].events;
+		result.emplace_back(fd, events);
+	}
 #endif
 	return result;
 }

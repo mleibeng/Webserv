@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 02:43:42 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 04:22:18 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ Handles: I/O operations using kqueue, file descriptors, timers and async actions
 #define EPOLLHUP_FLAG EPOLLHUP
 #define EPOLLOUT_FLAG EPOLLOUT
 #define EPOLLET_FLAG EPOLLET
-else
+#else
 #error "Unsupported platform"
 #endif
 
