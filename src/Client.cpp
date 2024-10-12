@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/11 19:06:14 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/12 22:00:25 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,30 @@ Client::~Client() {
 
 // ssize_t read(int fd, void buf[.count], size_t count);
 // ssize_t recv(int sockfd, void buf[.len], size_t len, int flags);
-ssize_t Client::read_request(std::vector<char>& buffer) {
+// ssize_t Client::read_request(std::vector<char>& buffer) {
+ssize_t Client::read_request(char* buffer) {
 	ssize_t nbytes;
-	std::cout << _client_fd << std::endl;
-	nbytes = read(_client_fd, buffer.data(), buffer.size());
+	// std::cout << _client_fd << std::endl;
+	// nbytes = read(_client_fd, buffer.data(), buffer.size());
+	nbytes = read(_client_fd, buffer, sizeof(buffer));
 	// nbytes = recv(_client_fd, buffer.data(), buffer.size(), 0);
-	if (nbytes == -1) {
+	// if (nbytes == -1) {
 		// throw std::runtime_error("read(): " + std::string(strerror(errno)));
-		throw std::runtime_error("recv(): " + std::string(strerror(errno)));
+		// throw std::runtime_error("recv(): " + std::string(strerror(errno)));
 		// return 1;
-	}
+
+		// if (errno == EAGAIN || errno == EWOULDBLOCK) {
+		// 	std::cout << "errno: " << errno << std::endl;
+		// 	std::cout << std::string(strerror(errno)) << std::endl;
+			// Keine Daten zum Lesen
+			// return 1;
+	// 	}
+	// 	else {
+	// 		std::cerr << "Error reading from client: " << strerror(errno) << std::endl;
+	// 		close(_client_fd);
+	// 		return 0;
+	// 	}
+	// }
 
 	return nbytes;
 }

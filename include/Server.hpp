@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:00 by mott              #+#    #+#             */
-/*   Updated: 2024/10/11 18:09:04 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/12 17:53:41 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include "external_functions.hpp"
 
 #define MAX_EVENTS 10
+#define BUFFER_SIZE 1024
 
 class Server {
 	public:
@@ -37,6 +38,7 @@ class Server {
 		int _server_fd;
 		int _port;
 		Epoll _epoll;
+		char _buffer[BUFFER_SIZE];
 		const std::string _http_response =
 			"HTTP/1.1 200 OK\r\n"
 			"Content-Type: text/plain\r\n"

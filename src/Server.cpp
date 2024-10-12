@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:13 by mott              #+#    #+#             */
-/*   Updated: 2024/10/11 19:05:51 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/12 23:15:40 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ void Server::start() {
 				handle_new_connection();
 			}
 			else {
+				// std::cout << "handle_client_request fd: " << events[i].data.fd << std::endl;
 				handle_client_request(events[i].data.fd);
 			}
 		}
@@ -78,35 +79,54 @@ void Server::handle_new_connection() {
 	if (client_fd == -1) {
 		throw std::runtime_error("accept(): " + std::string(strerror(errno)));
 	}
-		std::cout << client_fd << std::endl;
+	// std::cout << client_fd << std::endl;
 	std::cout << "New client connected" << std::endl;
 
-	// int flags = fcntl(client_fd, F_GETFL, 0);
-	// fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
-
 	int flags = fcntl(client_fd, F_GETFL, 0);
-	if (flags == -1) {
-		throw std::runtime_error("fcntl: " + std::string(strerror(errno)));
-	}
-	if (fcntl(client_fd, F_SETFL, flags | O_NONBLOCK) == -1) {
-		throw std::runtime_error("fcntl: " + std::string(strerror(errno)));
-	}
+	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+
+	// int flags = fcntl(client_fd, F_GETFL, 0);
+	// if (flags == -1) {
+	// 	throw std::runtime_error("fcntl: " + std::string(strerror(errno)));
+	// }
+	// if (fcntl(client_fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+	// 	throw std::runtime_error("fcntl: " + std::string(strerror(errno)));
+	// }
 
 	_epoll.add_fd(client_fd, EPOLLIN | EPOLLOUT);
+	// _epoll.add_fd(client_fd, EPOLLIN);
+			// sleep(1);
 }
 
 void Server::handle_client_request(int client_fd) {
 	Client client(client_fd);
-	std::vector<char> buffer(1024);
+	// std::vector<char> buffer(1024);
+	std::cout << "hallo" << std::endl;
+	// ssize_t nbytes = client.read_request(buffer);
+	// ssize_t nbytes = client.read_request(_buffer);
 
-	ssize_t nbytes = client.read_request(buffer);
-	if (nbytes == 0) {
-		std::cout << "Closing connection" << std::endl;
-		close(client_fd);
+	ssize_t nbytes;
+	do {
+		nbytes = read(client_fd, _buffer, sizeof(_buffer));
+			std::cout << "errno: " << errno << std::endl;
+			std::cout << std::string(strerror(errno)) << std::endl;
+	// } while (nbytes == -1 && errno == EAGAIN && errno == EWOULDBLOCK);
+	} while (nbytes == -1 && errno == EAGAIN);
+
+
+
+	if (nbytes <= 0) {
+		// std::cout << "Closing connection" << std::endl;
+		// close(client_fd);
 	}
 	else {
 		std::cout << "Request received:" << std::endl;
-		std::cout << std::string(buffer.data(), nbytes) << std::endl;
+		std::cout << YELLOW << _buffer << RESET << std::endl;
+
+		// HttpRequest request;
+		// request.parse(_buffer);
+		// RequestHandler handler;
+		// std::string _http_response = handler.handleRequest(request)
 
 		client.send_response(_http_response);
 		std::cout << "Response sent!" << std::endl;

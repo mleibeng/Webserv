@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/21 16:42:25 by mott              #+#    #+#             */
-/*   Updated: 2024/10/11 17:49:13 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/12 18:22:53 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,9 @@
 #include <cstring>
 #include <string>
 #include <vector>
+
+#define RESET  "\033[0m"
+#define YELLOW "\033[33m"
 
 #include <unistd.h>			// execve, dup, dup2, pipe, fork, chdir, close, read, write, access
 #include <string.h>			// strerror

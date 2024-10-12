@@ -35,66 +35,66 @@
 #include <arpa/inet.h>		// htons()
 
 
-int main() {
-	int server_fd, client_fd;
-	struct sockaddr_in my_addr;
-	socklen_t my_addr_size;
-	const int port = 8080;
-	const int backlog = 3;
+// int main() {
+// 	int server_fd, client_fd;
+// 	struct sockaddr_in my_addr;
+// 	socklen_t my_addr_size;
+// 	const int port = 8080;
+// 	const int backlog = 3;
 
 
-	memset(&my_addr, 0, sizeof(my_addr));
-	my_addr.sin_family = AF_INET;
-	my_addr.sin_addr.s_addr = INADDR_ANY;
-	my_addr.sin_port = htons(port);
-	my_addr_size = sizeof(my_addr);
+// 	memset(&my_addr, 0, sizeof(my_addr));
+// 	my_addr.sin_family = AF_INET;
+// 	my_addr.sin_addr.s_addr = INADDR_ANY;
+// 	my_addr.sin_port = htons(port);
+// 	my_addr_size = sizeof(my_addr);
 
-	std::cout << YELLOW << ">>>" << my_addr.sin_family << RESET << std::endl;
-	std::cout << YELLOW << ">>>" << my_addr.sin_addr.s_addr << RESET << std::endl;
-	std::cout << YELLOW << ">>>" << my_addr.sin_port << RESET << std::endl;
+// 	std::cout << YELLOW << ">>>" << my_addr.sin_family << RESET << std::endl;
+// 	std::cout << YELLOW << ">>>" << my_addr.sin_addr.s_addr << RESET << std::endl;
+// 	std::cout << YELLOW << ">>>" << my_addr.sin_port << RESET << std::endl;
 
-	if (bind(server_fd, (struct sockaddr*)&my_addr, my_addr_size) == -1) {
-		handle_error("bind");
-	}
+// 	if (bind(server_fd, (struct sockaddr*)&my_addr, my_addr_size) == -1) {
+// 		handle_error("bind");
+// 	}
 
-	if (listen(server_fd, backlog) == -1) {
-		handle_error("listen");
-	}
+// 	if (listen(server_fd, backlog) == -1) {
+// 		handle_error("listen");
+// 	}
 
-	// Now we can accept incoming connections one at a time using accept().
-	std::cout << "Wait for connection on port " << port << std::endl;
+// 	// Now we can accept incoming connections one at a time using accept().
+// 	std::cout << "Wait for connection on port " << port << std::endl;
 
-	client_fd = accept(server_fd, (struct sockaddr*)&my_addr, &my_addr_size);
-	// client_fd = accept(server_fd, NULL, NULL);
-	if (client_fd == -1) {
-		handle_error("accept");
-	}
+// 	client_fd = accept(server_fd, (struct sockaddr*)&my_addr, &my_addr_size);
+// 	// client_fd = accept(server_fd, NULL, NULL);
+// 	if (client_fd == -1) {
+// 		handle_error("accept");
+// 	}
 
-	std::cout << YELLOW << ">>>" << my_addr.sin_family << RESET << std::endl;
-	std::cout << YELLOW << ">>>" << my_addr.sin_addr.s_addr << RESET << std::endl;
-	std::cout << YELLOW << ">>>" << my_addr.sin_port << RESET << std::endl;
+// 	std::cout << YELLOW << ">>>" << my_addr.sin_family << RESET << std::endl;
+// 	std::cout << YELLOW << ">>>" << my_addr.sin_addr.s_addr << RESET << std::endl;
+// 	std::cout << YELLOW << ">>>" << my_addr.sin_port << RESET << std::endl;
 
-	char buffer[1024] = {0};
-	// recv(client_fd, buffer, sizeof(buffer), 0);
-	read(client_fd, buffer, sizeof(buffer));
-	std::cout << "Request received:\n" << buffer << std::endl;
+// 	char buffer[1024] = {0};
+// 	// recv(client_fd, buffer, sizeof(buffer), 0);
+// 	read(client_fd, buffer, sizeof(buffer));
+// 	std::cout << "Request received:\n" << buffer << std::endl;
 
-	const char* http_response =
-		"HTTP/1.1 200 OK\r\n"
-		"Content-Type: text/plain\r\n"
-		"Content-Length: 12\r\n"
-		"\r\n"
-		"Hello World!";
-	// send(client_fd, http_response, strlen(http_response), 0);
-	write(client_fd, http_response, strlen(http_response));
+// 	const char* http_response =
+// 		"HTTP/1.1 200 OK\r\n"
+// 		"Content-Type: text/plain\r\n"
+// 		"Content-Length: 12\r\n"
+// 		"\r\n"
+// 		"Hello World!";
+// 	// send(client_fd, http_response, strlen(http_response), 0);
+// 	write(client_fd, http_response, strlen(http_response));
 
-	std::cout << "HTTP response sent!" << std::endl;
+// 	std::cout << "HTTP response sent!" << std::endl;
 
-	close(client_fd);
-	close(server_fd);
+// 	close(client_fd);
+// 	close(server_fd);
 
-	return 0;
-}
+// 	return 0;
+// }
 
 
 #include <iostream>
@@ -104,9 +104,12 @@ int main() {
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+ #include <sys/wait.h>
+
 #define PORT 8080
 #define MAX_EVENTS 10
 #define BUFFER_SIZE 1024
+#define BACKLOG 100
 #define RESET  "\033[0m"
 #define YELLOW "\033[33m"
 void set_nonblocking(int sockfd) {
@@ -124,7 +127,7 @@ int main() {
 	socklen_t server_addr_size;
 	struct epoll_event event;
 	struct epoll_event events[MAX_EVENTS];
-	int nfds;
+	int nfds = 0;
 	char buffer[BUFFER_SIZE];
 	const char* http_response =
 		"HTTP/1.1 200 OK\r\n"
@@ -143,17 +146,19 @@ int main() {
 	server_addr.sin_port = htons(PORT);
 	server_addr_size = sizeof(server_addr);
 	bind(server_fd, (struct sockaddr*)&server_addr, server_addr_size);
-	listen(server_fd, SOMAXCONN);
+	listen(server_fd, BACKLOG);
 
 
 	// epoll_fd = epoll_create(0);
 	epoll_fd = epoll_create1(0);
 	event.events = EPOLLIN;
+	// event.events = EPOLLIN | EPOLLOUT;
+	// event.events = EPOLLIN | EPOLLET;
 	event.data.fd = server_fd;
 	epoll_ctl(epoll_fd, EPOLL_CTL_ADD, server_fd, &event);
 
 	while (true) {
-		std::cout << "Wait for connection" << std::endl;
+		std::cout << "Wait for connection" << nfds << std::endl;
 		// nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
 		nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, 2000);
 
@@ -162,23 +167,27 @@ int main() {
 				client_fd = accept(server_fd, NULL, NULL);
 				set_nonblocking(client_fd);
 				event.events = EPOLLIN | EPOLLOUT;
+				// event.events = EPOLLIN;
 				event.data.fd = client_fd;
 				epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &event);
+				sleep(1);
 			}
 			else {
 				count = read(events[i].data.fd, buffer, sizeof(buffer));
+
 				if (count <= 0) {
-					close(events[i].data.fd);
+					// close(events[i].data.fd);
 				}
 				else {
 					std::cout << "Request received:" << std::endl;
 					std::cout << buffer << std::endl;
+
 					write(client_fd, http_response, std::strlen(http_response));
+					close(events[i].data.fd);
 				}
 			}
 		}
 	}
-
 	return 0;
 }
 
