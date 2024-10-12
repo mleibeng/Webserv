@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 00:49:48 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 02:21:01 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,7 @@ Config Config::parse(const std::string& conf_file)
 			else if (in_server_block)
 			{
 				in_server_block = false;
-				config.servers = current_server;
+				config.servers.push_back(current_server);
 			}
 			else
 				throw std::runtime_error("Unexpected closing brace at line: " + std::to_string(line_number));
@@ -182,7 +182,9 @@ Config Config::parse(const std::string& conf_file)
 				throw std::runtime_error("invalid config line at: "  + std::to_string(line_number));
 		}
 	}
-		for (auto& [path, route] : config.servers.routes)
+	for (auto& server : config.servers)
+	{
+		for (auto& [path, route] : server.routes)
 		{
 			if (!route.max_header_size) route.max_header_size = config.globuli.g_max_header_size;
 			if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
@@ -190,8 +192,12 @@ Config Config::parse(const std::string& conf_file)
 			if (!route.max_connects) route.max_connects = config.globuli.g_max_connects;
 			if (!route.port) route.port = current_server.port;
 		}
+	}
 	return config;
 }
+
+const std::vector<ServerConf>& Config::getServerConfs() const
+{return servers;}
 
 void Config::print() const
 {
@@ -201,35 +207,37 @@ void Config::print() const
 	std::cout << "  Timeout: " << globuli.g_timeout << "\n";
 	std::cout << "  Max Connects: " << globuli.g_max_connects << "\n\n";
 
-
-	std::cout << "Server Configuration:\n";
-	std::cout << "  Hostname: " << servers.hostname << "\n";
-	std::cout << "  Port: " << servers.port << "\n";
-	std::cout << "  Server Names: ";
-	for (const auto& name : servers.server_names)
-		std::cout << name << " ";
-	std::cout << "\n";
-	std::cout << "  Default Error Pages: " << servers.default_error_pages << "\n";
-
-	for (const auto& [path, route] : servers.routes)
+	for (const auto& server : servers)
 	{
-		std::cout << "  Route: " << path << "\n";
-		std::cout << "    Methods: ";
-		for (const auto& method : route.methods)
-			std::cout << method << " ";
+		std::cout << "Server Configuration:\n";
+		std::cout << "  Hostname: " << server.hostname << "\n";
+		std::cout << "  Port: " << server.port << "\n";
+		std::cout << "  Server Names: ";
+		for (const auto& name : server.server_names)
+			std::cout << name << " ";
 		std::cout << "\n";
-		if (route.redirect)
-			std::cout << "    Redirect: " << *route.redirect << "\n";
-		std::cout << "    Route Port: " << *route.port << "\n";
-		std::cout << "    Root: " << route.root << "\n";
-		std::cout << "    Directory Listing: " << (route.dir_listing_active ? "On" : "Off") << "\n";
-		std::cout << "    Default File: " << route.default_file << "\n";
-		std::cout << "    CGI Extension: " << route.cgi_extension << "\n";
-		std::cout << "    Upload Directory: " << route.upload_dir << "\n";
-		std::cout << "    Max Header Size: " << *route.max_header_size << "\n";
-		std::cout << "    Max Body Size: " << *route.max_body_size << "\n";
-		std::cout << "    Timeout: " << *route.timeout << "\n";
-		std::cout << "    Max Connects: " << *route.max_connects << "\n";
+		std::cout << "  Default Error Pages: " << server.default_error_pages << "\n";
+
+		for (const auto& [path, route] : server.routes)
+		{
+			std::cout << "  Route: " << path << "\n";
+			std::cout << "    Methods: ";
+			for (const auto& method : route.methods)
+				std::cout << method << " ";
+			std::cout << "\n";
+			if (route.redirect)
+				std::cout << "    Redirect: " << *route.redirect << "\n";
+			std::cout << "    Route Port: " << *route.port << "\n";
+			std::cout << "    Root: " << route.root << "\n";
+			std::cout << "    Directory Listing: " << (route.dir_listing_active ? "On" : "Off") << "\n";
+			std::cout << "    Default File: " << route.default_file << "\n";
+			std::cout << "    CGI Extension: " << route.cgi_extension << "\n";
+			std::cout << "    Upload Directory: " << route.upload_dir << "\n";
+			std::cout << "    Max Header Size: " << *route.max_header_size << "\n";
+			std::cout << "    Max Body Size: " << *route.max_body_size << "\n";
+			std::cout << "    Timeout: " << *route.timeout << "\n";
+			std::cout << "    Max Connects: " << *route.max_connects << "\n";
+		}
+		std::cout << "\n";
 	}
-	std::cout << "\n";
 }

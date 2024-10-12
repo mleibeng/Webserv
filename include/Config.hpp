@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 00:39:01 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 02:19:45 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,12 +65,12 @@ class Config
 {
 	private:
 	GlobalConf globuli;
-	ServerConf servers;
+	std::vector<ServerConf> servers;
 
 	public:
 	Config() = default;
 	static Config parse(const std::string& conf_file);
-	ServerConf& getServerConfs() { return servers; }
+	const std::vector<ServerConf>& getServerConfs() const;
 	static void parseServerBlock(ServerConf& conf, const std::string& key, const std::vector<std::string>& value);
 	static void parseRouteBlock(RouteConf& conf, const std::string& key, const std::vector<std::string>& value);
 	static std::string trim(const std::string &s);
