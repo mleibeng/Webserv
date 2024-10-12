@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 01:15:26 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 04:46:47 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,9 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include <unistd.h>
 #include <sys/wait.h>
 #include <errno.h>
+#include <cstring>
 #include "Config.hpp"
-// #include "Loop.hpp"
+#include "Loop.hpp"
 
 class Loop;
 class WebServer
@@ -43,7 +44,7 @@ class WebServer
 	Config config;
 	std::unordered_map<std::string, std::vector<int>> server_listeners;
 	std::unordered_map<int, std::string> error_pages;
-	// Loop event_loop;
+	Loop event_loop;
 	std::atomic<bool> running;
 
 	void setupListeners();
