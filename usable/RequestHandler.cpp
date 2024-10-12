@@ -25,24 +25,34 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 
 std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
 {
-	auto	iter = _getRequestHandlers.find(request.getUri());
-	if (iter != _getRequestHandlers.end())
+	try
 	{
-		std::string	content = iter->second(request);
+		auto	iter = _getRequestHandlers.find(request.getUri());
+		if (iter != _getRequestHandlers.end())
+		{
+			std::string	content = iter->second(request);
 
-		HttpResponse	response;
-		response.setStatus(StatusCode::OK);
-		response.setHeader("Content-Type", "text/html");
-		response.setBody(content);
-		response.buildResponse();
-		return (response.buildResponse());
+			HttpResponse	response;
+			response.setStatus(StatusCode::OK);
+			response.setHeader("Content-Type", "text/html");
+			response.setBody(content);
+			return (response.buildResponse());
+		}
+		else
+		{
+			HttpResponse	response;
+			response.setStatus(StatusCode::NOT_FOUND);
+			response.setHeader("Content-Type", "text/plain");
+			response.setBody("404 Not Found");
+			return (response.buildResponse());
+		}
 	}
-	else
+	catch (const std::exception& e)
 	{
-		HttpResponse	response;
-		response.setStatus(StatusCode::NOT_FOUND);
+		HttpResponse response;
+		response.setStatus(StatusCode::INTERNAL_SERV_ERR);
 		response.setHeader("Content-Type", "text/plain");
-		response.setBody("404 Not Found");
+		response.setBody("500 Internal Server Error: " + std::string(e.what()));
 		return (response.buildResponse());
 	}
 }
