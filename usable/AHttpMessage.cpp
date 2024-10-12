@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HttpMessage.cpp                                    :+:      :+:    :+:   */
+/*   AHttpMessage.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,77 +10,77 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "HttpMessage.hpp"
+#include "AHttpMessage.hpp"
 
-HttpMessage::HttpMessage()
+AHttpMessage::AHttpMessage()
 {
-	// std::cout << GREY << "Default constructor called" << RESET << std::endl;
+
 }
 
-HttpMessage::HttpMessage(const HttpMessage &other)
+AHttpMessage::AHttpMessage(const AHttpMessage &other)
 {
-	// std::cout << GREY << "Copy constructor called" << RESET << std::endl;
 	*this = other;
 }
 
-HttpMessage& HttpMessage::operator=(const HttpMessage &other)
+AHttpMessage& AHttpMessage::operator=(const AHttpMessage &other)
 {
 	if (this != &other)
 	{
-		// std::cout << GREY << "Copy assignment operator called" << RESET << std::endl;
+		setHttpVersion(other.getHttpVersion());
+		// setAllHeaders(other.getAllHeaders()); <--- need to implement setAllHeaders
+		setBody(other.getBody());
 	}
-	return *this;
+	return (*this);
 }
 
-HttpMessage::~HttpMessage()
+AHttpMessage::~AHttpMessage()
 {
-	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
 
 //SETTERS
 
-void	HttpMessage::setHttpVersion(const std::string& vers)
+void	AHttpMessage::setHttpVersion(const std::string& vers)
 {
 	_httpVersion = vers;
 }
 
-void	HttpMessage::setBody(const std::string& body)
+void	AHttpMessage::setBody(const std::string& body)
 {
 	_body = body;
 	setHeader("Content-Length", std::to_string(body.length()));
 }
 
-void	HttpMessage::setHeader(const std::string& key, const std::string& val)
+void	AHttpMessage::setHeader(const std::string& key, const std::string& val)
 {
 	_header[key] = val;
 }
 
 //GETTERS
 
-std::string		HttpMessage::getHttpVersion() const
+std::string		AHttpMessage::getHttpVersion() const
 {
 	return (_httpVersion);
 }
 
-std::string		HttpMessage::getBody() const
+std::string		AHttpMessage::getBody() const
 {
 	return (_body);
 }
 
-std::string		HttpMessage::getHeader(const std::string& key) const
+std::string		AHttpMessage::getHeader(const std::string& key) const
 {
 	auto iter = (_header.find(key));
 	return (iter != _header.end() ? iter->second : "");
 }
 
-const std::map<std::string, std::string>&	HttpMessage::getAllHeaders() const
+const std::map<std::string, std::string>&	AHttpMessage::getAllHeaders() const
 {
 	return (_header);
 }
 
 //PARSE
 
-void	HttpMessage::parseHeader(std::istringstream& input)
+void	AHttpMessage::parseHeader(std::istringstream& input)
 {
 	std::string	line;
 	size_t		colPos;
@@ -89,7 +89,7 @@ void	HttpMessage::parseHeader(std::istringstream& input)
 
 	while(std::getline(input, line) && line != "\r")
 	{
-		colPos = line.find('.');
+		colPos = line.find(':');
 		if (colPos != std::string::npos)
 		{
 			key = trimStr(line.substr(0, colPos));
@@ -102,7 +102,7 @@ void	HttpMessage::parseHeader(std::istringstream& input)
 
 //UTILS
 
-std::string	HttpMessage::trimStr(const std::string& str)
+std::string	AHttpMessage::trimStr(const std::string& str)
 {
 	const std::string	whitespaces = "\n\t\r\v\f";
 	size_t				start;
