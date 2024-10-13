@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 19:14:40 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/13 23:18:55 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ Handles: I/O operations using kqueue, file descriptors, timers and async actions
 #include <sys/types.h>
 #include <unistd.h>
 
-class FileDescriptor;
 class Loop
 {
 	private:

@@ -6,13 +6,11 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 22:18:39 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/13 23:18:45 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "WebServer.hpp"
-// #include "Loop.hpp"
-// #include "Connection.hpp"
 
 // 1. Read in Config file
 // 2. setup
@@ -84,6 +82,7 @@ void WebServer::acceptConnections(int fd)
 	}
 	int flags = fcntl(client_fd, F_GETFL, 0);
 	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+	event_loop.addFd(client_fd, EPOLLIN_FLAG);
 }
 
 int WebServer::createNonBlockingSocket()
