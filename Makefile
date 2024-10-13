@@ -6,7 +6,7 @@
 #    By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/20 13:55:42 by mott              #+#    #+#              #
-#    Updated: 2024/10/11 16:48:54 by mott             ###   ########.fr        #
+#    Updated: 2024/10/13 13:39:32 by mott             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,11 +35,11 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CPP) $(CPPFLAGS) $(OBJS) -o $@
-	@echo "$(YELLOW) $(CPP) $(CPPFLAGS) $(OBJS) -o $@ $(RESET)"
+	@echo -e "$(YELLOW) $(CPP) $(CPPFLAGS) $(OBJS) -o $@ $(RESET)"
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp | $(BUILDDIR)
 	@$(CPP) $(CPPFLAGS) -MMD -MP -c $< -o $@
-	@echo "$(BLUE) $(CPP) $(CPPFLAGS) -MMD -MP -c $< -o $@ $(RESET)"
+	@echo -e "$(BLUE) $(CPP) $(CPPFLAGS) -MMD -MP -c $< -o $@ $(RESET)"
 
 -include $(DEPS)
 
@@ -48,11 +48,11 @@ $(BUILDDIR):
 
 clean:
 	@$(RM) $(BUILDDIR)
-	@echo "$(RED) $(RM) $(BUILDDIR) $(RESET)"
+	@echo -e "$(RED) $(RM) $(BUILDDIR) $(RESET)"
 
 fclean: clean
 	@$(RM) $(NAME)
-	@echo "$(RED) $(RM) $(NAME) $(RESET)"
+	@echo -e "$(RED) $(RM) $(NAME) $(RESET)"
 
 re: fclean all
 
