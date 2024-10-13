@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 23:18:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/14 00:10:53 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,6 @@ void WebServer::runLoop()
 	{
 		std::cout << "waiting for connection" << std::endl;
 		auto events = event_loop.wait();
-		std::cout << "waiting for connection 2" << std::endl;
 		for (const auto& [fd, event] : events) {
 			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
 			{
@@ -146,7 +145,6 @@ void WebServer::runLoop()
 					handleClientRequest(fd);
 			}
 		}
-		std::cout << "after loop" << std::endl;
 	}
 }
 
