@@ -5,26 +5,28 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/09 13:08:16 by mott              #+#    #+#             */
-/*   Updated: 2024/10/11 17:42:21 by mott             ###   ########.fr       */
+/*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
+/*   Updated: 2024/10/13 13:48:49 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
-#include "Client.hpp"
-#include "Epoll.hpp"
+#include "WebServer.hpp"
+#include <iostream>
 
-#define PORT 8080
-// Firefox -> http://localhost:8080
-// Firefox -> http://127.0.0.1:8080
+//should probably also implement signal handling!
+int main(int argc, char **argv)
+{
+	std::string config_file;
 
-int main(int argc, char** argv) {
-	(void)argc;
-	(void)argv;
-
-	try {
-		Server my_server(PORT);
-		my_server.start();
+	if (argc != 2)
+		config_file = "Configs/NGINX1.conf";
+	else
+		config_file = argv[1];
+	try
+	{
+		WebServer MainServ(config_file);
+		MainServ.initialize();
+		// MainServ.start();
 	}
 	catch (const std::runtime_error& e) {
 		std::cerr << e.what() << std::endl;
