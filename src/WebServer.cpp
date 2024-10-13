@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 21:55:15 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/13 22:18:39 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void WebServer::setupListeners()
 			}
 			server_listeners[server_key].push_back(fd);
 			event_loop.addFd(fd, EPOLLIN_FLAG);
-			std::cout << "Successfully bound and listening on " << server.hostname << ":" << port << std::endl;
+			std::cout << "Successfully bound and listening on " << server_key << std::endl;
 		}
 	}
 }
@@ -120,23 +120,35 @@ void WebServer::stop()
 
 void WebServer::runLoop()
 {
-	bool is_listening = false;
 	while (running)
 	{
+		std::cout << "waiting for connection" << std::endl;
 		auto events = event_loop.wait();
-		for (const auto& [fd, event] : events)
-		{
+		std::cout << "waiting for connection 2" << std::endl;
+		for (const auto& [fd, event] : events) {
 			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
 			{
-				acceptConnections(fd);
-				is_listening = true;
-				break;
+				close(fd);
+				event_loop.removeFd(fd);
 			}
-			if (!is_listening)
-				handleClientRequest(fd);
+			else if (event & EPOLLIN_FLAG)
+			{
+				bool is_listener = false;
+				for (const auto& [_, fds] : server_listeners)
+				{
+					if (std::find(fds.begin(), fds.end(), fd) != fds.end())
+					{
+						acceptConnections(fd);
+						is_listener = true;
+						break;
+					}
+				}
+				if (!is_listener)
+					handleClientRequest(fd);
+			}
 		}
+		std::cout << "after loop" << std::endl;
 	}
-
 }
 
 /// @brief initializes epoll_fd and sets up the listening socket fds. Also loads the error pages into the WebServer class

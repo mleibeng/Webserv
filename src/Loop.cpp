@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 19:45:55 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/13 22:04:20 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void Loop::addFd(int fd, uint32_t event)
 
 void Loop::removeFd(int fd)
 {
-	(void)fd;
+	// (void)fd;
 #ifdef __APPLE__
 	// don't know yet
 #else
