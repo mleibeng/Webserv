@@ -1,3 +1,20 @@
+NAME		:= webserv
+CC			:= c++
+CFLAGS		:= -Wall -Wextra -Werror -std=c++17
+HEADERS 	:= -I ./include
+
+# Directories
+SRC_DIR := src
+OBJ_DIR := obj
+
+COLOR_RESET			=	\033[0m
+COLOR_CYAN			=	\033[36m
+COLOR_GREEN			=	\033[32m
+COLOR_RED			=	\033[31m
+COLOR_YELLOW		=	\033[33m
+
+SRCS	:= $(wildcard $(SRC_DIR)/*.cpp)
+OBJS	:= $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
