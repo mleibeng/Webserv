@@ -1,34 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   HandleCGI.hpp                                      :+:      :+:    :+:   */
+/*   Epoll.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/20 02:56:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 13:51:21 by mott             ###   ########.fr       */
+/*   Created: 2024/10/11 15:08:58 by mott              #+#    #+#             */
+/*   Updated: 2024/10/11 17:46:39 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/*
-Purpose: Execution of CGI scripts
-Handles: dynamic content and script execution/ output return
-*/
+#ifndef EPOLL_H
+#define EPOLL_H
 
-#ifndef HANDLECGI_HPP
-#define HANDLECGI_HPP
+#include "external_functions.hpp"
 
-#include <string>
-#include "Request.hpp"
-
-class HandleCGI
-{
-	private:
-	std::string path_to_string;
-
+class Epoll {
 	public:
-	explicit HandleCGI(const std::string& path_to_string);
-	std::string executeRequest(const Request& request) const;
+		Epoll();
+		~Epoll();
+
+		Epoll(const Epoll& other) = delete;
+		Epoll& operator=(const Epoll& other) = delete;
+
+		void add_fd(int fd, uint32_t events);
+		int wait(struct epoll_event* events, int max_events, int timeout = -1);
+
+	private:
+		int _epoll_fd;
 };
 
-#endif
+#endif // EPOLL_H

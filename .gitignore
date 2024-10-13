@@ -31,5 +31,5 @@
 *.out
 *.app
 
-a.out
+build
 webserv

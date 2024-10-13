@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 00:51:14 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/13 13:48:49 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,9 @@ int main(int argc, char **argv)
 		MainServ.initialize();
 		// MainServ.start();
 	}
-	catch (const std::exception &e)
-	{
-		std::cerr << "Error: " << e.what() << std::endl;
+	catch (const std::runtime_error& e) {
+		std::cerr << e.what() << std::endl;
 		return 1;
 	}
-	catch (...)
-	{
-		std::cerr << "unknown error" << std::endl;
-		return 1;
-	}
-	return (0);
+	return 0;
 }
