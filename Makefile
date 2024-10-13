@@ -4,7 +4,7 @@ CFLAGS		:= -Wall -Wextra -Werror -std=c++17
 HEADERS 	:= -I ./include
 
 # Directories
-SRC_DIR := srcs
+SRC_DIR := src
 OBJ_DIR := obj
 
 COLOR_RESET			=	\033[0m

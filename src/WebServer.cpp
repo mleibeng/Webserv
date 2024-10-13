@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 19:49:42 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/13 21:55:15 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,97 +23,6 @@
 WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false)
 {
 	config.print();
-}
-
-/// @brief Stops the Server, cleaning up resources
-WebServer::~WebServer()
-{
-	stop();
-}
-
-void WebServer::start()
-{
-	if (server_listeners.empty())
-		throw std::runtime_error("No listeners set up.");
-	running = true;
-	runLoop();
-}
-
-void WebServer::stop()
-{
-	running = false;
-	for (auto [_, fds] : server_listeners)
-	{
-		for (int fd : fds)
-		{
-			close(fd);
-			event_loop.removeFd(fd);
-		}
-	}
-	server_listeners.clear();
-}
-
-void WebServer::runLoop()
-{
-	// bool is_listening = false;
-	// while (running)
-	// {
-	// 	auto events = event_loop.wait();
-	// 	for (const auto& [fd, event] : events)
-	// 	{
-	// 		if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
-	// 		{
-	// 			acceptConnections(fd);
-	// 			is_listening = true;
-	// 			break;
-	// 		}
-	// 	}
-	// }
-	// if (!is_listening)
-	// 	handleClientRequest(fd);
-}
-
-/// @brief Provides eventLoop functionality, renaming and splitting up of functionality in the future
-void WebServer::acceptConnections(int fd)
-{
-	struct sockaddr_in client_addr;
-	socklen_t client_len = sizeof(client_addr);
-	int client_fd = accept(fd, (struct sockaddr*)&client_addr, &client_len);
-	if (client_fd < 0)
-	{
-		if (errno != EWOULDBLOCK && errno != EAGAIN)
-			std::cerr << "Couldn't accept connection" << strerror(errno) << std::endl;
-		return;
-	}
-	int flags = fcntl(client_fd, F_GETFL, 0);
-	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
-}
-
-/// @brief initializes epoll_fd and sets up the listening socket fds. Also loads the error pages into the WebServer class
-void WebServer::initialize()
-{
-	setupListeners();
-	loadErrorPages();
-}
-
-void WebServer::loadErrorPages()
-{
-	for (const auto &server : config.getServerConfs())
-	{
-		if (!server.default_error_pages.empty())
-		{
-			std::ifstream file(server.default_error_pages);
-			std::string line;
-			while (std::getline(file, line))
-			{
-				std::istringstream iss(line);
-				int error_code;
-				std::string page_path;
-				if (iss >> error_code >> page_path)
-					error_pages[error_code] = page_path;
-			}
-		}
-	}
 }
 
 void WebServer::setupListeners()
@@ -155,6 +64,28 @@ void WebServer::setupListeners()
 	}
 }
 
+/// @brief Stops the Server, cleaning up resources
+WebServer::~WebServer()
+{
+	stop();
+}
+
+/// @brief Provides eventLoop functionality, renaming and splitting up of functionality in the future
+void WebServer::acceptConnections(int fd)
+{
+	struct sockaddr_in client_addr;
+	socklen_t client_len = sizeof(client_addr);
+	int client_fd = accept(fd, (struct sockaddr*)&client_addr, &client_len);
+	if (client_fd < 0)
+	{
+		if (errno != EWOULDBLOCK && errno != EAGAIN)
+			std::cerr << "Couldn't accept connection" << strerror(errno) << std::endl;
+		return;
+	}
+	int flags = fcntl(client_fd, F_GETFL, 0);
+	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+}
+
 int WebServer::createNonBlockingSocket()
 {
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -163,4 +94,74 @@ int WebServer::createNonBlockingSocket()
 	int flags = fcntl(fd, F_GETFL, 0);
 	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 	return fd;
+}
+
+void WebServer::start()
+{
+	if (server_listeners.empty())
+		throw std::runtime_error("No listeners set up.");
+	running = true;
+	runLoop();
+}
+
+void WebServer::stop()
+{
+	running = false;
+	for (auto [_, fds] : server_listeners)
+	{
+		for (int fd : fds)
+		{
+			close(fd);
+			event_loop.removeFd(fd);
+		}
+	}
+	server_listeners.clear();
+}
+
+void WebServer::runLoop()
+{
+	bool is_listening = false;
+	while (running)
+	{
+		auto events = event_loop.wait();
+		for (const auto& [fd, event] : events)
+		{
+			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
+			{
+				acceptConnections(fd);
+				is_listening = true;
+				break;
+			}
+			if (!is_listening)
+				handleClientRequest(fd);
+		}
+	}
+
+}
+
+/// @brief initializes epoll_fd and sets up the listening socket fds. Also loads the error pages into the WebServer class
+void WebServer::initialize()
+{
+	setupListeners();
+	loadErrorPages();
+}
+
+void WebServer::loadErrorPages()
+{
+	for (const auto &server : config.getServerConfs())
+	{
+		if (!server.default_error_pages.empty())
+		{
+			std::ifstream file(server.default_error_pages);
+			std::string line;
+			while (std::getline(file, line))
+			{
+				std::istringstream iss(line);
+				int error_code;
+				std::string page_path;
+				if (iss >> error_code >> page_path)
+					error_pages[error_code] = page_path;
+			}
+		}
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 19:39:50 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/13 21:51:02 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	{
 		WebServer MainServ(config_file);
 		MainServ.initialize();
-		// MainServ.start();
+		MainServ.start();
 	}
 	catch (const std::runtime_error& e) {
 		std::cerr << e.what() << std::endl;

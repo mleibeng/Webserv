@@ -1,21 +1,61 @@
 
 #include "WebServer.hpp"
+#include "Client.hpp"
 
 // HTTP Functionalities -> ErrorPages, FileUpload, CGIs
 // Should to run through REQUEST and RESPONSE Classes
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+Client::Client(int client_fd) : _client_fd(client_fd) {
+}
+
+Client::~Client() {
+	close(_client_fd);
+}
+
+ssize_t Client::read_request() {
+	ssize_t nbytes;
+	char buffer[BUFFER_SIZE];
+
+	do {
+		nbytes = read(_client_fd, buffer, sizeof(buffer));
+	} while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK));
+
+	if (nbytes == -1) {
+		std::cerr << RED << "read(): " << strerror(errno) << DEFAULT << std::endl;
+	}
+	else if (nbytes == 0) {
+		close(_client_fd);
+	}
+	else {
+		_request.assign(buffer, nbytes);
+		std::cout << YELLOW << _request << DEFAULT << std::endl;
+	}
+
+	return nbytes;
+}
+
+ssize_t Client::send_response() {
+	ssize_t nbytes;
+
+	nbytes = write(_client_fd, _response.c_str(), _response.size());
+	if (nbytes == -1) {
+		std::cerr << RED << "write(): " << strerror(errno) << DEFAULT << std::endl;
+	}
+
+	return nbytes;
+}
+
 void WebServer::handleClientRequest(int client_fd)
 {
-	(void)client_fd;
-	// if (case error)
-	// 	serveErrorPage(client_fd, error_code);
-	// else if (case client_upload)
-	// 	handleFileUpload(client_fd, directory to upload to)
-	// else if (case client_CGI)
-	// 	handleCGI(client_fd, cgi_path, task);
-	// else
-	// 	handleRequest(client_fd);
+	// (void)client_fd;
+	Client client(client_fd);
+
+	std::cout << "request from " << client_fd << std::endl;
+	client.read_request();
+
+	std::cout << "response to " << client_fd << std::endl;
+	client.send_response();
 }
 
 /// @brief Sets up a default error message + error code in case no default error page path was given in the config file and otherwise outputs the content from the error page path
