@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/12 02:32:58 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/13 16:40:14 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <functional>
 #include <map>
 #include <string>
+#include <exception>
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 
@@ -35,6 +36,22 @@ class RequestHandler
 
 		std::string		handleRequest(const HttpRequest& request);
 		std::string		handleGetRequest(const HttpRequest& request);
+
+		class MethodHandlerException : public std::exception
+		{
+			protected:
+				std::string	_customErrorMsg;
+			public:
+				explicit MethodHandlerException(const std::string& errormsg);
+				const char*	what() const noexcept override;
+		};
+
+		class GetHandlerException : public MethodHandlerException
+		{
+			public:
+				explicit GetHandlerException(const std::string& errormsg);
+		};
+
 
 	private:
 		std::map<std::string, std::function<std::string(const HttpRequest&)>> _getRequestHandlers;

@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/12 02:32:49 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/13 17:09:09 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 
 std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
 {
+	//move this try / catch to higher lvl later
 	try
 	{
 		auto	iter = _getRequestHandlers.find(request.getUri());
@@ -77,6 +78,33 @@ std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
 
 void			RequestHandler::registerGetHandler(const std::string& route, std::function<std::string(const HttpRequest&)> callback)
 {
-	_getRequestHandlers[route] = callback;
+	//move this try / catch to higher lvl later
+	try
+	{
+		if (route.empty())
+			throw (GetHandlerException("Route missing"));
+		if (callback == nullptr)
+			throw (GetHandlerException("Callback can't be null"));
+		if (_getRequestHandlers.find(route) != _getRequestHandlers.end())
+			throw (GetHandlerException("Route already registered"));
+		_getRequestHandlers[route] = callback;
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 }
 
+RequestHandler::MethodHandlerException::MethodHandlerException(const std::string& errormsg) : _customErrorMsg(errormsg)
+{
+}
+
+RequestHandler::GetHandlerException::GetHandlerException(const std::string& errormsg) : MethodHandlerException("GET Handler Exception: " + errormsg)
+{
+}
+
+const char*	RequestHandler::MethodHandlerException::what() const noexcept
+{
+	static std::string	errorMsg = "RequestHandler: " + _customErrorMsg;
+	return (errorMsg.c_str());
+}
