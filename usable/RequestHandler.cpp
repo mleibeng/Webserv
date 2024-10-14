@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/13 17:09:09 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/14 14:30:13 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,41 @@ std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
 	}
 }
 
+std::string		RequestHandler::handlePostRequest(const HttpRequest& request)
+{
+	//move this try / catch to higher lvl later
+	try
+	{
+		auto	iter = _postRequestHandlers.find(request.getUri());
+		if (iter != _postRequestHandlers.end())
+		{
+			std::string	content = iter->second(request);
+
+			HttpResponse	response;
+			response.setStatus(StatusCode::OK);
+			response.setHeader("Content-Type", "text/html");
+			response.setBody(content);
+			return (response.buildResponse());
+		}
+		else
+		{
+			HttpResponse	response;
+			response.setStatus(StatusCode::NOT_FOUND);
+			response.setHeader("Content-Type", "text/html");
+			response.setBody("404 Not Found");
+			return (response.buildResponse());
+		}
+	}
+	catch(const std::exception& e)
+	{
+		HttpResponse	response;
+		response.setStatus(StatusCode::INTERNAL_SERV_ERR);
+		response.setHeader("Content-Type", "text/html");
+		response.setBody("500 Internal Server Error: " + std::string(e.what()));
+		return (response.buildResponse());
+	}
+}
+
 void			RequestHandler::registerGetHandler(const std::string& route, std::function<std::string(const HttpRequest&)> callback)
 {
 	//move this try / catch to higher lvl later
@@ -85,8 +120,9 @@ void			RequestHandler::registerGetHandler(const std::string& route, std::functio
 			throw (GetHandlerException("Route missing"));
 		if (callback == nullptr)
 			throw (GetHandlerException("Callback can't be null"));
-		if (_getRequestHandlers.find(route) != _getRequestHandlers.end())
-			throw (GetHandlerException("Route already registered"));
+		// not sure if this is necessary
+		// if (_getRequestHandlers.find(route) != _getRequestHandlers.end())
+		// 	throw (GetHandlerException("Route already registered"));
 		_getRequestHandlers[route] = callback;
 	}
 	catch (std::exception& e)
@@ -95,11 +131,20 @@ void			RequestHandler::registerGetHandler(const std::string& route, std::functio
 	}
 }
 
+void			RequestHandler::registerPostHandler(const std::string& route,  std::function<std::string(const HttpRequest&)> callback)
+{
+
+}
+
 RequestHandler::MethodHandlerException::MethodHandlerException(const std::string& errormsg) : _customErrorMsg(errormsg)
 {
 }
 
 RequestHandler::GetHandlerException::GetHandlerException(const std::string& errormsg) : MethodHandlerException("GET Handler Exception: " + errormsg)
+{
+}
+
+RequestHandler::PostHandlerException::PostHandlerException(const std::string& errormsg) : MethodHandlerException("POST Handler Exception: " + errormsg)
 {
 }
 

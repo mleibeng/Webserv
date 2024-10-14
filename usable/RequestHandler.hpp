@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/13 16:40:14 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/14 13:54:30 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,12 @@ class RequestHandler
 		~RequestHandler();
 
 		void			registerGetHandler(const std::string& route, std::function<std::string(const HttpRequest&)> callback);
+		void			registerPostHandler(const std::string& route,  std::function<std::string(const HttpRequest&)> callback);
 
 		std::string		handleRequest(const HttpRequest& request);
 		std::string		handleGetRequest(const HttpRequest& request);
+		std::string		handlePostRequest(const HttpRequest& request);
+
 
 		class MethodHandlerException : public std::exception
 		{
@@ -52,9 +55,16 @@ class RequestHandler
 				explicit GetHandlerException(const std::string& errormsg);
 		};
 
+		class PostHandlerException : public MethodHandlerException
+		{
+			public:
+				explicit PostHandlerException(const std::string& errormsg);
+		};
+
 
 	private:
 		std::map<std::string, std::function<std::string(const HttpRequest&)>> _getRequestHandlers;
+		std::map<std::string, std::function<std::string(const HttpRequest&)>> _postRequestHandlers;
 
 };
 
