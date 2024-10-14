@@ -29,17 +29,8 @@ $(BUILD_DIR):
 	@mkdir -p $@
 
 $(NAME): $(OBJS)
-	@$(CPP) $(CPPFLAGS) $(OBJS) -o $@
-	@echo -e "$(YELLOW) $(CPP) $(CPPFLAGS) $(OBJS) -o $@ $(RESET)"
-
-$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp | $(BUILDDIR)
-	@$(CPP) $(CPPFLAGS) -MMD -MP -c $< -o $@
-	@echo -e "$(BLUE) $(CPP) $(CPPFLAGS) -MMD -MP -c $< -o $@ $(RESET)"
-
--include $(DEPS)
-
-$(BUILDDIR):
-	@mkdir -p $@
+	@$(CC) $(OBJS) $(HEADERS) -o $(NAME)
+	@echo "$(COLOR_GREEN)Compilation for $(NAME) complete$(COLOR_RESET)"
 
 clean:
 	@echo "$(COLOR_CYAN)Cleaning compiled files$(COLOR_RESET)"
