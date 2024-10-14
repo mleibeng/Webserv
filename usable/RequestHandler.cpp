@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/14 15:49:39 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/14 16:58:10 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,14 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 	{
 		case Method::GET:
 			return (handleGetRequest(request));
-		//case Method::POST:	<--implement later
+		case Method::POST:
+			return (handlePostRequest(request));
 		//case Method::DELETE:	<--implement later
 		default:
 		{
 			HttpResponse response;
 			response.setStatus(StatusCode::NOT_IMPLEMENTED);
-			response.setHeader("Content-Type", "text/plain");
+			response.setHeader("Content-Type", request.getHeader("Content-Type"));
 			response.setBody("501 Not Implemented");
 			return (response.buildResponse());
 		}
@@ -53,7 +54,7 @@ std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
 
 			HttpResponse	response;
 			response.setStatus(StatusCode::OK);
-			response.setHeader("Content-Type", "text/html");
+			response.setHeader("Content-Type", request.getHeader("Content-Type"));
 			response.setBody(content);
 			return (response.buildResponse());
 		}
@@ -61,7 +62,7 @@ std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
 		{
 			HttpResponse	response;
 			response.setStatus(StatusCode::NOT_FOUND);
-			response.setHeader("Content-Type", "text/plain");
+			response.setHeader("Content-Type", request.getHeader("Content-Type"));
 			response.setBody("404 Not Found");
 			return (response.buildResponse());
 		}
@@ -70,7 +71,7 @@ std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
 	{
 		HttpResponse response;
 		response.setStatus(StatusCode::INTERNAL_SERV_ERR);
-		response.setHeader("Content-Type", "text/plain");
+		response.setHeader("Content-Type", request.getHeader("Content-Type"));
 		response.setBody("500 Internal Server Error: " + std::string(e.what()));
 		return (response.buildResponse());
 	}
@@ -88,7 +89,7 @@ std::string		RequestHandler::handlePostRequest(const HttpRequest& request)
 
 			HttpResponse	response;
 			response.setStatus(StatusCode::OK);
-			response.setHeader("Content-Type", "text/html");
+			response.setHeader("Content-Type", request.getHeader("Content-Type"));
 			response.setBody(content);
 			return (response.buildResponse());
 		}
@@ -96,7 +97,7 @@ std::string		RequestHandler::handlePostRequest(const HttpRequest& request)
 		{
 			HttpResponse	response;
 			response.setStatus(StatusCode::NOT_FOUND);
-			response.setHeader("Content-Type", "text/html");
+			response.setHeader("Content-Type", request.getHeader("Content-Type"));
 			response.setBody("404 Not Found");
 			return (response.buildResponse());
 		}
@@ -105,7 +106,7 @@ std::string		RequestHandler::handlePostRequest(const HttpRequest& request)
 	{
 		HttpResponse	response;
 		response.setStatus(StatusCode::INTERNAL_SERV_ERR);
-		response.setHeader("Content-Type", "text/html");
+		response.setHeader("Content-Type", request.getHeader("Content-Type"));
 		response.setBody("500 Internal Server Error: " + std::string(e.what()));
 		return (response.buildResponse());
 	}
