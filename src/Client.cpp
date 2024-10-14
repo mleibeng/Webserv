@@ -17,9 +17,9 @@ ssize_t Client::read_request() {
 	ssize_t nbytes;
 	char buffer[BUFFER_SIZE];
 
-	do {
+	// do {
 		nbytes = read(_client_fd, buffer, sizeof(buffer));
-	} while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK));
+	// } while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK));
 
 	if (nbytes == -1) {
 		std::cerr << RED << "read(): " << strerror(errno) << DEFAULT << std::endl;
@@ -140,7 +140,55 @@ void WebServer::handleClientRequest(int client_fd)
 
 // void WebServer::handleCGI(int client_fd, const std::string& cgi_path, const std::string& query)
 // {
-// 	(void)client_fd;
-// 	(void)cgi_path;
-// 	(void)query;
+// 	int in_pipe[2];
+// 	int out_pipe[2];
+
+// 	if (pipe(in_pipe) == -1 || pipe(out_pipe) == -1)
+// 	{
+// 		perror("pipe error");
+// 		return;
+// 	}
+// 	pid_t pid = fork();
+// 	if (pid == -1)
+// 	{
+// 		perror("fork");
+// 		close(in_pipe[0]);
+// 		close(in_pipe[1]);
+// 		close(out_pipe[0]);
+// 		close(out_pipe[1]);
+// 		return;
+// 	}
+// 	if (pid == 0)
+// 	{
+// 		close(out_pipe[0]);
+// 		close(in_pipe[1]);
+
+// 		dup2(in_pipe[0], STDIN_FILENO);
+// 		dup2(out_pipe[1], STDOUT_FILENO);
+
+// 		setenv("REQUEST_METHOD", "GET", 1);
+// 		setenv("QUERY_STRING", query.c_str(), 1);
+// 		setenv("CONTENT_LENGTH", "0", 1);
+
+// 		execl("/usr/bin/php", "php", cgi_path.c_str(), NULL);
+// 		perror("execl");
+// 		exit(1);
+// 	}
+// 	else
+// 	{
+// 		close(out_pipe[1]);
+// 		close(in_pipe[0]);
+
+// 		char buffer[4096];
+// 		int bytes_read;
+// 		while ((bytes_read = read(out_pipe[0], buffer, sizeof(buffer))) > 0) {
+// 			if (write(client_fd, buffer, bytes_read) == -1) {
+// 				perror("write");
+// 				break;
+// 			}
+// 		}
+// 		close(out_pipe[0]);
+
+// 		waitpid(pid, NULL, 0);
+// 	}
 // }
