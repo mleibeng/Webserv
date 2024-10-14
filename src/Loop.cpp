@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/14 00:03:02 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 04:45:39 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ Loop::~Loop()
 
 void Loop::addFd(int fd, uint32_t event)
 {
+	std::cout << "trying to add fd to epoll_event/kevent" << std::endl;
 #ifdef __APPLE__
 	//dont know yet
 #elif __linux__

@@ -1,49 +1,59 @@
-NAME := webserv
-CC := c++
-CFLAGS := -Wall -Wextra -Werror -std=c++17
-HEADERS := -I ./include
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/09/20 13:55:42 by mott              #+#    #+#              #
+#    Updated: 2024/10/13 13:39:32 by mott             ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-# Directories
-SRC_DIR := src
-BUILD_DIR := build
+CPP			=	c++
+CPPFLAGS	=	-Wall -Wextra -Werror
+CPPFLAGS	+=	-Iinclude
+# CPPFLAGS	+=	-g -fsanitize=address
+# CPPFLAGS	+=	-std=c++98
+CPPFLAGS	+=	-std=c++17
+RM			=	rm -rf
+NAME		=	webserv
 
-# Colors
-COLOR_RESET := \033[0m
-COLOR_CYAN := \033[36m
-COLOR_GREEN := \033[32m
-COLOR_RED := \033[31m
-COLOR_YELLOW := \033[33m
-COLOR_BLUE := \033[34m
+SRCDIR		=	src
+BUILDDIR	=	build
 
-SRCS := $(wildcard $(SRC_DIR)/*.cpp)
-OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
-DEPS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.d,$(SRCS))
+SRCS		=	$(wildcard $(SRCDIR)/*.cpp)
+OBJS		=	$(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.o,$(SRCS))
+DEPS		=	$(patsubst $(SRCDIR)/%.cpp,$(BUILDDIR)/%.d,$(SRCS))
+
+RESET	=	\x1b[0m
+RED		=	\x1b[31m
+YELLOW	=	\x1b[33m
+BLUE	=	\x1b[34m
 
 all: $(NAME)
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
-	@$(CC) $(CFLAGS) -MMD -MP -c $< -o $@ $(HEADERS)
-	@echo -e "$(COLOR_BLUE)Compiling: $(notdir $<)$(COLOR_RESET)"
-
-$(BUILD_DIR):
-	@mkdir -p $@
-
 $(NAME): $(OBJS)
-	@$(CC) $(OBJS) $(HEADERS) -o $(NAME)
-	@echo "$(COLOR_GREEN)Compilation for $(NAME) complete$(COLOR_RESET)"
+	@$(CPP) $(CPPFLAGS) $(OBJS) -o $@
+	@echo -e "$(YELLOW) $(CPP) $(CPPFLAGS) $(OBJS) -o $@ $(RESET)"
 
-clean:
-	@echo "$(COLOR_CYAN)Cleaning compiled files$(COLOR_RESET)"
-	@rm -rf $(BUILD_DIR)
-	@echo "$(COLOR_GREEN)Cleanup completed.$(COLOR_RESET)"
-
-fclean: clean
-	@echo "$(COLOR_CYAN)Full compiled clean initiated$(COLOR_RESET)"
-	@rm -f $(NAME)
-	@echo "$(COLOR_GREEN)Full-Clean completed.$(COLOR_RESET)"
-
-re: fclean all
+$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp | $(BUILDDIR)
+	@$(CPP) $(CPPFLAGS) -MMD -MP -c $< -o $@
+	@echo -e "$(BLUE) $(CPP) $(CPPFLAGS) -MMD -MP -c $< -o $@ $(RESET)"
 
 -include $(DEPS)
+
+$(BUILDDIR):
+	@mkdir -p $@
+
+clean:
+	@$(RM) $(BUILDDIR)
+	@echo -e "$(RED) $(RM) $(BUILDDIR) $(RESET)"
+
+fclean: clean
+	@$(RM) $(NAME)
+	@echo -e "$(RED) $(RM) $(NAME) $(RESET)"
+
+re: fclean all
 
 .PHONY: all clean fclean re

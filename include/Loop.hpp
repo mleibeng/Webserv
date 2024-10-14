@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 23:37:22 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 04:22:18 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,15 @@ Handles: I/O operations using kqueue, file descriptors, timers and async actions
 #define EPOLLHUP_FLAG EVFILT_READ
 #define EPOLLOUT_FLAG EVFILT_WRITE
 #define EPOLLET_FLAG EV_CLEAR
-#else
+#elif __linux__
 #include <sys/epoll.h>
 #define EPOLLIN_FLAG EPOLLIN
 #define EPOLLERR_FLAG EPOLLERR
 #define EPOLLHUP_FLAG EPOLLHUP
 #define EPOLLOUT_FLAG EPOLLOUT
 #define EPOLLET_FLAG EPOLLET
+#else
+#error "Unsupported platform"
 #endif
 
 #include <vector>
@@ -41,6 +43,7 @@ Handles: I/O operations using kqueue, file descriptors, timers and async actions
 #include <sys/types.h>
 #include <unistd.h>
 
+class FileDescriptor;
 class Loop
 {
 	private:
@@ -49,7 +52,7 @@ class Loop
 #ifdef __APPLE__
 	// std::vector<struct kevent> change_list;
 	// struct kevent event_list[MAX_EVENTS];
-#else
+#elif __linux__
 	std::unordered_map<int, epoll_event> events;
 	epoll_event event_list[MAX_EVENTS];
 #endif
