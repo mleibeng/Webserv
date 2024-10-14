@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 03:15:11 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/14 20:15:16 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,44 +195,74 @@ std::string WebServer::getErrorPage(int error_code)
 	return default_error_message;
 }
 
-/// @brief sends error response back to client through ResponseHandler which should run this function.
-/// @param client_fd fd of the connected client sending the request to our webserver
-/// @param error_code 404, 500, etc..
-void WebServer::serveErrorPage(int client_fd, int error_code)
+void WebServer::stop()
 {
-	std::string error_content = getErrorPage(error_code);
-	std::string response = "HTTP/1.1 " + std::to_string(error_code) + " " +
-							(error_code == 404 ? "Not Found" : "Error") + "\r\n" +
-							"Content-Type: text/html\r\n" +
-							"Content-Length: " + std::to_string(error_content.length()) + "\r\n" +
-							"\r\n" +
-							error_content;
-	write(client_fd, response.c_str(), response.length());
+	running = false;
+	for (auto [_, fds] : server_listeners)
+	{
+		for (int fd : fds)
+		{
+			close(fd);
+			event_loop.removeFd(fd);
+		}
+	}
+	server_listeners.clear();
 }
 
-// 1. Parse the multipart/form-data content -> should get handled by the Request Parser!!
-// 2. Extract the file data
-// 3. Generate a unique filename
-// 4. Write the file data to the upload directory
-void WebServer::handleFileUpload(int client_fd, const std::string& upload_dir)
+void WebServer::runLoop()
 {
-	char buffer[4096];
-	ssize_t bytes_read;
-	std::string filename = upload_dir + std::to_string(time(nullptr)); // ->for unique filename
-
-	std::ofstream outfile(filename, std::ios::binary);
-	while ((bytes_read = read(client_fd, buffer, sizeof(buffer))) > 0)
-		outfile.write(buffer, bytes_read);
-	outfile.close();
-
-	// basically send confirmation back to the client that it got uploaded. -> should also be handled later by the HTTP Response Class
-	std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nFile uploaded successfully";
-	write(client_fd, response.c_str(), response.length());
+	while (running)
+	{
+		std::cout << "waiting for connection" << std::endl;
+		auto events = event_loop.wait();
+		for (const auto& [fd, event] : events) {
+			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
+			{
+				close(fd);
+				event_loop.removeFd(fd);
+			}
+			else if (event & EPOLLIN_FLAG)
+			{
+				bool is_listener = false;
+				for (const auto& [_, fds] : server_listeners)
+				{
+					if (std::find(fds.begin(), fds.end(), fd) != fds.end())
+					{
+						acceptConnections(fd);
+						is_listener = true;
+						break;
+					}
+				}
+				if (!is_listener)
+					handleClientRequest(fd);
+			}
+		}
+	}
 }
 
-void WebServer::handleCGI(int client_fd, const std::string& cgi_path, const std::string& query)
+/// @brief initializes epoll_fd and sets up the listening socket fds. Also loads the error pages into the WebServer class
+void WebServer::initialize()
 {
-	(void)client_fd;
-	(void)cgi_path;
-	(void)query;
+	setupListeners();
+	loadErrorPages();
+}
+
+void WebServer::loadErrorPages()
+{
+	for (const auto &server : config.getServerConfs())
+	{
+		if (!server.default_error_pages.empty())
+		{
+			std::ifstream file(server.default_error_pages);
+			std::string line;
+			while (std::getline(file, line))
+			{
+				std::istringstream iss(line);
+				int error_code;
+				std::string page_path;
+				if (iss >> error_code >> page_path)
+					error_pages[error_code] = page_path;
+			}
+		}
+	}
 }

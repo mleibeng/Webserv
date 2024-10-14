@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 04:46:47 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/10/14 20:14:03 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,12 @@ class WebServer
 	void runLoop();
 	void loadErrorPages();
 	void acceptConnections(int listener_fd);
-	int createNonBlockingSocket();
+	int	 createNonBlockingSocket();
 	void handleClientRequest(int client_fd);
 	void serveErrorPage(int client_fd, int error_code);
 	void handleCGI(int client_fd, const std::string& cgi_path, const std::string& query);
 	void handleFileUpload(int client_fd, const std::string& upload_dir);
 	std::string getErrorPage(int error_code);
-	void addToEventSystem( int listener_fd, int event);
-	void removeFromEventSystem(int fd);
 
 	public:
 	WebServer() = default;
