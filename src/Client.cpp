@@ -17,9 +17,9 @@ ssize_t Client::read_request() {
 	ssize_t nbytes;
 	char buffer[BUFFER_SIZE];
 
-	do {
+	// do {
 		nbytes = read(_client_fd, buffer, sizeof(buffer));
-	} while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK));
+	// } while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK));
 
 	if (nbytes == -1) {
 		std::cerr << RED << "read(): " << strerror(errno) << DEFAULT << std::endl;
