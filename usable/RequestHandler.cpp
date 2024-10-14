@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/14 14:30:13 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/14 15:49:39 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,7 +133,22 @@ void			RequestHandler::registerGetHandler(const std::string& route, std::functio
 
 void			RequestHandler::registerPostHandler(const std::string& route,  std::function<std::string(const HttpRequest&)> callback)
 {
-
+	//move this try / catch to higher lvl later
+	try
+	{
+		if (route.empty())
+			throw (PostHandlerException("Route missing"));
+		if (callback == nullptr)
+			throw (PostHandlerException("Callback can't be null"));
+		// not sure if this is necessary
+		// if (_postRequestHandlers.find(route) != _postRequestHandlers.end())
+		// 	throw (PostHandlerException("Route already registered"));
+		_postRequestHandlers[route] = callback;
+	}
+	catch (std::exception& e)
+	{
+		std::cout << e.what() << std::endl;
+	}
 }
 
 RequestHandler::MethodHandlerException::MethodHandlerException(const std::string& errormsg) : _customErrorMsg(errormsg)
