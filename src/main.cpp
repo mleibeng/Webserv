@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 13:48:49 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/13 23:59:37 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 	{
 		WebServer MainServ(config_file);
 		MainServ.initialize();
-		// MainServ.start();
+		MainServ.start();
 	}
 	catch (const std::runtime_error& e) {
 		std::cerr << e.what() << std::endl;
