@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/14 17:08:48 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/15 22:47:13 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,25 +18,25 @@
 
 /// @brief Webserver Constructor -> Parses and prints config data and sets running to false
 /// @param conf_file Saves data structures and values read in from the config file
-WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false)
+WebServer::WebServer(const std::string &conf_file) : _config(Config::parse(conf_file)), _running(false)
 {
-	config.print();
+	_config.print();
 }
 
 void WebServer::setupListeners()
 {
-	for (const auto& server : config.getServerConfs())
+	for (const auto& server : _config.getServerConfs())
 	{
-		std::vector<int> ports = {server.port};
-		for (const auto& route : server.routes)
+		std::vector<int> ports = {server._port};
+		for (const auto& route : server._routes)
 		{
-			if (route.second.port.has_value() && route.second.port.value() != 0 && route.second.port.value() != server.port)
-				ports.push_back(route.second.port.value());
+			if (route.second._port.has_value() && route.second._port.value() != 0 && route.second._port.value() != server._port)
+				ports.push_back(route.second._port.value());
 		}
 
 		for (const auto& port : ports)
 		{
-			std::string server_key = server.hostname + ":" + std::to_string(port);
+			std::string server_key = server._hostname + ":" + std::to_string(port);
 
 			int fd = createNonBlockingSocket();
 			struct sockaddr_in addr;
@@ -55,8 +55,8 @@ void WebServer::setupListeners()
 				close(fd);
 				throw std::runtime_error("Failed to listen on socket");
 			}
-			server_listeners[server_key].push_back(fd);
-			event_loop.addFd(fd, EPOLLIN_FLAG);
+			_server_listeners[server_key].push_back(fd);
+			_event_loop.addFd(fd, EPOLLIN_FLAG);
 			std::cout << "Successfully bound and listening on " << server_key << std::endl;
 		}
 	}
@@ -82,7 +82,7 @@ void WebServer::acceptConnections(int fd)
 	}
 	int flags = fcntl(client_fd, F_GETFL, 0);
 	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
-	event_loop.addFd(client_fd, EPOLLIN_FLAG);
+	_event_loop.addFd(client_fd, EPOLLIN_FLAG);
 }
 
 int WebServer::createNonBlockingSocket()
@@ -97,42 +97,42 @@ int WebServer::createNonBlockingSocket()
 
 void WebServer::start()
 {
-	if (server_listeners.empty())
+	if (_server_listeners.empty())
 		throw std::runtime_error("No listeners set up.");
-	running = true;
+	_running = true;
 	runLoop();
 }
 
 void WebServer::stop()
 {
-	running = false;
-	for (auto [_, fds] : server_listeners)
+	_running = false;
+	for (auto [_, fds] : _server_listeners)
 	{
 		for (int fd : fds)
 		{
 			close(fd);
-			event_loop.removeFd(fd);
+			_event_loop.removeFd(fd);
 		}
 	}
-	server_listeners.clear();
+	_server_listeners.clear();
 }
 
 void WebServer::runLoop()
 {
-	while (running)
+	while (_running)
 	{
 		std::cout << "waiting for connection" << std::endl;
-		auto events = event_loop.wait();
+		auto events = _event_loop.wait();
 		for (const auto& [fd, event] : events) {
 			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
 			{
 				close(fd);
-				event_loop.removeFd(fd);
+				_event_loop.removeFd(fd);
 			}
 			else if (event & EPOLLIN_FLAG)
 			{
 				bool is_listener = false;
-				for (const auto& [_, fds] : server_listeners)
+				for (const auto& [_, fds] : _server_listeners)
 				{
 					if (std::find(fds.begin(), fds.end(), fd) != fds.end())
 					{
@@ -157,11 +157,11 @@ void WebServer::initialize()
 
 void WebServer::loadErrorPages()
 {
-	for (const auto &server : config.getServerConfs())
+	for (const auto &server : _config.getServerConfs())
 	{
-		if (!server.default_error_pages.empty())
+		if (!server._default_error_pages.empty())
 		{
-			std::ifstream file(server.default_error_pages);
+			std::ifstream file(server._default_error_pages);
 			std::string line;
 			while (std::getline(file, line))
 			{
@@ -169,7 +169,7 @@ void WebServer::loadErrorPages()
 				int error_code;
 				std::string page_path;
 				if (iss >> error_code >> page_path)
-					error_pages[error_code] = page_path;
+					_error_pages[error_code] = page_path;
 			}
 		}
 	}

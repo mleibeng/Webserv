@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 22:04:20 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/16 00:32:11 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,18 +16,18 @@
 Loop::Loop()
 {
 #ifdef __APPLE__
-	loop_fd = kqueue();
+	_loop_fd = kqueue();
 #else
-	loop_fd = epoll_create1(0);
+	_loop_fd = epoll_create1(0);
 #endif
-	if (loop_fd == -1)
+	if (_loop_fd == -1)
 		throw std::runtime_error("Couldn't Create loop fd");
 }
 
 Loop::~Loop()
 {
-	if (loop_fd != -1)
-		close(loop_fd);
+	if (_loop_fd != -1)
+		close(_loop_fd);
 }
 
 void Loop::addFd(int fd, uint32_t event)
@@ -38,7 +38,7 @@ void Loop::addFd(int fd, uint32_t event)
 	epoll_event ev;
 	ev.events = event;
 	ev.data.fd = fd;
-	if (epoll_ctl(loop_fd, EPOLL_CTL_ADD, fd, &ev) == -1)
+	if (epoll_ctl(_loop_fd, EPOLL_CTL_ADD, fd, &ev) == -1)
 		throw std::runtime_error("Couldn't add fd to epoll");
 	events[fd] = ev;
 	std::cout << fd << std::endl;
@@ -51,7 +51,7 @@ void Loop::removeFd(int fd)
 #ifdef __APPLE__
 	// don't know yet
 #else
-	epoll_ctl(loop_fd, EPOLL_CTL_DEL, fd, nullptr);
+	epoll_ctl(_loop_fd, EPOLL_CTL_DEL, fd, nullptr);
 	events.erase(fd);
 #endif
 }
@@ -63,7 +63,7 @@ std::vector<std::pair<int, uint32_t>> Loop::wait(int timeout)
 #ifdef __APPLE__
 	// don't know yet
 #else
-	int nev = epoll_wait(loop_fd, event_list, MAX_EVENTS, timeout);
+	int nev = epoll_wait(_loop_fd, event_list, MAX_EVENTS, timeout);
 	for (int i = 0; i < nev; ++i)
 	{
 		int fd = event_list[i].data.fd;
