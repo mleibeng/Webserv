@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/15 22:45:12 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/16 19:42:30 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,6 @@ Handles: configuration of hosts, ports and route structure on server-side.
 #include <stdexcept>
 #include <unordered_map>
 #include <optional>
-
-// we could also implement max_client_header_size for buffering the headersize. NGINX does this as well!
 
 struct GlobalConf
 {

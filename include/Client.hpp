@@ -5,9 +5,10 @@
 #include <cstring>
 #include <cerrno>
 #include <string>
-
 #include <unistd.h>
 #include <fcntl.h>
+
+#include "HttpRequest.hpp"
 
 #define BUFFER_SIZE	1024
 
@@ -27,8 +28,13 @@ class Client {
 		ssize_t read_request();
 		ssize_t send_response();
 
+		const std::string getRequest();
+		const std::string getHostname();
+		void setHostname(const std::string &hostname);
+
 	private:
 		int _client_fd;
+		std::string _hostname;
 		std::string _request;
 		std::string _response =
 			"HTTP/1.1 200 OK\r\n"

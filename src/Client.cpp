@@ -46,13 +46,43 @@ ssize_t Client::send_response() {
 	return nbytes;
 }
 
+const std::string Client::getRequest()
+{
+	return _request;
+}
+
+void Client::setHostname(const std::string &hostname)
+{
+	_hostname = hostname;
+}
+
+const std::string Client::getHostname()
+{
+	return _hostname;
+}
+
 void WebServer::handleClientRequest(int client_fd)
 {
 	// (void)client_fd;
 	Client client(client_fd);
+	HttpRequest requester;
 
 	std::cout << "request from " << client_fd << std::endl;
 	client.read_request();
+
+	requester.parse(client.getRequest());
+
+	client.setHostname(requester.getHeader("host"));
+
+	ServerConf *server = nullptr;
+	for (ServerConf serverconf : _config.getServerConfs())
+	{
+		if (serverconf._hostname == client.getHostname() ||
+			std::find(serverconf._server_names.begin(), serverconf._server_names.end(), requester.getHeader("server_name"))) // wrong key for now;
+		{
+
+		}
+	}
 
 	std::cout << "response to " << client_fd << std::endl;
 	client.send_response();
@@ -64,18 +94,16 @@ void WebServer::handleClientRequest(int client_fd)
 // 1. maybe we build the client as the centerpiece of httprequest/response where these get saved? so that we can just hand over client?
 // 	  because the response and request and message themselves need to be saved in something -> need to discuss!
 
-/* so i mean like this client ?
-{
-	HttpRequest request;
-	HttpResponse response;
+// so i mean like this client ?
+// {
+// 	HttpRequest request;
+// 	HttpResponse response;
 
-	client_fd
-	etc...
-}
-*/
+// 	client_fd
+// 	etc...
+// }
 
 // 2. the response also needs to send back mime.types!
-
 // 3. do we sort the request itself (GET/POST/DELETE) in WebServer or in HttpRequestHandler?
 
 /* void WebServer::handleClientRequest(int client_fd)
@@ -91,24 +119,23 @@ void WebServer::handleClientRequest(int client_fd)
 		const HttpRequest& request = client.get_request(); // getter for the _request out of client class needed.
 		-> maybe automatically parse in the http request constructor.
 
-	-> NEEDS TO BE HERE!
-		Server logic part here for finding the correct server and route for the response
-		-> select correct serverconfig
-			-> compare server_hostname with request_hostname (Host: in the headers)
-			-> or find servername fitting to request_servername
-		-> std::find functions after selecting the correct server config
-			-> going through route map of the serverconf (std::unordered map[path, conf] : server_conf->_routes)
-				with compare each route with request.route_path Headertype is -> (Referer: )
-			-> if no route found -> error 404 not found
-		-> check if method is allowed
-			-> ServeErrorPage(405 Forbidden in case of no)
-		Then call request.getMethod() = get/post/delete and those handle
+	 Server logic part here for finding the correct server and route for the response
+	 -> select correct serverconfig
+	 	-> compare server_hostname with request_hostname (Host: in the headers)
+	 	-> or find servername fitting to request_servername
+	 -> std::find functions after selecting the correct server config
+	 	-> going through route map of the serverconf (std::unordered map[path, conf] : server_conf->_routes)
+	 		with compare each route with request.route_path Headertype is -> (Referer: )
+	 	-> if no route found -> error 404 not found
+	 -> check if method is allowed
+	 	-> ServeErrorPage(405 Forbidden in case of no)
+	 Then call request.getMethod() = get/post/delete and those handle
 
 	-> UP FOR DISCUSSION!
 			-> either HttpRequestHandler:HandleRequest or WebServer::HandleRequest -> need to discuss what more efficient.
 			switch:
 				GET:
-					-> handleGetRequest(client/httpRequest, *route_conf);
+
 				POST:
 					-> if content-type found in headers and content-type == multipart/form-data
 						-> handleFileUpload
@@ -172,35 +199,6 @@ What we need:
 	else if not found in filesystem serve 404 errorpage.
 }
 */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // /// @brief Sets up a default error message + error code in case no default error page path was given in the config file and otherwise outputs the content from the error page path
 // /// @param error_code Error codes like 404, 500 etc..

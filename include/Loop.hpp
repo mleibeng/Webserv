@@ -6,13 +6,13 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/16 00:32:11 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/16 19:11:53 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /*
 Purpose: Implement event handling
-Handles: I/O operations using kqueue, file descriptors, timers and async actions
+Handles: I/O operations using kqueue/epoll, file descriptors, timers and async actions
 */
 
 #ifndef LOOP_HPP
