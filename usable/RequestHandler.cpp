@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/14 16:58:10 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 17:47:08 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,84 +33,22 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 		//case Method::DELETE:	<--implement later
 		default:
 		{
-			HttpResponse response;
-			response.setStatus(StatusCode::NOT_IMPLEMENTED);
-			response.setHeader("Content-Type", request.getHeader("Content-Type"));
-			response.setBody("501 Not Implemented");
-			return (response.buildResponse());
+			// not sure how to do this yet?? either:
+			// WebServer::getErrorPage(501);
+			// requires to pass on a ref to the WebServer obj tho
+
+
+			// or return a response obj with err code 501:
+
+			// HttpResponse response;
+			// response.setStatus(StatusCode::NOT_IMPLEMENTED);
+			// response.setHeader("Content-Type", request.getHeader("Content-Type"));
+			// response.setBody("501 Not Implemented");
+			// return (response.buildResponse());
 		}
 	}
 }
 
-std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
-{
-	//move this try / catch to higher lvl later
-	try
-	{
-		auto	iter = _getRequestHandlers.find(request.getUri());
-		if (iter != _getRequestHandlers.end())
-		{
-			std::string	content = iter->second(request);
-
-			HttpResponse	response;
-			response.setStatus(StatusCode::OK);
-			response.setHeader("Content-Type", request.getHeader("Content-Type"));
-			response.setBody(content);
-			return (response.buildResponse());
-		}
-		else
-		{
-			HttpResponse	response;
-			response.setStatus(StatusCode::NOT_FOUND);
-			response.setHeader("Content-Type", request.getHeader("Content-Type"));
-			response.setBody("404 Not Found");
-			return (response.buildResponse());
-		}
-	}
-	catch (const std::exception& e)
-	{
-		HttpResponse response;
-		response.setStatus(StatusCode::INTERNAL_SERV_ERR);
-		response.setHeader("Content-Type", request.getHeader("Content-Type"));
-		response.setBody("500 Internal Server Error: " + std::string(e.what()));
-		return (response.buildResponse());
-	}
-}
-
-std::string		RequestHandler::handlePostRequest(const HttpRequest& request)
-{
-	//move this try / catch to higher lvl later
-	try
-	{
-		auto	iter = _postRequestHandlers.find(request.getUri());
-		if (iter != _postRequestHandlers.end())
-		{
-			std::string	content = iter->second(request);
-
-			HttpResponse	response;
-			response.setStatus(StatusCode::OK);
-			response.setHeader("Content-Type", request.getHeader("Content-Type"));
-			response.setBody(content);
-			return (response.buildResponse());
-		}
-		else
-		{
-			HttpResponse	response;
-			response.setStatus(StatusCode::NOT_FOUND);
-			response.setHeader("Content-Type", request.getHeader("Content-Type"));
-			response.setBody("404 Not Found");
-			return (response.buildResponse());
-		}
-	}
-	catch(const std::exception& e)
-	{
-		HttpResponse	response;
-		response.setStatus(StatusCode::INTERNAL_SERV_ERR);
-		response.setHeader("Content-Type", request.getHeader("Content-Type"));
-		response.setBody("500 Internal Server Error: " + std::string(e.what()));
-		return (response.buildResponse());
-	}
-}
 
 void			RequestHandler::registerGetHandler(const std::string& route, std::function<std::string(const HttpRequest&)> callback)
 {
