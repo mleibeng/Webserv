@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 17:47:08 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 19:18:11 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 			return (handleGetRequest(request));
 		case Method::POST:
 			return (handlePostRequest(request));
-		//case Method::DELETE:	<--implement later
+		case Method::DELETE:
+			return (handleDeleteRequest(request));
 		default:
 		{
 			// not sure how to do this yet?? either:
@@ -47,6 +48,20 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 			// return (response.buildResponse());
 		}
 	}
+}
+
+std::string		handleGetRequest(const HttpRequest& request)
+{
+
+}
+std::string		handlePostRequest(const HttpRequest& request)
+{
+
+}
+
+std::string		handleDeleteRequest(const HttpRequest& request)
+{
+	
 }
 
 

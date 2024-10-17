@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/14 13:54:30 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 19:17:56 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class RequestHandler
 		std::string		handleRequest(const HttpRequest& request);
 		std::string		handleGetRequest(const HttpRequest& request);
 		std::string		handlePostRequest(const HttpRequest& request);
-
+		std::string		handleDeleteRequest(const HttpRequest& request);
 
 		class MethodHandlerException : public std::exception
 		{
