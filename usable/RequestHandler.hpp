@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 21:53:29 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 22:05:23 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <string>
 #include <exception>
 #include <filesystem>
+#include <fstream>
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 

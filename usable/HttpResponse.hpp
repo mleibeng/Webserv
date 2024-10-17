@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/12 02:28:46 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 22:21:12 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <string>
+#include <filesystem>
 #include "AHttpMessage.hpp"
 
 /*
@@ -79,6 +80,7 @@ class HttpResponse : public AHttpMessage
 
 	private:
 		StatusCode	_status;
+		std::string	_mimeType;
 
 
 		std::string	statusCodeToStr() const;

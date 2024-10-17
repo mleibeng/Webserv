@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 21:58:04 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 22:00:41 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,6 @@ bool	HttpRequest::parse(const std::string& rawmsg)
 	setBody(body);
 	return (true);
 }
-
 
 Method		HttpRequest::strToMethod(const std::string& method)
 {
