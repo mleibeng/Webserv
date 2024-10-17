@@ -6,9 +6,10 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 22:16:53 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/17 22:58:35 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "HttpRequest.hpp"
 
@@ -105,7 +106,6 @@ bool	HttpRequest::parse(const std::string& rawmsg)
 	setBody(body);
 	return (true);
 }
-
 
 Method		HttpRequest::strToMethod(const std::string& method)
 {

@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/12 01:01:38 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 22:48:32 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,46 @@ void HttpResponse::setStatus(StatusCode status)
 {
 	_status = status;
 }
-
+void		HttpResponse::setMimeType(std::string extension)
+{
+	this->setHeader("Content-Type", this->getMimeType(extension));
+}
 //GETTERS
 
 StatusCode	HttpResponse::getStatus() const
 {
 	return (_status);
+}
+
+std::string		HttpResponse::getMimeType(const std::string extension)
+{
+	static const std::map<std::string, std::string> mimeTypes =
+	{
+		{".html", "text/html"},
+		{".htm", "text/html"},
+		{".css", "text/css"},
+		{".js", "application/javascript"},
+		{".json", "application/json"},
+		{".xml", "application/xml"},
+		{".png", "image/png"},
+		{".jpg", "image/jpeg"},
+		{".jpeg", "image/jpeg"},
+		{".gif", "image/gif"},
+		{".bmp", "image/bmp"},
+		{".ico", "image/x-icon"},
+		{".svg", "image/svg+xml"},
+		{".txt", "text/plain"},
+		{".pdf", "application/pdf"},
+		{".zip", "application/zip"},
+		{".tar", "application/x-tar"},
+		{".mp3", "audio/mpeg"},
+		{".mp4", "video/mp4"},
+		{".php", "application/x-httpd-php"}
+	};
+
+	auto	iter = mimeTypes.find(extension);
+	if (iter != mimeTypes.end())
+		return (iter->second);
 }
 
 bool	HttpResponse::parse(const std::string& rawmsg)

@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 21:53:29 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 22:50:50 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,11 @@
 #include <string>
 #include <exception>
 #include <filesystem>
+#include <fstream>
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 
+class Error;
 class RequestHandler
 {
 	public:
@@ -33,14 +35,17 @@ class RequestHandler
 		RequestHandler& operator=(const RequestHandler &other) = delete; //might implement this later if needed;
 		~RequestHandler();
 
-		HttpResponse	handleRequest(const HttpRequest& request);
-		HttpResponse	handleGetRequest(const HttpRequest& request);
-		HttpResponse	handlePostRequest(const HttpRequest& request);
-		HttpResponse	handleDeleteRequest(const HttpRequest& request);
+		HttpResponse	handleRequest(const HttpRequest& request, const Error& error);
+		HttpResponse	handleGetRequest(const HttpRequest& request, const Error& error);
+		HttpResponse	handlePostRequest(const HttpRequest& request, const Error& error);
+		HttpResponse	handleDeleteRequest(const HttpRequest& request, const Error& error);
+
+
 
 
 	private:
 
 };
+std::string		getFileExtension(const std::string& filepath);
 
 #endif // REQUESTHANDLER_H
