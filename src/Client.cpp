@@ -67,36 +67,41 @@ void WebServer::handleClientRequest(int client_fd)
 	Client client(client_fd);
 
 	std::cout << "request from " << client_fd << std::endl;
-	client.read_request();
-
-	const HttpRequest& requester(client.getRequest());
-
-	client.setHostname(requester.getHeader("host"));
-
-	const ServerConf *serverconf = nullptr;
-	for (auto &conf : _config.getServerConfs())
+	if(!client.read_request())
 	{
-		if (conf._hostname == requester.getHeader("host") ||
-			std::find(conf._server_names.begin(), conf._server_names.end(), client.getHostname()) != conf._server_names.end())
-			serverconf = &conf;
+		request_handler->serveErrorPage(client, 404);
+		return;
 	}
+	request_handler->handleRequest(client);
 
-	// error handling
+	// const HttpRequest& requester(client.getRequest());
 
-	const RouteConf *route_conf = nullptr;
-	for (auto& [path, conf] : serverconf->_routes)
-	{
-		if (requester.getUri().compare(0, path.length(), path) == 0)
-		{
-			route_conf = &conf;
-			break;
-		}
-	}
+	// client.setHostname(requester.getHeader("host"));
+
+	// const ServerConf *serverconf = nullptr;
+	// for (auto &conf : _config.getServerConfs())
+	// {
+	// 	if (conf._hostname == requester.getHeader("host") ||
+	// 		std::find(conf._server_names.begin(), conf._server_names.end(), client.getHostname()) != conf._server_names.end())
+	// 		serverconf = &conf;
+	// }
+
+	// // error handling
+
+	// const RouteConf *route_conf = nullptr;
+	// for (auto& [path, conf] : serverconf->_routes)
+	// {
+	// 	if (requester.getUri().compare(0, path.length(), path) == 0)
+	// 	{
+	// 		route_conf = &conf;
+	// 		break;
+	// 	}
+	// }
 
 
 
-	std::cout << "response to " << client_fd << std::endl;
-	client.send_response();
+	// std::cout << "response to " << client_fd << std::endl;
+	// client.send_response();
 }
 
 

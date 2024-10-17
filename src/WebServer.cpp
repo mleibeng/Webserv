@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/15 22:47:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/17 23:48:54 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,6 +153,7 @@ void WebServer::initialize()
 {
 	setupListeners();
 	loadErrorPages();
+	request_handler = std::make_unique<RequestHandler>(_error_pages, _config);
 }
 
 void WebServer::loadErrorPages()
@@ -173,4 +174,21 @@ void WebServer::loadErrorPages()
 			}
 		}
 	}
+}
+
+void WebServer::handleClientRequest(int client_fd)
+{
+	// (void)client_fd;
+	Client client(client_fd);
+
+	std::cout << "request from " << client_fd << std::endl;
+	if(!client.read_request())
+	{
+		request_handler->serveErrorPage(client, 404);
+		return;
+	}
+	// request_handler->handleRequest(client);
+
+	std::cout << "response to " << client_fd << std::endl;
+	client.send_response();
 }

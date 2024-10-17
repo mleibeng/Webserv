@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/16 19:18:07 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/17 23:48:40 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,10 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include <cstring>
 #include "Config.hpp"
 #include "Loop.hpp"
+#include "RequestHandler.hpp"
 
+
+class Client;
 class Loop;
 class WebServer
 {
@@ -46,6 +49,7 @@ class WebServer
 	std::unordered_map<int, std::string> _error_pages;
 	Loop _event_loop;
 	std::atomic<bool> _running;
+	std::unique_ptr<RequestHandler> request_handler;
 
 	void setupListeners();
 	void runLoop();
@@ -56,10 +60,6 @@ class WebServer
 
 	// Request/response handling part? could be moved out into other classes
 	//---------------------------------------------------------------------------------------------
-	void serveErrorPage(int client_fd, int error_code);
-	void handleCGI(int client_fd, const std::string& cgi_path, const std::string& query);
-	void handleFileUpload(int client_fd, const std::string& upload_dir);
-	std::string getErrorPage(int error_code);
 
 	public:
 	WebServer() = default;
