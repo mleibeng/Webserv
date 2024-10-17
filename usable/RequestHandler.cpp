@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 22:17:49 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 22:51:40 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,11 @@ HttpResponse		RequestHandler::handleRequest(const HttpRequest& request, const Er
 	switch(request.getMethod())
 	{
 		case Method::GET:
-			return (handleGetRequest(request));
+			return (handleGetRequest(request, error));
 		case Method::POST:
-			return (handlePostRequest(request));
+			return (handlePostRequest(request, error));
 		case Method::DELETE:
-			return (handleDeleteRequest(request));
+			return (handleDeleteRequest(request, error));
 		default:
 		{
 			HttpResponse response;
@@ -42,7 +42,7 @@ HttpResponse		RequestHandler::handleRequest(const HttpRequest& request, const Er
 	}
 }
 
-HttpResponse		handleGetRequest(const HttpRequest& request)
+HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request, const Error& error)
 {
 	HttpResponse response;
 	if (!std::filesystem::exists(request.getFilePath()))
@@ -58,16 +58,20 @@ HttpResponse		handleGetRequest(const HttpRequest& request)
 	fileContent << file.rdbuf();
 	response.setStatus(StatusCode::OK);
 	response.setBody(fileContent.str());
-	response.addHeader("Content-Type", setMimeType(request.getFilePath()))
+	response.setMimeType(getFileExtension(request.getFilePath()));
 
 }
-HttpResponse		handlePostRequest(const HttpRequest& request)
+HttpResponse		RequestHandler::handlePostRequest(const HttpRequest& request, const Error& error)
 {
 
 }
 
-HttpResponse		handleDeleteRequest(const HttpRequest& request)
+HttpResponse		RequestHandler::handleDeleteRequest(const HttpRequest& request, const Error& error)
 {
 
 }
 
+std::string		getFileExtension(const std::string& filepath)
+{
+	return (std::filesystem::path(filepath).extension().string());
+}

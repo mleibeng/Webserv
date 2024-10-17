@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 22:21:12 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 22:49:58 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <string>
+#include <map>
 #include <filesystem>
 #include "AHttpMessage.hpp"
 
@@ -76,6 +77,8 @@ class HttpResponse : public AHttpMessage
 		bool	parse(const std::string& rawmsg) override;
 
 		void		setStatus(StatusCode status);
+		void		setMimeType(std::string extension);
+		std::string	getMimeType(const std::string extension);
 		StatusCode	getStatus() const;
 
 	private:
