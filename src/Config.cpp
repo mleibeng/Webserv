@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/15 22:45:12 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/17 22:02:57 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ Config Config::parse(const std::string& conf_file)
 			in_route_block = true;
 			current_route = RouteConf();
 			current_route_path = trim(line.substr(6, line.find('{') - 7));
+			std::cout << current_route_path << std::endl;
 		}
 		else if (line == "}")
 		{

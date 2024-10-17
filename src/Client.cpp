@@ -70,19 +70,29 @@ void WebServer::handleClientRequest(int client_fd)
 	std::cout << "request from " << client_fd << std::endl;
 	client.read_request();
 
-	requester.parse(client.getRequest());
+	// requester.parse(client.getRequest());
 
-	client.setHostname(requester.getHeader("host"));
+	// client.setHostname(requester.getHeader("host"));
 
-	ServerConf *server = nullptr;
-	for (ServerConf serverconf : _config.getServerConfs())
-	{
-		if (serverconf._hostname == client.getHostname() ||
-			std::find(serverconf._server_names.begin(), serverconf._server_names.end(), requester.getHeader("server_name"))) // wrong key for now;
-		{
+	// const ServerConf *server = nullptr;
+	// for (auto &serverconf : _config.getServerConfs())
+	// {
+	// 	if (serverconf._hostname == client.getHostname() ||
+	// 		std::find(serverconf._server_names.begin(), serverconf._server_names.end(), client.getHostname()) != serverconf._server_names.end())
+	// 		server = &serverconf;
+	// }
 
-		}
-	}
+	// // error handling
+
+	// const RouteConf *route_conf = nullptr;
+	// for (auto& [path, conf] : server->_routes)
+	// {
+	// 	if (requester.getUri().compare(0, path.length(), path) == 0)
+	// 	{
+	// 		route_conf = &conf;
+	// 		break;
+	// 	}
+	// }
 
 	std::cout << "response to " << client_fd << std::endl;
 	client.send_response();
