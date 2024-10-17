@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 21:54:06 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 21:55:20 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ HttpResponse		RequestHandler::handleRequest(const HttpRequest& request)
 
 HttpResponse		handleGetRequest(const HttpRequest& request)
 {
-
+	
 }
 HttpResponse		handlePostRequest(const HttpRequest& request)
 {

@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/11 15:22:39 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 21:58:04 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,11 @@ std::string	HttpRequest::getUri() const
 	return (_uri);
 }
 
+std::string	HttpRequest::getFilePath() const
+{
+	return (_filePath);
+}
+
 //SETTERS
 void	HttpRequest::setMethod(Method method)
 {
@@ -56,6 +61,11 @@ void	HttpRequest::setMethod(Method method)
 void	HttpRequest::setUri(const std::string& uri)
 {
 	_uri = uri;
+}
+
+void	HttpRequest::setFilePath(const std::string& filepath)
+{
+	_filePath = filepath;
 }
 
 //PARSE
