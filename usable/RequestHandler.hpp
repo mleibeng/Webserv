@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 19:17:56 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 21:53:29 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <map>
 #include <string>
 #include <exception>
+#include <filesystem>
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 
@@ -32,39 +33,13 @@ class RequestHandler
 		RequestHandler& operator=(const RequestHandler &other) = delete; //might implement this later if needed;
 		~RequestHandler();
 
-		void			registerGetHandler(const std::string& route, std::function<std::string(const HttpRequest&)> callback);
-		void			registerPostHandler(const std::string& route,  std::function<std::string(const HttpRequest&)> callback);
-
-		std::string		handleRequest(const HttpRequest& request);
-		std::string		handleGetRequest(const HttpRequest& request);
-		std::string		handlePostRequest(const HttpRequest& request);
-		std::string		handleDeleteRequest(const HttpRequest& request);
-
-		class MethodHandlerException : public std::exception
-		{
-			protected:
-				std::string	_customErrorMsg;
-			public:
-				explicit MethodHandlerException(const std::string& errormsg);
-				const char*	what() const noexcept override;
-		};
-
-		class GetHandlerException : public MethodHandlerException
-		{
-			public:
-				explicit GetHandlerException(const std::string& errormsg);
-		};
-
-		class PostHandlerException : public MethodHandlerException
-		{
-			public:
-				explicit PostHandlerException(const std::string& errormsg);
-		};
+		HttpResponse	handleRequest(const HttpRequest& request);
+		HttpResponse	handleGetRequest(const HttpRequest& request);
+		HttpResponse	handlePostRequest(const HttpRequest& request);
+		HttpResponse	handleDeleteRequest(const HttpRequest& request);
 
 
 	private:
-		std::map<std::string, std::function<std::string(const HttpRequest&)>> _getRequestHandlers;
-		std::map<std::string, std::function<std::string(const HttpRequest&)>> _postRequestHandlers;
 
 };
 
