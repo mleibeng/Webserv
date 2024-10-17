@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/10 20:12:10 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 21:58:42 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,11 @@ class HttpRequest : public AHttpMessage
 
 		//parse
 		bool	parse(const std::string& rawmsg) override;
-		
+
 		//getters
 		Method		getMethod() const;
 		std::string	getUri() const;
+		std::string	getFilePath() const;
 
 
 		class InvalidMethodException : public std::exception
@@ -74,11 +75,13 @@ class HttpRequest : public AHttpMessage
 		};
 
 	private:
-		std::string	_uri; //Uniform Resource Identifier
 		Method		_method;
+		std::string	_uri; //Uniform Resource Identifier
+		std::string	_filePath;
 
 		void		setMethod(Method method);
 		void		setUri(const std::string& uri);
+		void		setFilePath(const std::string& filepath);
 
 
 		//utils
