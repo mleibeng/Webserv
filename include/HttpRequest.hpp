@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 22:11:33 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/17 22:50:40 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include <string>
+#include "WebServer.hpp"
 #include "AHttpMessage.hpp"
 
 // The following example illustrates a typical message exchange for a
@@ -53,6 +54,7 @@ class HttpRequest : public AHttpMessage
 {
 	public:
 		HttpRequest();
+		HttpRequest(std::string rawmsg);
 		HttpRequest(const HttpRequest &other);
 		HttpRequest& operator=(const HttpRequest &other);
 		~HttpRequest();
@@ -78,6 +80,7 @@ class HttpRequest : public AHttpMessage
 		Method		_method;
 		std::string	_uri; //Uniform Resource Identifier
 		std::string	_filePath;
+		bool		badparse;
 
 		void		setMethod(Method method);
 		void		setUri(const std::string& uri);
