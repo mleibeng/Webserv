@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/18 16:19:56 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 16:41:58 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,11 @@ ssize_t Client::send_response() {
 	}
 
 	return nbytes;
+}
+
+std::string	Client::getRawRequest() const
+{
+	return (_request);
 }
 
 

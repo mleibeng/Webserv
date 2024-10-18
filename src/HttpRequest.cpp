@@ -6,17 +6,18 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 22:00:41 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 16:47:29 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
 
-HttpRequest::HttpRequest()
+HttpRequest::HttpRequest(const std::string& raw_request)
 {
+	parse(raw_request);
 }
 
-HttpRequest::HttpRequest(const HttpRequest &other)
+HttpRequest::HttpRequest(const HttpRequest &other) : AHttpMessage()
 {
 	*this = other;
 }

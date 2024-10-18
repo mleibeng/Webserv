@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 21:58:42 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 16:39:37 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ enum class Method { GET, POST, DELETE };
 class HttpRequest : public AHttpMessage
 {
 	public:
-		HttpRequest();
+		HttpRequest() = delete;
+		HttpRequest(const std::string& raw_request);
 		HttpRequest(const HttpRequest &other);
 		HttpRequest& operator=(const HttpRequest &other);
 		~HttpRequest();

@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 22:48:32 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 16:50:23 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ HttpResponse::HttpResponse()
 	// std::cout << GREY << "Default constructor called" << RESET << std::endl;
 }
 
-HttpResponse::HttpResponse(const HttpResponse &other)
+HttpResponse::HttpResponse(const HttpResponse &other) : AHttpMessage()
 {
 	// std::cout << GREY << "Copy constructor called" << RESET << std::endl;
 	*this = other;
@@ -83,6 +83,7 @@ std::string		HttpResponse::getMimeType(const std::string extension)
 	auto	iter = mimeTypes.find(extension);
 	if (iter != mimeTypes.end())
 		return (iter->second);
+	return (""); // do this later
 }
 
 bool	HttpResponse::parse(const std::string& rawmsg)
@@ -140,7 +141,7 @@ std::string	HttpResponse::buildResponse() const
 	}
 	if (_header.find("Content-Length") == _header.end())
 		response << "Content-Length: " << _body.size() << "\r\n";
-	if (_header.find("Content-Type") == _header.end());
+	if (_header.find("Content-Type") == _header.end())
 		response << "Content-Type: text/plain\r\n";
 	response << "\r\n";
 	response << _body;

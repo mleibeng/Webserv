@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 16:20:09 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 16:43:10 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,8 @@ void WebServer::handleClientRequest(int client_fd)
 
 	std::cout << "request from " << client_fd << std::endl;
 	client.read_request();
+	HttpRequest request(client.getRawRequest());
+	
 
 	std::cout << "response to " << client_fd << std::endl;
 	client.send_response();
