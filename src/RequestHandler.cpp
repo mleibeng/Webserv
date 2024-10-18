@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 17:37:25 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 19:58:23 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,16 +57,18 @@ HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request)
 	std::ifstream		file("html_pages/index.html");
 	if (!file.is_open())
 	{
-	std::cerr << "Could not open " << std::endl;
+		std::cerr << "Could not open " << std::endl;
 	}
 	std::stringstream	fileBuffer;
 	std::string			fileContent;
 
 	fileBuffer << file.rdbuf();
 	fileContent = fileBuffer.str();
+	file.close();
 	response.setStatus(StatusCode::OK);
 	response.setBody(fileContent);
-	response.setMimeType(getFileExtension(request.getFilePath()));
+	// response.setMimeType(getFileExtension(request.getFilePath()));
+	response.setMimeType(getFileExtension("html_pages/index.html"));
 	return(response);
 }
 HttpResponse		RequestHandler::handlePostRequest(const HttpRequest& request)

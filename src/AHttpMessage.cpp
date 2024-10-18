@@ -27,7 +27,7 @@ AHttpMessage& AHttpMessage::operator=(const AHttpMessage &other)
 	if (this != &other)
 	{
 		setHttpVersion(other.getHttpVersion());
-		setAllHeaders(other.getAllHeaders());
+		setAllHeaders(other._header);
 		setBody(other.getBody());
 	}
 	return (*this);
@@ -57,10 +57,10 @@ void	AHttpMessage::setHeader(const std::string& key, const std::string& val)
 
 void AHttpMessage::setAllHeaders(const std::map<std::string, std::string>& headers)
 {
-	_header.clear();  // Clear existing headers before copying
+	_header.clear();
 	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
 	{
-		_header[it->first] = it->second;  // Copy each header key-value pair
+		_header[it->first] = it->second;
 	}
 }
 

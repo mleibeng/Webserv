@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 17:00:06 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 18:34:56 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 
-class Error;
 class RequestHandler
 {
 	public:

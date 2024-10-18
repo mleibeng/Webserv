@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 17:05:04 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 19:57:10 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,11 @@ void WebServer::setupListeners()
 		for (const auto& port : ports)
 		{
 			std::string server_key = server.hostname + ":" + std::to_string(port);
+
+			// int opt = 1;
+			// if (setsockopt(_server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+			// 	std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
+			// }
 
 			int fd = createNonBlockingSocket();
 			struct sockaddr_in addr;
@@ -184,8 +189,7 @@ void WebServer::handleClientRequest(int client_fd)
 	client.read_request();
 	HttpRequest request(client.getRawRequest());
 	RequestHandler handler;
-	HttpResponse response;
-	response = handler.handleRequest(request);
+	HttpResponse response(handler.handleRequest(request)); // might have to revisit later but this fixes the bug with missing headers
 
 	std::cout << "response to " << client_fd << std::endl;
 	client.send_response(response.buildResponse());
