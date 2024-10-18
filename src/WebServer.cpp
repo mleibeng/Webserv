@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/14 17:08:48 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 16:20:09 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,4 +173,16 @@ void WebServer::loadErrorPages()
 			}
 		}
 	}
+}
+
+void WebServer::handleClientRequest(int client_fd)
+{
+	// (void)client_fd;
+	Client client(client_fd);
+
+	std::cout << "request from " << client_fd << std::endl;
+	client.read_request();
+
+	std::cout << "response to " << client_fd << std::endl;
+	client.send_response();
 }

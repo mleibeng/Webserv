@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/18 15:28:21 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/18 16:19:56 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,21 +55,6 @@ ssize_t Client::send_response() {
 
 	return nbytes;
 }
-
-void WebServer::handleClientRequest(int client_fd)
-{
-	// (void)client_fd;
-	Client client(client_fd);
-
-	std::cout << "request from " << client_fd << std::endl;
-	client.read_request();
-
-	std::cout << "response to " << client_fd << std::endl;
-	client.send_response();
-}
-
-
-
 
 
 
