@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 23:21:31 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 02:49:17 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class HttpRequest : public AHttpMessage
 {
 	public:
 		HttpRequest();
-		HttpRequest(std::string& rawmsg);
+		HttpRequest(const std::string& rawmsg);
 		HttpRequest(const HttpRequest &other);
 		HttpRequest& operator=(const HttpRequest &other);
 		~HttpRequest();

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 23:48:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 03:30:15 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,10 @@ class RequestHandler
 		HttpResponse	handlePostRequest(const HttpRequest& request, const Client& client);
 		HttpResponse	handleDeleteRequest(const HttpRequest& request, const Client& client);
 
-		void loadErrorPage();
+		std::string		returnResponse(const HttpResponse &why_do_we_do_this_again);
+
+		const ServerConf *RequestHandler::findServerConf(const HttpRequest &request);
+		const RouteConf *RequestHandler::findRouteConf(const HttpRequest& request, const ServerConf &server_conf);
 		std::string serveErrorPage(int error_code);
 		void handleCGI(Client& client, const std::string& cgi_path, const std::string& query);
 		void handleFileUpload(Client &client, const std::string& upload_dir);

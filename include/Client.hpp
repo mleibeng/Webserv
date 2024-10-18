@@ -26,7 +26,7 @@ class Client {
 		Client& operator=(const Client& other) = delete;
 
 		ssize_t read_request();
-		ssize_t send_response();
+		ssize_t send_response(const std::string& response);
 
 		const std::string getRequest();
 		const std::string getHostname();
@@ -34,7 +34,7 @@ class Client {
 
 	private:
 		int _client_fd;
-		std::string _hostname;
+		// std::string _hostname;
 		std::string _request;
 		std::string _response =
 			"HTTP/1.1 200 OK\r\n"

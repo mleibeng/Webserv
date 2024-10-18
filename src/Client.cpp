@@ -35,9 +35,10 @@ ssize_t Client::read_request() {
 	return nbytes;
 }
 
-ssize_t Client::send_response() {
+ssize_t Client::send_response(const std::string &response) {
 	ssize_t nbytes;
 
+	//vergesst nicht liebe kinder _response mit response zu ersetzen. Sonst gibts nur die standard message hello World!
 	nbytes = write(_client_fd, _response.c_str(), _response.size());
 	if (nbytes == -1) {
 		std::cerr << RED << "write(): " << strerror(errno) << DEFAULT << std::endl;
@@ -51,58 +52,17 @@ const std::string Client::getRequest()
 	return _request;
 }
 
-void Client::setHostname(const std::string &hostname)
-{
-	_hostname = hostname;
-}
+// void Client::setHostname(const std::string &hostname)
+// {
+// 	_hostname = hostname;
+// }
 
-const std::string Client::getHostname()
-{
-	return _hostname;
-}
-
-void WebServer::handleClientRequest(int client_fd)
-{
-	// (void)client_fd;
-	Client client(client_fd);
-
-	std::cout << "request from " << client_fd << std::endl;
-	if(!client.read_request())
-	{
-		request_handler->serveErrorPage(client, 404);
-		return;
-	}
-	request_handler->handleRequest(client);
-
-	// const HttpRequest& requester(client.getRequest());
-
-	// client.setHostname(requester.getHeader("host"));
-
-	// const ServerConf *serverconf = nullptr;
-	// for (auto &conf : _config.getServerConfs())
-	// {
-	// 	if (conf._hostname == requester.getHeader("host") ||
-	// 		std::find(conf._server_names.begin(), conf._server_names.end(), client.getHostname()) != conf._server_names.end())
-	// 		serverconf = &conf;
-	// }
-
-	// // error handling
-
-	// const RouteConf *route_conf = nullptr;
-	// for (auto& [path, conf] : serverconf->_routes)
-	// {
-	// 	if (requester.getUri().compare(0, path.length(), path) == 0)
-	// 	{
-	// 		route_conf = &conf;
-	// 		break;
-	// 	}
-	// }
+// const std::string Client::getHostname()
+// {
+// 	return _hostname;
+// }
 
 
-
-	// std::cout << "response to " << client_fd << std::endl;
-	// client.send_response();
-}
 
 
 // Discussion topics i found:

@@ -6,14 +6,14 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 23:36:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 02:49:36 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "HttpRequest.hpp"
 
-HttpRequest::HttpRequest(std::string& rawmsg)
+HttpRequest::HttpRequest(const std::string& rawmsg)
 {
 	bool badparse = parse(rawmsg);
 }

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/17 23:48:54 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 03:26:48 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,17 +178,22 @@ void WebServer::loadErrorPages()
 
 void WebServer::handleClientRequest(int client_fd)
 {
-	// (void)client_fd;
 	Client client(client_fd);
 
 	std::cout << "request from " << client_fd << std::endl;
 	if(!client.read_request())
 	{
-		request_handler->serveErrorPage(client, 404);
+		std::string responsebody = request_handler->serveErrorPage(404);
 		return;
-	}
-	// request_handler->handleRequest(client);
+	} // irgendwie muss hier fuer diesen einen fall ein response gebaut werden...
+	  // oder wir machen den client.readRequest && den Bau vom HttpRequest im request handler
+	  // oder loeschen den client
+
+	HttpRequest request(client.getRequest());
+	request_handler->handleRequest(request, client);
 
 	std::cout << "response to " << client_fd << std::endl;
-	client.send_response();
+	client.send_response(request_handler->returnResponse()); // warum erst hier? ich passe es durch die buildResponse funktion.
+															// das funktioniert nicht mal richtig
+															// weil ich kein objekt zum reichen habe auf diesem level.
 }
