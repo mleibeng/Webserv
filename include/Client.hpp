@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/10/18 16:41:20 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 17:08:33 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,19 +37,19 @@ class Client {
 		Client& operator=(const Client& other) = delete;
 
 		ssize_t read_request();
-		ssize_t send_response();
+		ssize_t send_response(const std::string& response_string);
 
 		std::string	getRawRequest() const;
 
 	private:
 		int _client_fd;
 		std::string _request;
-		std::string _response =
-			"HTTP/1.1 200 OK\r\n"
-			"Content-Type: text/plain\r\n"
-			"Content-Length: 12\r\n"
-			"\r\n"
-			"Hello World!";
+		std::string _response;
+			// "HTTP/1.1 200 OK\r\n"
+			// "Content-Type: text/plain\r\n"
+			// "Content-Length: 12\r\n"
+			// "\r\n"
+			// "Hello World!";
 };
 
 #endif // CLIENT_H

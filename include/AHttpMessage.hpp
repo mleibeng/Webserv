@@ -34,6 +34,7 @@ class AHttpMessage
 		//setters
 		void	setHttpVersion(const std::string& vers);
 		void	setHeader(const std::string& key, const std::string& val);
+		void	setAllHeaders(const std::map<std::string, std::string>& headers);
 		void	setBody(const std::string& body);
 
 		//getters

@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/18 16:41:58 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 17:09:36 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,11 @@ ssize_t Client::read_request() {
 	return nbytes;
 }
 
-ssize_t Client::send_response() {
+ssize_t Client::send_response(const std::string& response_string) {
 	ssize_t nbytes;
 
-	nbytes = write(_client_fd, _response.c_str(), _response.size());
+	std::cout << response_string << std::endl;
+	nbytes = write(_client_fd, response_string.c_str(), response_string.size());
 	if (nbytes == -1) {
 		std::cerr << RED << "write(): " << strerror(errno) << DEFAULT << std::endl;
 	}

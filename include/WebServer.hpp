@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 16:37:47 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 16:56:15 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include "Loop.hpp"
 #include "Client.hpp"
 #include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
+#include "RequestHandler.hpp"
 
 class Loop;
 class Client;

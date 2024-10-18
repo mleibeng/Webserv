@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 16:50:23 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 17:35:43 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,10 @@ HttpResponse& HttpResponse::operator=(const HttpResponse &other)
 {
 	if (this != &other)
 	{
+		AHttpMessage::operator=(other);
+		setStatus(other.getStatus());
+		setMimeType(other._mimeType);
+
 		// std::cout << GREY << "Copy assignment operator called" << RESET << std::endl;
 	}
 	return *this;
