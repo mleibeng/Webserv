@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 18:55:24 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/18 15:28:39 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,19 @@
 int main(int argc, char** argv) {
 	Config config;
 
-	// config part
-	if (argc == 1) {
-		config.parse(std::string("config/NGINX1.conf"));
+	if (argc != 2)
+		config_file = "Configs/NGINX1.conf";
+	else
+		config_file = argv[1];
+	try
+	{
+		WebServer MainServ(config_file);
+		MainServ.initialize();
+		MainServ.start();
 	}
-	else if (argc == 2) {
-		config.parse(argv[1]);
+	catch (const std::runtime_error& e) {
+		std::cerr << e.what() << std::endl;
+		return 1;
 	}
-	else {
-		std::cerr << RED << "Usage ./webserv <configfile>" << DEFAULT << std::endl;
-	}
-
-	// epoll part
-	EventLoop event_loop(PORT);
-	event_loop.start();
-
 	return 0;
 }

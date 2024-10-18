@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/12 02:32:49 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/17 22:51:40 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,61 +22,56 @@ RequestHandler::~RequestHandler()
 	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
 
-std::string		RequestHandler::handleRequest(const HttpRequest& request)
+HttpResponse		RequestHandler::handleRequest(const HttpRequest& request, const Error& error)
 {
 	switch(request.getMethod())
 	{
 		case Method::GET:
-			return (handleGetRequest(request));
-		//case Method::POST:	<--implement later
-		//case Method::DELETE:	<--implement later
+			return (handleGetRequest(request, error));
+		case Method::POST:
+			return (handlePostRequest(request, error));
+		case Method::DELETE:
+			return (handleDeleteRequest(request, error));
 		default:
 		{
 			HttpResponse response;
 			response.setStatus(StatusCode::NOT_IMPLEMENTED);
-			response.setHeader("Content-Type", "text/plain");
-			response.setBody("501 Not Implemented");
-			return (response.buildResponse());
+			response.setBody(error.getErrorPage(501));
+			response.setHeader("Content-Type", "html/txt");
 		}
 	}
 }
 
-std::string		RequestHandler::handleGetRequest(const HttpRequest& request)
+HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request, const Error& error)
 {
-	try
+	HttpResponse response;
+	if (!std::filesystem::exists(request.getFilePath()))
 	{
-		auto	iter = _getRequestHandlers.find(request.getUri());
-		if (iter != _getRequestHandlers.end())
-		{
-			std::string	content = iter->second(request);
+		response.setStatus(StatusCode::NOT_FOUND);
+		response.setBody(error.getErrorPage(404));
+		response.
+	}
 
-			HttpResponse	response;
-			response.setStatus(StatusCode::OK);
-			response.setHeader("Content-Type", "text/html");
-			response.setBody(content);
-			return (response.buildResponse());
-		}
-		else
-		{
-			HttpResponse	response;
-			response.setStatus(StatusCode::NOT_FOUND);
-			response.setHeader("Content-Type", "text/plain");
-			response.setBody("404 Not Found");
-			return (response.buildResponse());
-		}
-	}
-	catch (const std::exception& e)
-	{
-		HttpResponse response;
-		response.setStatus(StatusCode::INTERNAL_SERV_ERR);
-		response.setHeader("Content-Type", "text/plain");
-		response.setBody("500 Internal Server Error: " + std::string(e.what()));
-		return (response.buildResponse());
-	}
+	std::ifstream		file(request.getFilePath());
+	std::stringstream	fileContent;
+
+	fileContent << file.rdbuf();
+	response.setStatus(StatusCode::OK);
+	response.setBody(fileContent.str());
+	response.setMimeType(getFileExtension(request.getFilePath()));
+
 }
-
-void			RequestHandler::registerGetHandler(const std::string& route, std::function<std::string(const HttpRequest&)> callback)
+HttpResponse		RequestHandler::handlePostRequest(const HttpRequest& request, const Error& error)
 {
-	_getRequestHandlers[route] = callback;
+
 }
 
+HttpResponse		RequestHandler::handleDeleteRequest(const HttpRequest& request, const Error& error)
+{
+
+}
+
+std::string		getFileExtension(const std::string& filepath)
+{
+	return (std::filesystem::path(filepath).extension().string());
+}
