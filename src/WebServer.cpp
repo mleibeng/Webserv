@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 03:26:48 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 05:10:55 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,15 +185,15 @@ void WebServer::handleClientRequest(int client_fd)
 	{
 		std::string responsebody = request_handler->serveErrorPage(404);
 		return;
-	} // irgendwie muss hier fuer diesen einen fall ein response gebaut werden...
+	} // irgendwie muss hier fuer diesen fall ein response gebaut werden...
+	  // oder wir verschicken den response direkt im handler
 	  // oder wir machen den client.readRequest && den Bau vom HttpRequest im request handler
-	  // oder loeschen den client
+	  // oder loeschen den client und machen dann beides im handler
 
 	HttpRequest request(client.getRequest());
 	request_handler->handleRequest(request, client);
 
 	std::cout << "response to " << client_fd << std::endl;
-	client.send_response(request_handler->returnResponse()); // warum erst hier? ich passe es durch die buildResponse funktion.
-															// das funktioniert nicht mal richtig
-															// weil ich kein objekt zum reichen habe auf diesem level.
+	client.send_response(request_handler->returnResponse()); // irgendwie muessen wir jetzt das response objekt
+															 // doch wieder in einen string casten
 }

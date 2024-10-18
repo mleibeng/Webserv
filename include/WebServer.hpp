@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/17 23:48:40 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 05:05:43 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 
 
 class Client;
-class Loop;
 class WebServer
 {
 	private:

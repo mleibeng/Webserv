@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 03:30:17 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 05:08:31 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,6 @@ RequestHandler::RequestHandler(const std::unordered_map<int, std::string>& _erro
 RequestHandler::~RequestHandler()
 {
 	// std::cout << GREY << "Destructor called" << RESET << std::endl;
-}
-
-std::string		RequestHandler::returnResponse(const HttpResponse &why_do_we_do_this_again)
-{
-	// warum konvertieren wir httpresponse wieder zu string um damit der client den string dann wieder verschicken kann??
-	// naja hier ist die logik
-	return(why_do_we_do_this_again.buildResponse());
 }
 
 std::string RequestHandler::serveErrorPage(int error_code)
@@ -68,7 +61,6 @@ HttpResponse		RequestHandler::handleRequest(const HttpRequest& request, const Cl
 			RueckgabeObjekt.setBody(serveErrorPage(501));
 			RueckgabeObjekt.setHeader("Content-Type", "html/txt");
 			return RueckgabeObjekt;
-		// so das muessen wir jetzt ueberall bei jedem serven von ner error page machen...
 	}
 
 	const RouteConf* route_conf = findRouteConf(*server_conf, request);
@@ -109,7 +101,6 @@ HttpResponse		RequestHandler::handleRequest(const HttpRequest& request, const Cl
 			return response;
 		}
 	}
-	// ok aber client sendet nen string, kein response class objekt
 }
 
 HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request, const Client& client)

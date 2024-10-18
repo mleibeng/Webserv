@@ -16,7 +16,8 @@
 #define RED			"\033[31m"
 #define YELLOW		"\033[33m"
 
-class Client {
+class Client
+{
 	public:
 		Client(int client_fd);
 		~Client();
@@ -29,12 +30,9 @@ class Client {
 		ssize_t send_response(const std::string& response);
 
 		const std::string getRequest();
-		const std::string getHostname();
-		void setHostname(const std::string &hostname);
 
 	private:
 		int _client_fd;
-		// std::string _hostname;
 		std::string _request;
 		std::string _response =
 			"HTTP/1.1 200 OK\r\n"
