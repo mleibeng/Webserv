@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 05:08:31 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 06:11:23 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,38 @@ std::string RequestHandler::serveErrorPage(int error_code)
 
 const ServerConf *RequestHandler::findServerConf(const HttpRequest &request)
 {
-
+	const ServerConf *server_conf = nullptr;
+	for (const auto& conf : _config.getServerConfs())
+	{
+		if (conf._hostname == request.host ||
+			std::find(conf.server_names.begin(), conf.server_names.end(), request.getHeader("host")) != conf.server_names.end())
+		{
+			server_conf = &conf;
+			break;
+		}
+	}
+	return server_conf;
 }
 
 const RouteConf *RequestHandler::findRouteConf(const ServerConf &server_conf, HttpRequest& request)
 {
+	const RouteConf *route_conf = nullptr;
+	for (const auto& [path, conf] : server_conf->_routes)
+	{
+		if (request.getUri().compare(0, path.length(), path) == 0)
+		{
+			route_conf = &conf;
+			break;
+		}
+	}
+	return route_conf;
+}
 
+bool RequestHandler::isMethodAllowed(const RouteConf &route_conf, HttpRequest& request)
+{
+	if (std::find(route_conf->_methods.begin(), route_conf->_methods.end(), request.getMethod) == route_conf->_methods.end())
+		return false
+	return true;
 }
 
 //sollten wir wirklich in einen string umwandeln vor dem zurueckgeben...
