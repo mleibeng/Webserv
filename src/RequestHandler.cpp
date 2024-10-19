@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/19 14:11:18 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/19 15:48:49 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,15 +46,17 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request)
 {
 	HttpResponse response;
-	if (!std::filesystem::exists(request.getFilePath()))
-	{
-		response.setStatus(StatusCode::NOT_FOUND);
-		// response.setBody(error.getErrorPage(404));
-		response.setHeader("Content-Type", "html/txt");
-	}
+	// if (!std::filesystem::exists(request.getFilePath()))
+	// {
+	// 	response.setStatus(StatusCode::NOT_FOUND);
+	// 	// response.setBody(error.getErrorPage(404));
+	// 	response.setHeader("Content-Type", "html/txt");
+	// }
 
 	// std::ifstream		file(request.getFilePath());
-	std::ifstream		file("html_pages/index.html");
+	// std::ifstream		file("html_pages/index.html");
+	// std::cout << RED << request.getUri() << RESET << std::endl;
+	std::ifstream		file("html_pages/" + request.getUri());
 	if (!file.is_open())
 	{
 		std::cerr << "Could not open " << std::endl;
@@ -68,9 +70,11 @@ HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request)
 	response.setStatus(StatusCode::OK);
 	response.setBody(fileContent);
 	// response.setMimeType(getFileExtension(request.getFilePath()));
-	response.setMimeType(getFileExtension("html_pages/index.html"));
+	// response.setMimeType(getFileExtension("html_pages/index.html"));
+	response.setMimeType(getFileExtension("html_pages/" + request.getUri()));
 	return(response);
 }
+
 HttpResponse		RequestHandler::handlePostRequest(const HttpRequest& request)
 {
 	(void)request;
