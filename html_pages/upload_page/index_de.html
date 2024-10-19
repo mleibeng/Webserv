@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deutsche Version</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .switch-lang {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .content {
+            text-align: center;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sprachschalter -->
+    <div class="switch-lang">
+        <a href="index_en.html">Wechseln zur englischen Version</a>
+    </div>
+
+    <!-- Inhalt der Seite -->
+    <div class="content">
+        <h1>Willkommen auf unserer Website!</h1>
+        <p>Dies ist die deutsche Version unserer Seite. Sie können unten eine Datei hochladen.</p>
+    </div>
+
+    <!-- Datei-Upload-Formular -->
+    <div class="content">
+        <form action="upload.php" method="post" enctype="multipart/form-data">
+            Wählen Sie eine Datei zum Hochladen:
+            <input type="file" name="fileToUpload">
+            <input type="submit" value="Datei hochladen">
+        </form>
+    </div>
+</body>
+</html>
