@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/19 14:13:26 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/19 14:51:05 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,7 @@ void WebServer::stop()
 
 void WebServer::runLoop()
 {
+	RequestHandler handler;
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
@@ -147,7 +148,7 @@ void WebServer::runLoop()
 					}
 				}
 				if (!is_listener)
-					handleClientRequest(fd);
+					handleClientRequest(fd, handler);
 			}
 		}
 	}
@@ -180,7 +181,7 @@ void WebServer::loadErrorPages()
 	}
 }
 
-void WebServer::handleClientRequest(int client_fd)
+void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 {
 	// (void)client_fd;
 	Client client(client_fd);
@@ -188,7 +189,6 @@ void WebServer::handleClientRequest(int client_fd)
 	std::cout << "request from " << client_fd << std::endl;
 	client.read_request();
 	HttpRequest request(client.getRawRequest());
-	RequestHandler handler;
 	std::string	response_str = handler.handleRequest(request);// might have to revisit later but this fixes the bug with missing headers
 
 	std::cout << "response to " << client_fd << std::endl;
