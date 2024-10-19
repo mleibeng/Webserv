@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 19:58:23 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/19 14:11:18 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,23 +22,23 @@ RequestHandler::~RequestHandler()
 	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
 
-HttpResponse		RequestHandler::handleRequest(const HttpRequest& request)
+std::string		RequestHandler::handleRequest(const HttpRequest& request)
 {
 	switch(request.getMethod())
 	{
 		case Method::GET:
-			return (handleGetRequest(request));
+			return (handleGetRequest(request).buildResponse());
 		case Method::POST:
-			return (handlePostRequest(request));
+			return (handlePostRequest(request).buildResponse());
 		case Method::DELETE:
-			return (handleDeleteRequest(request));
+			return (handleDeleteRequest(request).buildResponse());
 		default:
 		{
 			HttpResponse response;
 			response.setStatus(StatusCode::NOT_IMPLEMENTED);
 			// response.setBody(error.getErrorPage(501));
 			response.setHeader("Content-Type", "html/txt");
-			return (response);
+			return (response.buildResponse());
 		}
 	}
 }
@@ -50,7 +50,7 @@ HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request)
 	{
 		response.setStatus(StatusCode::NOT_FOUND);
 		// response.setBody(error.getErrorPage(404));
-		// response.
+		response.setHeader("Content-Type", "html/txt");
 	}
 
 	// std::ifstream		file(request.getFilePath());

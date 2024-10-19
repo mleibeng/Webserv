@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 19:57:10 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/19 14:13:26 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,8 +189,8 @@ void WebServer::handleClientRequest(int client_fd)
 	client.read_request();
 	HttpRequest request(client.getRawRequest());
 	RequestHandler handler;
-	HttpResponse response(handler.handleRequest(request)); // might have to revisit later but this fixes the bug with missing headers
+	std::string	response_str = handler.handleRequest(request);// might have to revisit later but this fixes the bug with missing headers
 
 	std::cout << "response to " << client_fd << std::endl;
-	client.send_response(response.buildResponse());
+	client.send_response(response_str);
 }

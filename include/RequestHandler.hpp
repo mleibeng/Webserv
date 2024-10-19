@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 18:34:56 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/19 14:08:59 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class RequestHandler
 		RequestHandler& operator=(const RequestHandler &other) = delete; //might implement this later if needed;
 		~RequestHandler();
 
-		HttpResponse	handleRequest(const HttpRequest& request);
+		std::string		handleRequest(const HttpRequest& request);
 		HttpResponse	handleGetRequest(const HttpRequest& request);
 		HttpResponse	handlePostRequest(const HttpRequest& request);
 		HttpResponse	handleDeleteRequest(const HttpRequest& request);
