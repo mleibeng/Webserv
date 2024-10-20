@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/19 14:51:05 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/20 05:05:37 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,6 @@ void WebServer::stop()
 
 void WebServer::runLoop()
 {
-	RequestHandler handler;
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
@@ -148,7 +147,7 @@ void WebServer::runLoop()
 					}
 				}
 				if (!is_listener)
-					handleClientRequest(fd, handler);
+					handleClientRequest(fd, *request_handler);
 			}
 		}
 	}
@@ -158,27 +157,7 @@ void WebServer::runLoop()
 void WebServer::initialize()
 {
 	setupListeners();
-	loadErrorPages();
-}
-
-void WebServer::loadErrorPages()
-{
-	for (const auto &server : config.getServerConfs())
-	{
-		if (!server.default_error_pages.empty())
-		{
-			std::ifstream file(server.default_error_pages);
-			std::string line;
-			while (std::getline(file, line))
-			{
-				std::istringstream iss(line);
-				int error_code;
-				std::string page_path;
-				if (iss >> error_code >> page_path)
-					error_pages[error_code] = page_path;
-			}
-		}
-	}
+	request_handler = std::make_unique<RequestHandler>(config);
 }
 
 void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
