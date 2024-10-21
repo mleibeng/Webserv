@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/20 05:21:58 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/21 22:21:59 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,15 +135,35 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 }
 
 // und hier das argument nr2 so: ->  handleGetRequest(request, const RouteConf &route_conf)!
-HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request)
+HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request, const RouteConf& route_conf)
 {
 	// HIER ist der FilePath
 	//  |
 	//  v
-	// std::string file_path = route_conf._root + client.get_request().path; <- path muss hier aus der URI ausgelesen werden oder ist die URI wie gesagt hab keine Ahnug wie das bei euch abgespeichert wird!
+	std::string file_path = route_conf.root + request.getUri(); // weiss wie gesagt nich ob das 100% stimmt mit der URI
 
 	HttpResponse response;
-	// if (!std::filesystem::exists(request.getFilePath()))
+
+	// DIESE LOGIK FEHLT
+	//      |
+	//      V
+	// if (std::filesystem::is_directory(file_path))
+	// {
+	// 	if (route_conf.dir_listing_active)
+	// 		sendDirectoryListing(client, file_path);
+	// 	else if (!route_conf._default_file.empty())
+	// 	{
+	// 		file_path += "/" + route_conf._default_file;
+	// 		sendFile(client, file_path);
+	// 	}
+	// 	else
+	// 		serveErrorPage(client.get_fd(), 403); // Forbidden
+	// }
+	// else
+	// 	sendFile(client, file_path);
+
+// ------------------------------------------------------------------------------------
+	// if (!std::filesystem::exists(file_path))
 	// {
 	// 	response.setStatus(StatusCode::NOT_FOUND);
 	// 	// response.setBody(error.getErrorPage(404));
@@ -174,13 +194,35 @@ HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request)
 
 HttpResponse		RequestHandler::handlePostRequest(const HttpRequest& request)
 {
+	// std::string file_path = route_conf.root + request.getUri();
 	(void)request;
 	HttpResponse response;
+
+	// DIESE LOGIK MUSS REIN <- filedescriptor koennte ein issue sein. weil CGI schickt selber zurueck und baut keine Nachricht!!
+	// if (!route_conf.cgi_extension.empty() && request.getUri().ends_with(route_conf.cgi_extension))
+	//		handleCGI(int fd, file_path, request.getBody());
+	// else
+	//		normale handler logik!
 	return(response);
 }
 
 HttpResponse		RequestHandler::handleDeleteRequest(const HttpRequest& request)
 {
+	// std::string file_path = route_conf.root + request.getUri();
+
+	// LOGIK:
+	//  |
+	//  V
+	// if (std::filesystem::exists(file_path) && !std::filesystem::is_directory(file_path))
+	// {
+	// 	if (std::filesystem::remove(file_path))
+	// 		client.send_response(HttpResponse(200, "text/plain", "File deleted successfully"));
+	// 	else
+	// 		serveErrorPage(client.get_fd(), 500); // Internal Server Error
+	// }
+	// else
+	// 	serveErrorPage(client.get_fd(), 404); // Not
+
 	(void)request;
 	HttpResponse response;
 	return(response);

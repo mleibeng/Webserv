@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/20 05:16:46 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/21 21:52:47 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,9 @@ class RequestHandler
 		~RequestHandler();
 
 		std::string		handleRequest(const HttpRequest& request);
-		HttpResponse	handleGetRequest(const HttpRequest& request);
-		HttpResponse	handlePostRequest(const HttpRequest& request);
-		HttpResponse	handleDeleteRequest(const HttpRequest& request);
+		HttpResponse	handleGetRequest(const HttpRequest& request, const RouteConf& route_conf);
+		HttpResponse	handlePostRequest(const HttpRequest& request, const RouteConf& route_conf);
+		HttpResponse	handleDeleteRequest(const HttpRequest& request, const RouteConf& route_conf);
 
 		const ServerConf *findServerConf(const HttpRequest &request);
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
