@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
+/*   Updated: 2024/10/21 21:10:17 by mleibeng         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CLIENT_H
 #define CLIENT_H
 
@@ -27,19 +39,19 @@ class Client
 		Client& operator=(const Client& other) = delete;
 
 		ssize_t read_request();
-		ssize_t send_response(const std::string& response);
+		ssize_t send_response(const std::string& response_string);
 
-		const std::string getRequest();
+		std::string	getRawRequest() const;
 
 	private:
 		int _client_fd;
 		std::string _request;
-		std::string _response =
-			"HTTP/1.1 200 OK\r\n"
-			"Content-Type: text/plain\r\n"
-			"Content-Length: 12\r\n"
-			"\r\n"
-			"Hello World!";
+		std::string _response;
+			// "HTTP/1.1 200 OK\r\n"
+			// "Content-Type: text/plain\r\n"
+			// "Content-Length: 12\r\n"
+			// "\r\n"
+			// "Hello World!";
 };
 
 #endif // CLIENT_H

@@ -6,16 +6,20 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 00:47:21 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/21 21:12:00 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "WebServer.hpp"
+#include "Config.hpp"
 #include <iostream>
+#include <string>
+#include "WebServer.hpp"
 
-//should probably also implement signal handling!
-int main(int argc, char **argv)
-{
+#define DEFAULT	"\033[0m"
+#define RED		"\033[31m"
+#define PORT	8080
+
+int main(int argc, char** argv) {
 	std::string config_file;
 
 	if (argc != 2)

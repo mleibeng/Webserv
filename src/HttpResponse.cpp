@@ -6,18 +6,18 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/17 22:48:32 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/18 19:46:07 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
-HttpResponse::HttpResponse()
+HttpResponse::HttpResponse() : AHttpMessage()
 {
 	// std::cout << GREY << "Default constructor called" << RESET << std::endl;
 }
 
-HttpResponse::HttpResponse(const HttpResponse &other)
+HttpResponse::HttpResponse(const HttpResponse &other) : AHttpMessage()
 {
 	// std::cout << GREY << "Copy constructor called" << RESET << std::endl;
 	*this = other;
@@ -27,6 +27,9 @@ HttpResponse& HttpResponse::operator=(const HttpResponse &other)
 {
 	if (this != &other)
 	{
+		AHttpMessage::operator=(other);
+		setStatus(other.getStatus());
+		setMimeType(other._mimeType);
 		// std::cout << GREY << "Copy assignment operator called" << RESET << std::endl;
 	}
 	return *this;
@@ -45,7 +48,8 @@ void HttpResponse::setStatus(StatusCode status)
 }
 void		HttpResponse::setMimeType(std::string extension)
 {
-	this->setHeader("Content-Type", this->getMimeType(extension));
+	this->setHeader("Content-Type", getMimeType(extension));
+	// return (iter->second);
 }
 //GETTERS
 
@@ -79,10 +83,10 @@ std::string		HttpResponse::getMimeType(const std::string extension)
 		{".mp4", "video/mp4"},
 		{".php", "application/x-httpd-php"}
 	};
-
 	auto	iter = mimeTypes.find(extension);
-	if (iter != mimeTypes.end())
-		return (iter->second);
+	if (iter == mimeTypes.end())
+		return (""); // do this later
+	return (iter->second);
 }
 
 bool	HttpResponse::parse(const std::string& rawmsg)
@@ -134,16 +138,20 @@ std::string	HttpResponse::buildResponse() const
 
 	response << "HTTP/1.1 " << statusCodeToInt() << " " << statusCodeToStr() << "\r\n";
 
+	std::cout << RED << this->getHeader("Content-Type") << RESET << std::endl;
 	for (const auto& header : _header)
 	{
 		response << header.first << ": " << header.second << "\r\n";
+		// std::cout << header.first << std::endl;
+		// std::cout << header.second << std::endl;
 	}
 	if (_header.find("Content-Length") == _header.end())
 		response << "Content-Length: " << _body.size() << "\r\n";
-	if (_header.find("Content-Type") == _header.end());
+	if (_header.find("Content-Type") == _header.end())
 		response << "Content-Type: text/plain\r\n";
 	response << "\r\n";
 	response << _body;
+
 
 	return (response.str());
 }

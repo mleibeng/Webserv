@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 05:10:55 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/21 21:12:33 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,12 @@ void WebServer::setupListeners()
 
 		for (const auto& port : ports)
 		{
-			std::string server_key = server._hostname + ":" + std::to_string(port);
+			std::string server_key = server.hostname + ":" + std::to_string(port);
+
+			// int opt = 1;
+			// if (setsockopt(_server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+			// 	std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
+			// }
 
 			int fd = createNonBlockingSocket();
 			struct sockaddr_in addr;
@@ -142,7 +147,7 @@ void WebServer::runLoop()
 					}
 				}
 				if (!is_listener)
-					handleClientRequest(fd);
+					handleClientRequest(fd, *request_handler);
 			}
 		}
 	}
@@ -152,28 +157,21 @@ void WebServer::runLoop()
 void WebServer::initialize()
 {
 	setupListeners();
-	loadErrorPages();
-	request_handler = std::make_unique<RequestHandler>(_error_pages, _config);
+	request_handler = std::make_unique<RequestHandler>(config);
 }
 
-void WebServer::loadErrorPages()
+void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 {
-	for (const auto &server : _config.getServerConfs())
-	{
-		if (!server._default_error_pages.empty())
-		{
-			std::ifstream file(server._default_error_pages);
-			std::string line;
-			while (std::getline(file, line))
-			{
-				std::istringstream iss(line);
-				int error_code;
-				std::string page_path;
-				if (iss >> error_code >> page_path)
-					_error_pages[error_code] = page_path;
-			}
-		}
-	}
+	// (void)client_fd;
+	Client client(client_fd);
+
+	std::cout << "request from " << client_fd << std::endl;
+	client.read_request();
+	HttpRequest request(client.getRawRequest());
+	std::string	response_str = handler.handleRequest(request);// might have to revisit later but this fixes the bug with missing headers
+
+	std::cout << "response to " << client_fd << std::endl;
+	client.send_response(response_str);
 }
 
 void WebServer::handleClientRequest(int client_fd)

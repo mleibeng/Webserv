@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 05:05:43 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/21 21:11:27 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,31 +34,31 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include <sys/wait.h>
 #include <errno.h>
 #include <cstring>
+#include <memory>
 #include "Config.hpp"
 #include "Loop.hpp"
+#include "Client.hpp"
+#include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
 #include "RequestHandler.hpp"
 
-
+class Loop;
 class Client;
 class WebServer
 {
 	private:
-	Config _config;
-	std::unordered_map<std::string, std::vector<int>> _server_listeners;
-	std::unordered_map<int, std::string> _error_pages;
-	Loop _event_loop;
-	std::atomic<bool> _running;
+	Config config;
+	std::unordered_map<std::string, std::vector<int>> server_listeners;
+	std::unordered_map<int, std::string> error_pages;
+	Loop event_loop;
+	std::atomic<bool> running;
 	std::unique_ptr<RequestHandler> request_handler;
 
 	void setupListeners();
 	void runLoop();
-	void loadErrorPages();
 	void acceptConnections(int listener_fd);
 	int	 createNonBlockingSocket();
-	void handleClientRequest(int client_fd);
-
-	// Request/response handling part? could be moved out into other classes
-	//---------------------------------------------------------------------------------------------
+	void handleClientRequest(int client_fd, RequestHandler& handler);
 
 	public:
 	WebServer() = default;

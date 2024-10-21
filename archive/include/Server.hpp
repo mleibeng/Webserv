@@ -6,19 +6,26 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:00 by mott              #+#    #+#             */
-/*   Updated: 2024/10/12 17:53:41 by mott             ###   ########.fr       */
+/*   Updated: 2024/10/13 18:32:27 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_H
 #define SERVER_H
 
-#include "Client.hpp"
-#include "Epoll.hpp"
-#include "external_functions.hpp"
+#include <iostream>
+#include <cstring>
+#include <cerrno>
 
-#define MAX_EVENTS 10
-#define BUFFER_SIZE 1024
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+#define DEFAULT		"\033[0m"
+#define RED			"\033[31m"
+#define YELLOW		"\033[33m"
 
 class Server {
 	public:
@@ -29,22 +36,14 @@ class Server {
 		Server(const Server& other) = delete;
 		Server& operator=(const Server& other) = delete;
 
-		void start();
+		int accept_client();
+		int get_fd() const;
 
 	private:
-		void handle_new_connection();
-		void handle_client_request(int client_fd);
+		void set_nonblocking(int socket_fd);
 
 		int _server_fd;
 		int _port;
-		Epoll _epoll;
-		char _buffer[BUFFER_SIZE];
-		const std::string _http_response =
-			"HTTP/1.1 200 OK\r\n"
-			"Content-Type: text/plain\r\n"
-			"Content-Length: 12\r\n"
-			"\r\n"
-			"Hello World!";
 };
 
 #endif // SERVER_H

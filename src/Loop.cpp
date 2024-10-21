@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/16 00:32:11 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/21 21:11:54 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,12 @@
 
 Loop::Loop()
 {
-#ifdef __APPLE__
-	_loop_fd = kqueue();
-#else
-	_loop_fd = epoll_create1(0);
-#endif
-	if (_loop_fd == -1)
+// #ifdef __APPLE__
+	// loop_fd = kqueue();
+// #else
+	loop_fd = epoll_create1(0);
+// #endif
+	if (loop_fd == -1)
 		throw std::runtime_error("Couldn't Create loop fd");
 }
 
@@ -32,9 +32,9 @@ Loop::~Loop()
 
 void Loop::addFd(int fd, uint32_t event)
 {
-#ifdef __APPLE__
+// #ifdef __APPLE__
 	//dont know yet
-#else
+// #else
 	epoll_event ev;
 	ev.events = event;
 	ev.data.fd = fd;
@@ -42,34 +42,34 @@ void Loop::addFd(int fd, uint32_t event)
 		throw std::runtime_error("Couldn't add fd to epoll");
 	events[fd] = ev;
 	std::cout << fd << std::endl;
-#endif
+// #endif
 }
 
 void Loop::removeFd(int fd)
 {
 	// (void)fd;
-#ifdef __APPLE__
+// #ifdef __APPLE__
 	// don't know yet
-#else
-	epoll_ctl(_loop_fd, EPOLL_CTL_DEL, fd, nullptr);
+// #else
+	epoll_ctl(loop_fd, EPOLL_CTL_DEL, fd, nullptr);
 	events.erase(fd);
-#endif
+// #endif
 }
 
 std::vector<std::pair<int, uint32_t>> Loop::wait(int timeout)
 {
 	// (void)timeout;
 	std::vector<std::pair<int, uint32_t>> result;
-#ifdef __APPLE__
+// #ifdef __APPLE__
 	// don't know yet
-#else
-	int nev = epoll_wait(_loop_fd, event_list, MAX_EVENTS, timeout);
+// #else
+	int nev = epoll_wait(loop_fd, event_list, MAX_EVENTS, timeout);
 	for (int i = 0; i < nev; ++i)
 	{
 		int fd = event_list[i].data.fd;
 		uint32_t events = event_list[i].events;
 		result.emplace_back(fd, events);
 	}
-#endif
+// #endif
 	return result;
 }

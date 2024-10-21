@@ -13,6 +13,8 @@
 #ifndef AHTTPMESSAGE_H
 #define AHTTPMESSAGE_H
 
+#define RED			"\033[31m"
+#define YELLOW		"\033[33m"
 #define	GREY  "\033[38;5;246m"
 #define	RESET "\033[0m"
 
@@ -34,6 +36,7 @@ class AHttpMessage
 		//setters
 		void	setHttpVersion(const std::string& vers);
 		void	setHeader(const std::string& key, const std::string& val);
+		void	setAllHeaders(const std::map<std::string, std::string>& headers);
 		void	setBody(const std::string& body);
 
 		//getters
