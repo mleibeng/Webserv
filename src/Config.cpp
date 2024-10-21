@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/17 22:02:57 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/12 02:21:01 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,13 +56,13 @@ std::string Config::trim(const std::string &s)
 void Config::parseServerBlock(ServerConf& conf, const std::string& key, const std::vector<std::string>& values)
 {
 	if (key == "hostname")
-		conf._hostname = values[0];
+		conf.hostname = values[0];
 	else if (key == "port")
-		conf._port = std::stoi(values[0]);
+		conf.port = std::stoi(values[0]);
 	else if (key == "server_name")
-		conf._server_names = values;
+		conf.server_names = values;
 	else if (key == "default_error_pages")
-		conf._default_error_pages = values[0];
+		conf.default_error_pages = values[0];
 	else
 		throw std::runtime_error("Unknown Server Configuration key");
 }
@@ -70,29 +70,29 @@ void Config::parseServerBlock(ServerConf& conf, const std::string& key, const st
 void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std::vector<std::string>& values)
 {
 	if (key == "methods")
-		conf._methods = values;
+		conf.methods = values;
 	else if (key == "redirect")
-		conf._redirect = values[0];
+		conf.redirect = values[0];
 	else if (key == "port")
-		conf._port = std::stoi(values[0]);
+		conf.port = std::stoi(values[0]);
 	else if (key == "root")
-		conf._root = values[0];
+		conf.root = values[0];
 	else if (key == "dir_listing")
-		conf._dir_listing_active = (values[0] == "on" || values[0] == "true" || values[0] == "1");
+		conf.dir_listing_active = (values[0] == "on" || values[0] == "true" || values[0] == "1");
 	else if (key == "default_file")
-		conf._default_file = values[0];
+		conf.default_file = values[0];
 	else if (key == "cgi_extension")
-		conf._cgi_extension = values[0];
+		conf.cgi_extension = values[0];
 	else if (key == "upload_dir")
-		conf._upload_dir = values[0];
+		conf.upload_dir = values[0];
 	else if (key == "max_body_size")
-		conf._max_body_size = parseSizeNotation(values[0]);
+		conf.max_body_size = parseSizeNotation(values[0]);
 	else if (key == "max_header_size")
-		conf._max_header_size = parseSizeNotation(values[0]);
+		conf.max_header_size = parseSizeNotation(values[0]);
 	else if (key == "timeout")
-		conf._timeout = std::stoi(values[0]);
+		conf.timeout = std::stoi(values[0]);
 	else if (key == "max_connects")
-		conf._max_connects = std::stoi(values[0]);
+		conf.max_connects = std::stoi(values[0]);
 	else
 		throw std::runtime_error("Unknown Route Configuration key");
 }
@@ -100,13 +100,13 @@ void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std:
 void Config::parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::vector<std::string>& values)
 {
 	if (key == "timeout")
-		conf._g_timeout = std::stoi(values[0]);
+		conf.g_timeout = std::stoi(values[0]);
 	else if (key == "max_connects")
-		conf._g_max_connects = std::stoi(values[0]);
+		conf.g_max_connects = std::stoi(values[0]);
 	else if (key == "max_body_size")
-		conf._g_max_body_size = parseSizeNotation(values[0]);
+		conf.g_max_body_size = parseSizeNotation(values[0]);
 	else if (key == "max_header_size")
-		conf._g_max_header_size = parseSizeNotation(values[0]);
+		conf.g_max_header_size = parseSizeNotation(values[0]);
 	else
 		throw std::runtime_error("Unknown Global Configuration key");
 }
@@ -144,20 +144,19 @@ Config Config::parse(const std::string& conf_file)
 			in_route_block = true;
 			current_route = RouteConf();
 			current_route_path = trim(line.substr(6, line.find('{') - 7));
-			std::cout << current_route_path << std::endl;
 		}
 		else if (line == "}")
 		{
 			if (in_route_block)
 			{
 				in_route_block = false;
-				current_server._routes[current_route_path] = current_route;
+				current_server.routes[current_route_path] = current_route;
 				current_route_path.clear();
 			}
 			else if (in_server_block)
 			{
 				in_server_block = false;
-				config._servers.push_back(current_server);
+				config.servers.push_back(current_server);
 			}
 			else
 				throw std::runtime_error("Unexpected closing brace at line: " + std::to_string(line_number));
@@ -177,67 +176,67 @@ Config Config::parse(const std::string& conf_file)
 				else if (in_server_block)
 					parseServerBlock(current_server, key, values);
 				else
-					parseGlobalBlock(config._globals, key, values);
+					parseGlobalBlock(config.globuli, key, values);
 			}
 			else
 				throw std::runtime_error("invalid config line at: "  + std::to_string(line_number));
 		}
 	}
-	for (auto& server : config._servers)
+	for (auto& server : config.servers)
 	{
-		for (auto& [path, route] : server._routes)
+		for (auto& [path, route] : server.routes)
 		{
-			if (!route._max_header_size) route._max_header_size = config._globals._g_max_header_size;
-			if (!route._max_body_size) route._max_body_size = config._globals._g_max_body_size;
-			if (!route._timeout) route._timeout = config._globals._g_timeout;
-			if (!route._max_connects) route._max_connects = config._globals._g_max_connects;
-			if (!route._port) route._port = current_server._port;
+			if (!route.max_header_size) route.max_header_size = config.globuli.g_max_header_size;
+			if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
+			if (!route.timeout) route.timeout = config.globuli.g_timeout;
+			if (!route.max_connects) route.max_connects = config.globuli.g_max_connects;
+			if (!route.port) route.port = current_server.port;
 		}
 	}
 	return config;
 }
 
 const std::vector<ServerConf>& Config::getServerConfs() const
-{return _servers;}
+{return servers;}
 
 void Config::print() const
 {
 	std::cout << "Global Configuration:\n";
-	std::cout << "  Max Header Size: " << _globals._g_max_header_size << "\n";
-	std::cout << "  Max Body Size: " << _globals._g_max_body_size << "\n";
-	std::cout << "  Timeout: " << _globals._g_timeout << "\n";
-	std::cout << "  Max Connects: " << _globals._g_max_connects << "\n\n";
+	std::cout << "  Max Header Size: " << globuli.g_max_header_size << "\n";
+	std::cout << "  Max Body Size: " << globuli.g_max_body_size << "\n";
+	std::cout << "  Timeout: " << globuli.g_timeout << "\n";
+	std::cout << "  Max Connects: " << globuli.g_max_connects << "\n\n";
 
-	for (const auto& server : _servers)
+	for (const auto& server : servers)
 	{
 		std::cout << "Server Configuration:\n";
-		std::cout << "  Hostname: " << server._hostname << "\n";
-		std::cout << "  Port: " << server._port << "\n";
+		std::cout << "  Hostname: " << server.hostname << "\n";
+		std::cout << "  Port: " << server.port << "\n";
 		std::cout << "  Server Names: ";
-		for (const auto& name : server._server_names)
+		for (const auto& name : server.server_names)
 			std::cout << name << " ";
 		std::cout << "\n";
-		std::cout << "  Default Error Pages: " << server._default_error_pages << "\n";
+		std::cout << "  Default Error Pages: " << server.default_error_pages << "\n";
 
-		for (const auto& [path, route] : server._routes)
+		for (const auto& [path, route] : server.routes)
 		{
 			std::cout << "  Route: " << path << "\n";
 			std::cout << "    Methods: ";
-			for (const auto& method : route._methods)
+			for (const auto& method : route.methods)
 				std::cout << method << " ";
 			std::cout << "\n";
-			if (route._redirect)
-				std::cout << "    Redirect: " << *route._redirect << "\n";
-			std::cout << "    Route Port: " << *route._port << "\n";
-			std::cout << "    Root: " << route._root << "\n";
-			std::cout << "    Directory Listing: " << (route._dir_listing_active ? "On" : "Off") << "\n";
-			std::cout << "    Default File: " << route._default_file << "\n";
-			std::cout << "    CGI Extension: " << route._cgi_extension << "\n";
-			std::cout << "    Upload Directory: " << route._upload_dir << "\n";
-			std::cout << "    Max Header Size: " << *route._max_header_size << "\n";
-			std::cout << "    Max Body Size: " << *route._max_body_size << "\n";
-			std::cout << "    Timeout: " << *route._timeout << "\n";
-			std::cout << "    Max Connects: " << *route._max_connects << "\n";
+			if (route.redirect)
+				std::cout << "    Redirect: " << *route.redirect << "\n";
+			std::cout << "    Route Port: " << *route.port << "\n";
+			std::cout << "    Root: " << route.root << "\n";
+			std::cout << "    Directory Listing: " << (route.dir_listing_active ? "On" : "Off") << "\n";
+			std::cout << "    Default File: " << route.default_file << "\n";
+			std::cout << "    CGI Extension: " << route.cgi_extension << "\n";
+			std::cout << "    Upload Directory: " << route.upload_dir << "\n";
+			std::cout << "    Max Header Size: " << *route.max_header_size << "\n";
+			std::cout << "    Max Body Size: " << *route.max_body_size << "\n";
+			std::cout << "    Timeout: " << *route.timeout << "\n";
+			std::cout << "    Max Connects: " << *route.max_connects << "\n";
 		}
 		std::cout << "\n";
 	}

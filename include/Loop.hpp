@@ -6,13 +6,13 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/16 19:11:53 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/13 23:18:55 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 /*
 Purpose: Implement event handling
-Handles: I/O operations using kqueue/epoll, file descriptors, timers and async actions
+Handles: I/O operations using kqueue, file descriptors, timers and async actions
 */
 
 #ifndef LOOP_HPP
@@ -44,11 +44,11 @@ Handles: I/O operations using kqueue/epoll, file descriptors, timers and async a
 class Loop
 {
 	private:
-	int _loop_fd;
+	int loop_fd;
 	static const int MAX_EVENTS = 10;
 #ifdef __APPLE__
-	std::vector<struct kevent> _change_list;
-	struct kevent _event_list[MAX_EVENTS];
+	// std::vector<struct kevent> change_list;
+	// struct kevent event_list[MAX_EVENTS];
 #else
 	std::unordered_map<int, epoll_event> events;
 	epoll_event event_list[MAX_EVENTS];

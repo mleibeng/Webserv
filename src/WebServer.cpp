@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/21 21:12:33 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/20 05:05:37 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,20 @@
 
 /// @brief Webserver Constructor -> Parses and prints config data and sets running to false
 /// @param conf_file Saves data structures and values read in from the config file
-WebServer::WebServer(const std::string &conf_file) : _config(Config::parse(conf_file)), _running(false)
+WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false)
 {
-	_config.print();
+	config.print();
 }
 
 void WebServer::setupListeners()
 {
-	for (const auto& server : _config.getServerConfs())
+	for (const auto& server : config.getServerConfs())
 	{
-		std::vector<int> ports = {server._port};
-		for (const auto& route : server._routes)
+		std::vector<int> ports = {server.port};
+		for (const auto& route : server.routes)
 		{
-			if (route.second._port.has_value() && route.second._port.value() != 0 && route.second._port.value() != server._port)
-				ports.push_back(route.second._port.value());
+			if (route.second.port.has_value() && route.second.port.value() != 0 && route.second.port.value() != server.port)
+				ports.push_back(route.second.port.value());
 		}
 
 		for (const auto& port : ports)
@@ -60,8 +60,8 @@ void WebServer::setupListeners()
 				close(fd);
 				throw std::runtime_error("Failed to listen on socket");
 			}
-			_server_listeners[server_key].push_back(fd);
-			_event_loop.addFd(fd, EPOLLIN_FLAG);
+			server_listeners[server_key].push_back(fd);
+			event_loop.addFd(fd, EPOLLIN_FLAG);
 			std::cout << "Successfully bound and listening on " << server_key << std::endl;
 		}
 	}
@@ -87,7 +87,7 @@ void WebServer::acceptConnections(int fd)
 	}
 	int flags = fcntl(client_fd, F_GETFL, 0);
 	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
-	_event_loop.addFd(client_fd, EPOLLIN_FLAG);
+	event_loop.addFd(client_fd, EPOLLIN_FLAG);
 }
 
 int WebServer::createNonBlockingSocket()
@@ -102,42 +102,42 @@ int WebServer::createNonBlockingSocket()
 
 void WebServer::start()
 {
-	if (_server_listeners.empty())
+	if (server_listeners.empty())
 		throw std::runtime_error("No listeners set up.");
-	_running = true;
+	running = true;
 	runLoop();
 }
 
 void WebServer::stop()
 {
-	_running = false;
-	for (auto [_, fds] : _server_listeners)
+	running = false;
+	for (auto [_, fds] : server_listeners)
 	{
 		for (int fd : fds)
 		{
 			close(fd);
-			_event_loop.removeFd(fd);
+			event_loop.removeFd(fd);
 		}
 	}
-	_server_listeners.clear();
+	server_listeners.clear();
 }
 
 void WebServer::runLoop()
 {
-	while (_running)
+	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
-		auto events = _event_loop.wait();
+		auto events = event_loop.wait();
 		for (const auto& [fd, event] : events) {
 			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
 			{
 				close(fd);
-				_event_loop.removeFd(fd);
+				event_loop.removeFd(fd);
 			}
 			else if (event & EPOLLIN_FLAG)
 			{
 				bool is_listener = false;
-				for (const auto& [_, fds] : _server_listeners)
+				for (const auto& [_, fds] : server_listeners)
 				{
 					if (std::find(fds.begin(), fds.end(), fd) != fds.end())
 					{
@@ -172,26 +172,4 @@ void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 
 	std::cout << "response to " << client_fd << std::endl;
 	client.send_response(response_str);
-}
-
-void WebServer::handleClientRequest(int client_fd)
-{
-	Client client(client_fd);
-
-	std::cout << "request from " << client_fd << std::endl;
-	if(!client.read_request())
-	{
-		std::string responsebody = request_handler->serveErrorPage(404);
-		return;
-	} // irgendwie muss hier fuer diesen fall ein response gebaut werden...
-	  // oder wir verschicken den response direkt im handler
-	  // oder wir machen den client.readRequest && den Bau vom HttpRequest im request handler
-	  // oder loeschen den client und machen dann beides im handler
-
-	HttpRequest request(client.getRequest());
-	request_handler->handleRequest(request, client);
-
-	std::cout << "response to " << client_fd << std::endl;
-	client.send_response(request_handler->returnResponse()); // irgendwie muessen wir jetzt das response objekt
-															 // doch wieder in einen string casten
 }

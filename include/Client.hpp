@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/10/21 21:10:17 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/18 17:08:33 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,9 @@
 #include <cstring>
 #include <cerrno>
 #include <string>
+
 #include <unistd.h>
 #include <fcntl.h>
-
-#include "HttpRequest.hpp"
 
 #define BUFFER_SIZE	1024
 
@@ -28,8 +27,7 @@
 #define RED			"\033[31m"
 #define YELLOW		"\033[33m"
 
-class Client
-{
+class Client {
 	public:
 		Client(int client_fd);
 		~Client();
