@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/21 22:21:59 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/21 22:24:13 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,17 +150,17 @@ HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request, const
 	// if (std::filesystem::is_directory(file_path))
 	// {
 	// 	if (route_conf.dir_listing_active)
-	// 		sendDirectoryListing(client, file_path);
+	// 		sendDirectoryListing(request, file_path);
 	// 	else if (!route_conf._default_file.empty())
 	// 	{
 	// 		file_path += "/" + route_conf._default_file;
-	// 		sendFile(client, file_path);
+	// 		sendFile(request, file_path); 					//jetzt wahrscheinlich prepareFile oder so...
 	// 	}
 	// 	else
 	// 		serveErrorPage(client.get_fd(), 403); // Forbidden
 	// }
 	// else
-	// 	sendFile(client, file_path);
+	// 	sendFile(request, file_path);
 
 // ------------------------------------------------------------------------------------
 	// if (!std::filesystem::exists(file_path))
