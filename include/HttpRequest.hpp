@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 16:39:37 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/23 19:33:21 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,9 @@ class HttpRequest : public AHttpMessage
 				const char*	what() const noexcept override;
 		};
 
+		Method		strToMethod(const std::string& methodStr);
+		std::string	methodToStr() const;
+
 	private:
 		Method		_method;
 		std::string	_uri; //Uniform Resource Identifier
@@ -84,10 +87,6 @@ class HttpRequest : public AHttpMessage
 		void		setUri(const std::string& uri);
 		void		setFilePath(const std::string& filepath);
 
-
-		//utils
-		Method		strToMethod(const std::string& methodStr);
-		std::string	methodToStr() const;
 };
 
 #endif // HTTPREQUEST_H

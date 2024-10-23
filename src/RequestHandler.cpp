@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/21 22:24:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/23 19:40:55 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,8 @@ const ServerConf *RequestHandler::findServerConf(const HttpRequest &request)
 	const ServerConf *server_conf = nullptr;
 	for (const auto& conf : _config.getServerConfs())
 	{
-		if (conf.hostname == request.getHeader("host") || // Hier nicht sicher wie der Header fuer host heisst!!!
-			std::find(conf.server_names.begin(), conf.server_names.end(), request.getHeader("host")) != conf.server_names.end())
+		if (conf.hostname == request.getHeader("Host") || // Hier nicht sicher wie der Header fuer host heisst!!!
+			std::find(conf.server_names.begin(), conf.server_names.end(), request.getHeader("Host")) != conf.server_names.end())
 		{
 			server_conf = &conf;
 			break;
@@ -103,7 +103,7 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 	}
 
 	// hier als string reingeben die method!!
-	if (!isMethodAllowed(*route_conf, request._method))
+	if (!isMethodAllowed(*route_conf, request.methodToStr()))
 	{
 		// Koennt ihr das machen?? keine Ahnung wie ihr das bauen wollt.
 		// HttpResponse RueckgabeObjekt;
@@ -118,11 +118,11 @@ std::string		RequestHandler::handleRequest(const HttpRequest& request)
 	{
 		// Bsp: handleGetRequest(request, *route_conf)
 		case Method::GET:
-			return (handleGetRequest(request).buildResponse());
+			return (handleGetRequest(request, *route_conf).buildResponse());
 		case Method::POST:
-			return (handlePostRequest(request).buildResponse());
+			return (handlePostRequest(request,*route_conf).buildResponse());
 		case Method::DELETE:
-			return (handleDeleteRequest(request).buildResponse());
+			return (handleDeleteRequest(request, *route_conf).buildResponse());
 		default:
 		{
 			HttpResponse response;
@@ -192,7 +192,7 @@ HttpResponse		RequestHandler::handleGetRequest(const HttpRequest& request, const
 	return(response);
 }
 
-HttpResponse		RequestHandler::handlePostRequest(const HttpRequest& request)
+HttpResponse		RequestHandler::handlePostRequest(const HttpRequest& request, const RouteConf& route_conf)
 {
 	// std::string file_path = route_conf.root + request.getUri();
 	(void)request;
@@ -206,7 +206,7 @@ HttpResponse		RequestHandler::handlePostRequest(const HttpRequest& request)
 	return(response);
 }
 
-HttpResponse		RequestHandler::handleDeleteRequest(const HttpRequest& request)
+HttpResponse		RequestHandler::handleDeleteRequest(const HttpRequest& request, const RouteConf& route_conf)
 {
 	// std::string file_path = route_conf.root + request.getUri();
 
