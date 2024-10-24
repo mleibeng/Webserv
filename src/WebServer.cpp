@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/21 21:49:08 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/24 01:49:22 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,13 @@ void WebServer::setupListeners()
 		{
 			std::string server_key = server.hostname + ":" + std::to_string(port);
 
-			// int opt = 1;
-			// if (setsockopt(_server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
-			// 	std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
-			// }
-
 			int fd = createNonBlockingSocket();
+
+			int opt = 1;
+			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+				std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
+			}
+
 			struct sockaddr_in addr;
 			addr.sin_family = AF_INET;
 			addr.sin_addr.s_addr = INADDR_ANY;
@@ -167,9 +168,9 @@ void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 
 	std::cout << "request from " << client_fd << std::endl;
 	client.read_request();
-	HttpRequest request(client.getRawRequest()); // hier muessen wir auch noch klaeren was passiert wenn der request nicht richtig gelesen werden kann.
-	std::string	response_str = handler.handleRequest(request);// might have to revisit later but this fixes the bug with missing headers
+	// if (error in readin)
+	// {
 
-	std::cout << "response to " << client_fd << std::endl;
-	client.send_response(response_str);
+	// }
+	handler.handleRequest(client);
 }

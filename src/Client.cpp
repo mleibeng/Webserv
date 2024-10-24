@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/18 17:09:36 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/24 02:35:27 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,11 @@ Client::~Client() {
 	close(_client_fd);
 }
 
-ssize_t Client::read_request() {
+ssize_t Client::read_request()
+{
 	ssize_t nbytes;
 	char buffer[BUFFER_SIZE];
+	std::string request;
 
 	// do {
 		nbytes = read(_client_fd, buffer, sizeof(buffer));
@@ -38,10 +40,10 @@ ssize_t Client::read_request() {
 		close(_client_fd);
 	}
 	else {
-		_request.assign(buffer, nbytes);
-		std::cout << YELLOW << _request << DEFAULT << std::endl;
+		request.assign(buffer, nbytes);
+		std::cout << YELLOW << request << DEFAULT << std::endl;
+		_request.parse(request);
 	}
-
 	return nbytes;
 }
 
@@ -57,11 +59,15 @@ ssize_t Client::send_response(const std::string& response_string) {
 	return nbytes;
 }
 
-std::string	Client::getRawRequest() const
+const int& Client::getFd() const
 {
-	return (_request);
+	return _client_fd;
 }
 
+const HttpRequest& Client::getRequest() const
+{
+	return _request;
+}
 
 
 

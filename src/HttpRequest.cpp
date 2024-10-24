@@ -3,19 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 16:47:29 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/24 02:09:16 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
 
-HttpRequest::HttpRequest(const std::string& raw_request)
-{
-	parse(raw_request);
-}
+HttpRequest::HttpRequest()
+{}
 
 HttpRequest::HttpRequest(const HttpRequest &other) : AHttpMessage()
 {
@@ -34,28 +32,19 @@ HttpRequest& HttpRequest::operator=(const HttpRequest &other)
 }
 
 HttpRequest::~HttpRequest()
-{
-}
+{}
 
-//GETTERS
-
-Method HttpRequest::getMethod() const
+const std::string& HttpRequest::getMethod() const
 {
 	return (_method);
 }
 
-std::string	HttpRequest::getUri() const
+const std::string&	HttpRequest::getUri() const
 {
 	return (_uri);
 }
 
-std::string	HttpRequest::getFilePath() const
-{
-	return (_filePath);
-}
-
-//SETTERS
-void	HttpRequest::setMethod(Method method)
+void	HttpRequest::setMethod(const std::string& method)
 {
 	_method = method;
 }
@@ -63,13 +52,6 @@ void	HttpRequest::setUri(const std::string& uri)
 {
 	_uri = uri;
 }
-
-void	HttpRequest::setFilePath(const std::string& filepath)
-{
-	_filePath = filepath;
-}
-
-//PARSE
 
 bool	HttpRequest::parse(const std::string& rawmsg)
 {
@@ -87,58 +69,13 @@ bool	HttpRequest::parse(const std::string& rawmsg)
 	if (!(reqLine >> method >> uri >> vers))
 		return (false);
 
-	try
-	{
-		setMethod(strToMethod(method));
-	}
-	catch(const std::exception& e)
-	{
-		// std::cerr << e.what() << std::endl;
-		return (false);
-	}
-	setUri(uri);
-	setHttpVersion(vers);
+	setMethod(trimStr(method));
+	setUri(trimStr(uri));
+	setHttpVersion(trimStr(vers));
 
 	parseHeader(input);
 
 	std::string body((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-	setBody(body);
+	setBody(trimStr(body));
 	return (true);
-}
-
-Method		HttpRequest::strToMethod(const std::string& method)
-{
-	if (method == "GET")
-		return (Method::GET);
-	else if (method == "POST")
-		return (Method::POST);
-	else if (method == "DELETE")
-		return (Method::DELETE);
-	else
-		throw (InvalidMethodException(method));
-}
-
-std::string	HttpRequest::methodToStr() const
-{
-	switch (_method)
-	{
-		case Method::GET:
-			return ("GET");
-		case Method::POST:
-			return ("POST");
-		case Method::DELETE:
-			return ("DELETE");
-		default:
-			throw (InvalidMethodException("Unknown Method"));
-	}
-}
-
-HttpRequest::InvalidMethodException::InvalidMethodException(const std::string& method) : _invalidMethod(method)
-{
-}
-
-const char*	HttpRequest::InvalidMethodException::what() const noexcept
-{
-	static std::string	errorMsg = "Invalid method: " + _invalidMethod;
-	return (errorMsg.c_str());
 }

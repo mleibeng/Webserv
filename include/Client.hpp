@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/10/18 17:08:33 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/24 02:35:22 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 
 #include <unistd.h>
 #include <fcntl.h>
+
+#include "HttpRequest.hpp"
 
 #define BUFFER_SIZE	1024
 
@@ -36,20 +38,15 @@ class Client {
 		Client(const Client& other) = delete;
 		Client& operator=(const Client& other) = delete;
 
+		const HttpRequest& getRequest() const;
+		const int& getFd() const;
+
 		ssize_t read_request();
 		ssize_t send_response(const std::string& response_string);
 
-		std::string	getRawRequest() const;
-
 	private:
 		int _client_fd;
-		std::string _request;
-		std::string _response;
-			// "HTTP/1.1 200 OK\r\n"
-			// "Content-Type: text/plain\r\n"
-			// "Content-Length: 12\r\n"
-			// "\r\n"
-			// "Hello World!";
+		HttpRequest _request;
 };
 
 #endif // CLIENT_H

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/21 21:52:47 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/24 02:28:19 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <exception>
 #include <filesystem>
 #include <fstream>
+#include "Client.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "Config.hpp"
@@ -36,10 +37,10 @@ class RequestHandler
 		RequestHandler& operator=(const RequestHandler &other) = delete; //might implement this later if needed;
 		~RequestHandler();
 
-		std::string		handleRequest(const HttpRequest& request);
-		HttpResponse	handleGetRequest(const HttpRequest& request, const RouteConf& route_conf);
-		HttpResponse	handlePostRequest(const HttpRequest& request, const RouteConf& route_conf);
-		HttpResponse	handleDeleteRequest(const HttpRequest& request, const RouteConf& route_conf);
+		void			handleRequest(Client& client);
+		void			handleGetRequest(Client& client, const RouteConf& route_conf);
+		void			handlePostRequest(Client& client, const RouteConf& route_conf);
+		void			handleDeleteRequest(Client& client, const RouteConf& route_conf);
 
 		const ServerConf *findServerConf(const HttpRequest &request);
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
@@ -48,6 +49,8 @@ class RequestHandler
 		void loadErrorPages();
 		void serveErrorPage(int client_fd, int error_code);
 
+		void sendDirListing(Client &client, const std::string& dir_path);
+		void sendFile(Client& client, const std::string& file_path);
 		void handleCGI(int client_fd, const std::string& cgi_path, const std::string& query);
 		void handleFileUpload(int client_fd, const std::string& upload_dir);
 

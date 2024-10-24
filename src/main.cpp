@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 16:31:24 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/23 22:58:03 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,8 @@ int main(int argc, char** argv) {
 		MainServ.initialize();
 		MainServ.start();
 	}
-	catch (const std::runtime_error& e) {
+	catch (const std::runtime_error& e)
+	{
 		std::cerr << e.what() << std::endl;
 		return 1;
 	}

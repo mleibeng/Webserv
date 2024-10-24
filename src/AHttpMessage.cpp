@@ -92,19 +92,13 @@ const std::map<std::string, std::string>&	AHttpMessage::getAllHeaders() const
 
 void	AHttpMessage::parseHeader(std::istringstream& input)
 {
-	std::string	line;
-	size_t		colPos;
-	std::string key;
-	std::string	value;
-
-	while(std::getline(input, line) && line != "\r")
-	{
-		colPos = line.find(':');
-		if (colPos != std::string::npos)
-		{
-			key = trimStr(line.substr(0, colPos));
-			value = trimStr(line.substr(colPos + 1));
-			setHeader(key, value);
+	std::string line;
+	while (std::getline(input, line) && !line.empty() && line != "\r") {
+		size_t separator = line.find(':');
+		if (separator != std::string::npos) {
+			std::string key = trimStr(line.substr(0, separator));
+			std::string value = trimStr(line.substr(separator + 1));
+			setHeader(key,value);
 		}
 	}
 }
@@ -114,12 +108,10 @@ void	AHttpMessage::parseHeader(std::istringstream& input)
 
 std::string	AHttpMessage::trimStr(const std::string& str)
 {
-	const std::string	whitespaces = "\n\t\r\v\f";
-	size_t				start;
-	size_t				end;
+	size_t first = str.find_first_not_of(" \t\n\r");
+	if (first == std::string::npos)
+		return "";
 
-	start = str.find_first_not_of(whitespaces);
-	end = str.find_last_not_of(whitespaces);
-
-	return ((start == std::string::npos) ? "" : str.substr(start, end - start + 1));
+	size_t last = str.find_last_not_of(" \t\n\r");
+	return str.substr(first, (last - first + 1));
 }
