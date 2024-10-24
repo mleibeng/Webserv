@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 04:46:47 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/10/20 04:58:37 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,16 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include <sys/wait.h>
 #include <errno.h>
 #include <cstring>
+#include <memory>
 #include "Config.hpp"
 #include "Loop.hpp"
+#include "Client.hpp"
+#include "HttpRequest.hpp"
+#include "HttpResponse.hpp"
+#include "RequestHandler.hpp"
 
 class Loop;
+class Client;
 class WebServer
 {
 	private:
@@ -46,19 +52,13 @@ class WebServer
 	std::unordered_map<int, std::string> error_pages;
 	Loop event_loop;
 	std::atomic<bool> running;
+	std::unique_ptr<RequestHandler> request_handler;
 
 	void setupListeners();
 	void runLoop();
-	void loadErrorPages();
 	void acceptConnections(int listener_fd);
-	int createNonBlockingSocket();
-	void handleClientRequest(int client_fd);
-	void serveErrorPage(int client_fd, int error_code);
-	void handleCGI(int client_fd, const std::string& cgi_path, const std::string& query);
-	void handleFileUpload(int client_fd, const std::string& upload_dir);
-	std::string getErrorPage(int error_code);
-	void addToEventSystem( int listener_fd, int event);
-	void removeFromEventSystem(int fd);
+	int	 createNonBlockingSocket();
+	void handleClientRequest(int client_fd, RequestHandler& handler);
 
 	public:
 	WebServer() = default;
