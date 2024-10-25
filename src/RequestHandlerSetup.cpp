@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/25 20:29:09 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/25 22:25:29 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,17 +21,37 @@ void RequestHandler::loadErrorPages() // this probably only works if we have 1 s
 {
 	for (const auto &server : _config.getServerConfs())
 	{
-		if (!server.default_error_pages.empty())
+		if (!std::filesystem::exists(server.default_error_pages))
+			throw std::runtime_error("Error pages not defined!");
+		for (const auto& file : std::filesystem::directory_iterator(server.default_error_pages))
 		{
-			std::ifstream file(server.default_error_pages);
-			std::string line;
-			while (std::getline(file, line))
+			if (!file.is_regular_file())
+				continue;
+
+			std::string filename = file.path().filename().string();
+
+			try
 			{
-				std::istringstream iss(line);
-				int error_code;
-				std::string page_path;
-				if (iss >> error_code >> page_path)
-					_error_pages[error_code] = page_path;
+				size_t dot = filename.find('.');
+				if (dot == std::string::npos)
+					continue;
+				int error_code = std::stoi(filename.substr(0, dot));
+
+				std::ifstream content(file.path(), std::ios::binary);
+				if (!content.is_open())
+					throw std::runtime_error("cannot open error page");
+
+				std::stringstream filebuf;
+				filebuf << content.rdbuf();
+				// std::cout << filebuf.str() << std::endl; // debugging
+				_error_pages[error_code] = filebuf.str();
+
+				content.close();
+			}
+			catch(const std::exception& e)
+			{
+				std::cerr << e.what() << '\n';
+				continue;
 			}
 		}
 	}
@@ -41,20 +61,8 @@ void RequestHandler::serveErrorPage(Client& client, int error_code)
 {
 	HttpResponse response;
 
-	std::ifstream file(_error_pages[error_code], std::ios::binary);
-	if (!file.is_open())
-	{
-		response.setStatus(error_code);
-		response.setBody("Error " + std::to_string(error_code));
-		response.setMimeType(getFileExtension("text/plain"));
-		client.send_response(response.buildResponse());
-	}
-	std::stringstream fileBuf;
-	fileBuf << file.rdbuf();
-	file.close();
-
 	response.setStatus(error_code);
-	response.setBody(fileBuf.str());
+	response.setBody(_error_pages[error_code]);
 	response.setMimeType(getFileExtension("text/html"));
 	client.send_response(response.buildResponse());
 }

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/20 04:58:37 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/25 22:16:01 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ class WebServer
 	private:
 	Config config;
 	std::unordered_map<std::string, std::vector<int>> server_listeners;
-	std::unordered_map<int, std::string> error_pages;
 	Loop event_loop;
 	std::atomic<bool> running;
 	std::unique_ptr<RequestHandler> request_handler;
