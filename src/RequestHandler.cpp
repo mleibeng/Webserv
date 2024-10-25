@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/25 19:37:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/25 20:32:03 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,21 @@ void		RequestHandler::handleRequest(Client& client)
 {
 	const ServerConf* server_conf = findServerConf(client.getRequest());
 	if (!server_conf)
-	{}
+	{
+		serveErrorPage(client, 404);
+		return;
+	}
 	const RouteConf* route_conf = findRouteConf(*server_conf, client.getRequest());
 	if (!route_conf)
-	{}
+	{
+		serveErrorPage(client, 404);
+		return;
+	}
 	if (!isMethodAllowed(*route_conf, client.getRequest().getMethod()))
-	{}
+	{
+		serveErrorPage(client, 405);
+		return;
+	}
 	if (client.getRequest().getMethod() == "GET")
 		handleGetRequest(client, *route_conf);
 	else if (client.getRequest().getMethod() == "POST")
@@ -31,7 +40,7 @@ void		RequestHandler::handleRequest(Client& client)
 	else if (client.getRequest().getMethod() == "DELETE")
 		handleDeleteRequest(client, *route_conf);
 	else
-	{}
+		serveErrorPage(client, 501);
 }
 
 /// @brief Get request handling logic // CURRENTLY MISSING CGI AND ERRORPAGE SUPPORT!!!!
@@ -53,8 +62,8 @@ void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_co
 			file_path += route_conf.default_file;
 			sendFile(client, file_path);
 		}
-		// else
-			// Errorpage 403 Forbidden.
+		else
+			serveErrorPage(client, 405);
 	}
 	else
 		sendFile(client, file_path);
@@ -82,15 +91,16 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 					<< name << "</a></li>";
 		}
 	}
-	catch (const std::filesystem::filesystem_error& e) {
+	catch (const std::filesystem::filesystem_error& e)
+	{
 		std::cerr << "Directory listing error: " << e.what() << std::endl;
-		// serveErrorPage(client.getFd(), 500);
+		serveErrorPage(client, 500);
 		return;
 	}
 
 	html << "</ul></body></html>";
 
-	response.setStatus(StatusCode::OK);
+	response.setStatus(200);
 	response.setBody(html.str());
 	response.setMimeType("text/html");
 	client.send_response(response.buildResponse());
@@ -106,22 +116,21 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	std::ifstream file(file_path, std::ios::binary);
 	if (!file.is_open())
 	{
-		std::cerr << "Could not open file: " << file_path << std::endl;
+		std::cerr << "Could not open file in sendFile func: " << file_path << std::endl;
+		serveErrorPage(client, 500);
 		return;
 	}
 	std::stringstream fileBuf;
 	fileBuf << file.rdbuf();
 	file.close();
 
-	response.setStatus(StatusCode::OK);
+	response.setStatus(200);
 	response.setBody(fileBuf.str());
 	response.setMimeType(getFileExtension(file_path));
 	client.send_response(response.buildResponse());
 }
 
 // und hier das argument nr2 so: ->  handleGetRequest(request, const RouteConf &route_conf)!
-
-
 void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_conf)
 {
 	// std::string file_path = route_conf.root + request.getUri();
@@ -159,6 +168,8 @@ void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route
 	// HttpResponse response;
 	// client.send_response(response.buildResponse());
 }
+
+// UTILS
 
 std::string		getFileExtension(const std::string& filepath)
 {

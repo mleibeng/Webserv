@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/24 01:49:22 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/25 20:34:09 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,8 @@ void WebServer::setupListeners()
 			int fd = createNonBlockingSocket();
 
 			int opt = 1;
-			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
 				std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
-			}
 
 			struct sockaddr_in addr;
 			addr.sin_family = AF_INET;

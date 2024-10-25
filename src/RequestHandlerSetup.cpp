@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/25 19:29:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/25 20:29:09 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,28 @@ void RequestHandler::loadErrorPages() // this probably only works if we have 1 s
 			}
 		}
 	}
+}
+
+void RequestHandler::serveErrorPage(Client& client, int error_code)
+{
+	HttpResponse response;
+
+	std::ifstream file(_error_pages[error_code], std::ios::binary);
+	if (!file.is_open())
+	{
+		response.setStatus(error_code);
+		response.setBody("Error " + std::to_string(error_code));
+		response.setMimeType(getFileExtension("text/plain"));
+		client.send_response(response.buildResponse());
+	}
+	std::stringstream fileBuf;
+	fileBuf << file.rdbuf();
+	file.close();
+
+	response.setStatus(error_code);
+	response.setBody(fileBuf.str());
+	response.setMimeType(getFileExtension("text/html"));
+	client.send_response(response.buildResponse());
 }
 
 RequestHandler::~RequestHandler()

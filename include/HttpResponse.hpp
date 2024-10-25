@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 17:35:37 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/10/25 20:27:21 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ enum class StatusCode
 	UNAUTHORIZED = 401,
 	FORBIDDEN = 403,
 	NOT_FOUND = 404,
+	METH_NOT_ALLOWED = 405,
 	INTERNAL_SERV_ERR = 500,
 	NOT_IMPLEMENTED = 501,
 	BAD_GATEWAY = 502,
@@ -76,13 +77,13 @@ class HttpResponse : public AHttpMessage
 
 		bool	parse(const std::string& rawmsg) override;
 
-		void		setStatus(StatusCode status);
+		void		setStatus(int status);
 		void		setMimeType(std::string extension);
 		std::string	getMimeType(const std::string extension);
-		StatusCode	getStatus() const;
+		int	getStatus() const;
 
 	private:
-		StatusCode	_status;
+		int	_status;
 		std::string	_mimeType;
 
 

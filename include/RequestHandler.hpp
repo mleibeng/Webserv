@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/24 02:28:19 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/25 20:19:17 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class RequestHandler
 		bool isMethodAllowed(const RouteConf &route_conf, const std::string& method);
 
 		void loadErrorPages();
-		void serveErrorPage(int client_fd, int error_code);
+		void serveErrorPage(Client& client, int error_code);
 
 		void sendDirListing(Client &client, const std::string& dir_path);
 		void sendFile(Client& client, const std::string& file_path);
