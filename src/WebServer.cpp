@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/25 20:34:09 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/28 01:01:16 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,8 @@ void WebServer::runLoop()
 	{
 		std::cout << "waiting for connection" << std::endl;
 		auto events = event_loop.wait();
+		if (!running)
+			break;
 		for (const auto& [fd, event] : events) {
 			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
 			{

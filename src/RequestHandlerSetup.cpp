@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandlerSetup.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/25 22:25:29 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/28 00:29:39 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ RequestHandler::RequestHandler(const Config& config) : _config(config)
 	loadErrorPages();
 }
 
-void RequestHandler::loadErrorPages() // this probably only works if we have 1 singular error pages...
+void RequestHandler::loadErrorPages() // now this works for more than 1 page but doesn't work for more than 1 server!
 {
 	for (const auto &server : _config.getServerConfs())
 	{
