@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/25 20:32:03 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/28 22:05:05 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,20 +48,36 @@ void		RequestHandler::handleRequest(Client& client)
 /// @param route_conf correct route configuration for the request. Hands over available resources, flags and path configurations
 void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_conf)
 {
-	std::string file_path = route_conf.root + client.getRequest().getUri();
-	// std::cout << file_path << std::endl;
-	// std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
+	std::string uri = client.getRequest().getUri();
+	std::string file_path = route_conf.root + uri;
+	std::cout << file_path << std::endl;
+	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
+
+	std::string query = "";
+	size_t query_point = file_path.find('?');
+	if (query_point != std::string::npos)
+	{
+		query = uri.substr(query_point + 1);
+		std::cout << query << "\n\n";
+		file_path = file_path.substr(0, query_point);
+		std::cout << file_path << "\n\n";
+	}
+	if (!route_conf.cgi_extension.empty())
+	{
+		handleCGI(client, file_path, query);
+		return;
+	}
 	if (std::filesystem::is_directory(file_path))
 	{
-		if (route_conf.dir_listing_active)
-			sendDirListing(client, file_path);
-		else if (!route_conf.default_file.empty())
+		if (!route_conf.default_file.empty())
 		{
 			if (file_path.back() != '/')
 				file_path += '/';
 			file_path += route_conf.default_file;
 			sendFile(client, file_path);
 		}
+		else if (route_conf.dir_listing_active)
+			sendDirListing(client, file_path);
 		else
 			serveErrorPage(client, 405);
 	}
@@ -100,10 +116,7 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 
 	html << "</ul></body></html>";
 
-	response.setStatus(200);
-	response.setBody(html.str());
-	response.setMimeType("text/html");
-	client.send_response(response.buildResponse());
+	sendResponse(client, html.str());
 }
 
 /// @brief Function to send back a static file response that was requested by the browser.

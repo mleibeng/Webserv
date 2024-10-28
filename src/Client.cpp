@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/24 02:35:27 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/28 20:23:02 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,59 +143,4 @@ const HttpRequest& Client::getRequest() const
 // 	// basically send confirmation back to the client that it got uploaded. -> should also be handled later by the HTTP Response Class
 // 	std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nFile uploaded successfully";
 // 	write(client_fd, response.c_str(), response.length());
-// }
-
-// void WebServer::handleCGI(int client_fd, const std::string& cgi_path, const std::string& query)
-// {
-// 	int in_pipe[2];
-// 	int out_pipe[2];
-
-// 	if (pipe(in_pipe) == -1 || pipe(out_pipe) == -1)
-// 	{
-// 		perror("pipe error");
-// 		return;
-// 	}
-// 	pid_t pid = fork();
-// 	if (pid == -1)
-// 	{
-// 		perror("fork");
-// 		close(in_pipe[0]);
-// 		close(in_pipe[1]);
-// 		close(out_pipe[0]);
-// 		close(out_pipe[1]);
-// 		return;
-// 	}
-// 	if (pid == 0)
-// 	{
-// 		close(out_pipe[0]);
-// 		close(in_pipe[1]);
-
-// 		dup2(in_pipe[0], STDIN_FILENO);
-// 		dup2(out_pipe[1], STDOUT_FILENO);
-
-// 		setenv("REQUEST_METHOD", "GET", 1);
-// 		setenv("QUERY_STRING", query.c_str(), 1);
-// 		setenv("CONTENT_LENGTH", "0", 1);
-
-// 		execl("/usr/bin/php", "php", cgi_path.c_str(), NULL);
-// 		perror("execl");
-// 		exit(1);
-// 	}
-// 	else
-// 	{
-// 		close(out_pipe[1]);
-// 		close(in_pipe[0]);
-
-// 		char buffer[4096];
-// 		int bytes_read;
-// 		while ((bytes_read = read(out_pipe[0], buffer, sizeof(buffer))) > 0) {
-// 			if (write(client_fd, buffer, bytes_read) == -1) {
-// 				perror("write");
-// 				break;
-// 			}
-// 		}
-// 		close(out_pipe[0]);
-
-// 		waitpid(pid, NULL, 0);
-// 	}
 // }
