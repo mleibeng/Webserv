@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/28 01:01:16 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/10/29 23:56:15 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 /// @param conf_file Saves data structures and values read in from the config file
 WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false)
 {
-	config.print();
+	// config.print();
 }
 
 void WebServer::setupListeners()
@@ -164,7 +164,6 @@ void WebServer::initialize()
 
 void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 {
-	// (void)client_fd;
 	Client client(client_fd);
 
 	std::cout << "request from " << client_fd << std::endl;

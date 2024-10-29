@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/28 22:05:05 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 00:32:13 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,23 +50,36 @@ void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_co
 {
 	std::string uri = client.getRequest().getUri();
 	std::string file_path = route_conf.root + uri;
-	std::cout << file_path << std::endl;
+
+	std::cout << "Current file_path " << file_path << std::endl;
 	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
 
 	std::string query = "";
-	size_t query_point = file_path.find('?');
+	size_t query_point = uri.find('?');
 	if (query_point != std::string::npos)
 	{
 		query = uri.substr(query_point + 1);
 		std::cout << query << "\n\n";
-		file_path = file_path.substr(0, query_point);
+		file_path = route_conf.root + uri.substr(0, query_point);
 		std::cout << file_path << "\n\n";
 	}
+
 	if (!route_conf.cgi_extension.empty())
 	{
-		handleCGI(client, file_path, query);
-		return;
+		std::string extension = getFileExtension(file_path);
+		std::cout << "cgi_extension: " << extension << std::endl;
+		if (extension == route_conf.cgi_extension)
+		{
+			if (!std::filesystem::exists(file_path))
+			{
+				serveErrorPage(client, 404);
+				return;
+			}
+			handleCGI(client, file_path, query);
+			return;
+		}
 	}
+
 	if (std::filesystem::is_directory(file_path))
 	{
 		if (!route_conf.default_file.empty())
@@ -74,15 +87,18 @@ void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_co
 			if (file_path.back() != '/')
 				file_path += '/';
 			file_path += route_conf.default_file;
-			sendFile(client, file_path);
+			if (std::filesystem::exists(file_path))
+				sendFile(client, file_path);
+			else
+				serveErrorPage(client, 404);
 		}
 		else if (route_conf.dir_listing_active)
 			sendDirListing(client, file_path);
 		else
-			serveErrorPage(client, 405);
+			serveErrorPage(client, 403);
+		return;
 	}
-	else
-		sendFile(client, file_path);
+	sendFile(client, file_path);
 }
 
 /// @brief Function to build a directory listing to send back to the client with hyperlinks to available resources
@@ -116,7 +132,10 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 
 	html << "</ul></body></html>";
 
-	sendResponse(client, html.str());
+	response.setStatus(200);
+	response.setBody(html.str());
+	response.setMimeType(getFileExtension(".html"));
+	client.send_response(response.buildResponse());
 }
 
 /// @brief Function to send back a static file response that was requested by the browser.
@@ -186,5 +205,8 @@ void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route
 
 std::string		getFileExtension(const std::string& filepath)
 {
-	return (std::filesystem::path(filepath).extension().string());
+	size_t dot_pos = filepath.find_last_of(".");
+		if (dot_pos != std::string::npos)
+			return filepath.substr(dot_pos);
+		return "";
 }

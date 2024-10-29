@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/28 20:23:02 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/29 23:00:30 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ Client::~Client() {
 ssize_t Client::read_request()
 {
 	ssize_t nbytes;
-	char buffer[BUFFER_SIZE];
+	char buffer[1024];
 	std::string request;
 
 	// do {

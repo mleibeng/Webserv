@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/28 22:05:03 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 00:35:02 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ void RequestHandler::handleCGI(Client& client, const std::string& cgi_path, cons
 		serveErrorPage(client, 500);
 		return;
 	}
-
 	if (pid == 0)
 	{
 		CGIEnvironment env;
@@ -58,37 +57,44 @@ void RequestHandler::handleCGI(Client& client, const std::string& cgi_path, cons
 
 		std::string cgi_output = readCGIOutput(pipes.out_pipe[0]);
 		close(pipes.out_pipe[0]);
-		waitpid(pid, NULL, 0);
 
-		std::string body = extractRespBody(cgi_output);
-		sendResponse(client, body);
+		int status;
+		waitpid(pid, &status, 0);
+
+		HttpResponse response;
+		if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+			parseCGIOutput(cgi_output, response);
+		else
+			serveErrorPage(client, 500);
+		client.send_response(response.buildResponse());
 	}
 }
 
 char** RequestHandler::CGIEnvironment::getEnvpArray()
 {
-	static char* envp[] =
-	{
-		req_method,
-		query_string,
-		content_length,
-		script_filename,
-		redirect_status,
-		NULL
-	};
-	return envp;
+	return env_array.data();
 }
 
 void RequestHandler::CGIEnvironment::setupEnvironment(const std::string& query, const std::string& cgi_path)
 {
-	std::strcpy(req_method, "REQUEST_METHOD=GET");
-	std::strcpy(query_string, "QUERY_STRING=");
-	std::strcpy(content_length, "CONTENT_LENGTH=0");
-	std::strcpy(script_filename, "SCRIPT_FILENAME=");
-	std::strcpy(redirect_status, "REDIRECT_STATUS=200");
+		env_array.clear();
 
-	std::strncat(query_string, query.c_str(), sizeof(query_string) - strlen(query_string) - 1);
-	std::strncat(script_filename, cgi_path.c_str(), sizeof(script_filename) - strlen(script_filename) - 1);
+		// Initialize environment variables with proper null-termination
+		std::snprintf(req_method, BUFFER_SIZE, "REQUEST_METHOD=GET");
+		std::snprintf(query_string, BUFFER_SIZE, "QUERY_STRING=%s", query.c_str());
+		std::snprintf(content_length, BUFFER_SIZE, "CONTENT_LENGTH=0");
+		std::snprintf(script_filename, BUFFER_SIZE, "SCRIPT_FILENAME=%s", cgi_path.c_str());
+		std::snprintf(redirect_status, BUFFER_SIZE, "REDIRECT_STATUS=200");
+		std::snprintf(content_type, BUFFER_SIZE, "CONTENT_TYPE=application/x-httpd-php");
+
+		// Add pointers to env_array
+		env_array.push_back(req_method);
+		env_array.push_back(query_string);
+		env_array.push_back(content_length);
+		env_array.push_back(script_filename);
+		env_array.push_back(redirect_status);
+		env_array.push_back(content_type);
+		env_array.push_back(nullptr);
 }
 
 void RequestHandler::handleChildProc(const PipeDescriptors& pipes, const std::string& cgi_path, CGIEnvironment& env)
@@ -101,7 +107,7 @@ void RequestHandler::handleChildProc(const PipeDescriptors& pipes, const std::st
 	char php_path[] = "/usr/bin/php-cgi";
 	char php_name[] = "php-cgi";
 	char script_path[4096];
-	strncpy(script_path, cgi_path.c_str(), sizeof(script_path) - 1);
+	std::strncpy(script_path, cgi_path.c_str(), sizeof(script_path) - 1);
 	script_path[sizeof(script_path) - 1] = '\0';
 
 	char* argv[] =
@@ -112,8 +118,8 @@ void RequestHandler::handleChildProc(const PipeDescriptors& pipes, const std::st
 	};
 
 	execve(php_path, argv, env.getEnvpArray());
-	perror("execve");
-	exit(1);
+	std::perror("execve");
+	std::exit(1);
 }
 
 std::string RequestHandler::readCGIOutput(int pipe_fd)
@@ -128,23 +134,83 @@ std::string RequestHandler::readCGIOutput(int pipe_fd)
 	return cgi_output;
 }
 
-std::string RequestHandler::extractRespBody(const std::string& cgi_output)
+void RequestHandler::parseCGIOutput(const std::string& cgi_output, HttpResponse& response)
 {
-	size_t header_end = cgi_output.find("\r\n\r\n");
-	if (header_end == std::string::npos)
-		header_end = cgi_output.find("\n\n");
+	std::istringstream iss(cgi_output);
+	std::string line;
+	bool headers_done = false;
+	std::string body;
+	std::stringstream body_stream;
 
-	if (header_end != std::string::npos)
-		return cgi_output.substr(header_end + (cgi_output[header_end + 1] == '\n' ? 2 : 4));
+	// Parse headers
+	while (std::getline(iss, line) && !headers_done)
+	{
+		// Check for empty line or just \r that indicates end of headers
+		if (line.empty() || line == "\r")
+		{
+			headers_done = true;
+			continue;
+		}
 
-	return cgi_output;
+		// Remove \r if present
+		if (!line.empty() && line[line.length() - 1] == '\r')
+			line.erase(line.length() - 1);
+
+		// Parse header
+		size_t colon_pos = line.find(':');
+		if (colon_pos != std::string::npos)
+		{
+			std::string header_name = line.substr(0, colon_pos);
+			std::string header_value = line.substr(colon_pos + 1);
+
+			// Trim leading/trailing whitespace from header value
+			header_value.erase(0, header_value.find_first_not_of(" "));
+			header_value.erase(header_value.find_last_not_of(" ") + 1);
+
+			response.setHeader(header_name, header_value);
+		}
+	}
+
+	// Read the rest of the body
+	if (headers_done)
+	{
+		while (std::getline(iss, line))
+		{
+			if (line[line.length() - 1] == '\r')
+				line.erase(line.length() - 1);
+			body_stream << line << "\n";
+		}
+	}
+	else
+	{
+		// If no headers were found, treat entire output as body
+		iss.clear();
+		iss.seekg(0);
+		body_stream << iss.rdbuf();
+	}
+
+	body = body_stream.str();
+
+	// Set response properties
+	if (response.getHeader("Content-Type").empty()) {
+		response.setHeader("Content-Type", "text/html");
+	}
+
+	// Ensure we have proper HTML structure if it's missing
+	if (body.find("<html>") == std::string::npos) {
+		std::string full_html = "<html><body>\n" + body;
+		if (body.find("</html>") == std::string::npos) {
+			full_html += "</body></html>";
+		}
+		body = full_html;
+	}
+
+	response.setStatus(200);  // Default success status
+	response.setBody(body);
 }
 
-void RequestHandler::sendResponse(Client& client, const std::string& body)
+
+RequestHandler::CGIEnvironment::~CGIEnvironment()
 {
-	HttpResponse response;
-	response.setStatus(200);
-	response.setBody(body);
-	response.setMimeType("text/html");
-	client.send_response(response.buildResponse());
+	env_array.clear();
 }

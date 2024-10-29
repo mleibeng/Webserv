@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/10/24 02:35:22 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/29 22:49:15 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,6 @@
 #include <fcntl.h>
 
 #include "HttpRequest.hpp"
-
-#define BUFFER_SIZE	1024
 
 #define DEFAULT		"\033[0m"
 #define RED			"\033[31m"

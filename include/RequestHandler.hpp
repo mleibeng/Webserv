@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/28 21:52:38 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 00:32:37 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,33 @@
 
 class RequestHandler
 {
+	struct PipeDescriptors
+	{
+		int in_pipe[2];
+		int out_pipe[2];
+
+		void closeAll();
+	};
+
+	class CGIEnvironment
+	{
+		private:
+		static const size_t BUFFER_SIZE = 4096;
+		char req_method[BUFFER_SIZE];
+		char query_string[BUFFER_SIZE];
+		char content_length[BUFFER_SIZE];
+		char script_filename[BUFFER_SIZE];
+		char redirect_status[BUFFER_SIZE];
+		char content_type[BUFFER_SIZE];
+		std::vector<char*> env_array;
+
+		public:
+		void setupEnvironment(const std::string& query, const std::string& cgi_path);
+		char** getEnvpArray();
+
+		~CGIEnvironment();
+	};
+
 	public:
 		RequestHandler() = delete;
 		RequestHandler(const Config& config);
@@ -38,10 +65,10 @@ class RequestHandler
 		RequestHandler& operator=(const RequestHandler &other) = delete; //might implement this later if needed;
 		~RequestHandler();
 
-		void			handleRequest(Client& client);
-		void			handleGetRequest(Client& client, const RouteConf& route_conf);
-		void			handlePostRequest(Client& client, const RouteConf& route_conf);
-		void			handleDeleteRequest(Client& client, const RouteConf& route_conf);
+		void	handleRequest(Client& client);
+		void	handleGetRequest(Client& client, const RouteConf& route_conf);
+		void	handlePostRequest(Client& client, const RouteConf& route_conf);
+		void	handleDeleteRequest(Client& client, const RouteConf& route_conf);
 
 		const ServerConf *findServerConf(const HttpRequest &request);
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
@@ -60,31 +87,10 @@ class RequestHandler
 		const Config& _config;
 		std::unordered_map<int, std::string> _error_pages;
 
-	struct PipeDescriptors
-	{
-		int in_pipe[2];
-		int out_pipe[2];
-
-		void closeAll();
-	};
-
-	struct CGIEnvironment
-	{
-		void setupEnvironment(const std::string& query, const std::string& cgi_path);
-		char** getEnvpArray();
-
-		char req_method[20];
-		char query_string[4096];
-		char content_length[20];
-		char script_filename[4096];
-		char redirect_status[20];
-	};
-
 	bool setupPipes(PipeDescriptors &pipes, Client& client);
 	void handleChildProc(const PipeDescriptors& pipes, const std::string& cgi_path, CGIEnvironment &env);
 	std::string readCGIOutput(int pipe_fd);
-	std::string extractRespBody(const std::string& cgi_output);
-	void sendResponse(Client& client, const std::string& body);
+	void parseCGIOutput(const std::string& cgi_output, HttpResponse& response);
 };
 std::string		getFileExtension(const std::string& filepath);
 
