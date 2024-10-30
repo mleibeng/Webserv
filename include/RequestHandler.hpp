@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/30 00:32:37 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 02:38:59 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,14 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "Config.hpp"
+
+
+struct ParsedPath
+{
+	std::string phys_path;
+	std::string relative_uri;
+	std::string query;
+};
 
 class RequestHandler
 {
@@ -66,12 +74,13 @@ class RequestHandler
 		~RequestHandler();
 
 		void	handleRequest(Client& client);
-		void	handleGetRequest(Client& client, const RouteConf& route_conf);
-		void	handlePostRequest(Client& client, const RouteConf& route_conf);
-		void	handleDeleteRequest(Client& client, const RouteConf& route_conf);
+		void	handleGetRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed);
+		void	handlePostRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed);
+		void	handleDeleteRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed);
 
 		const ServerConf *findServerConf(const HttpRequest &request);
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
+		ParsedPath parsePath(const RouteConf& route_conf, const HttpRequest& request);
 		bool isMethodAllowed(const RouteConf &route_conf, const std::string& method);
 
 		void loadErrorPages();
@@ -81,7 +90,6 @@ class RequestHandler
 		void sendFile(Client& client, const std::string& file_path);
 		void handleCGI(Client& client, const std::string& cgi_path, const std::string& query);
 		void handleFileUpload(int client_fd, const std::string& upload_dir);
-
 
 	private:
 		const Config& _config;

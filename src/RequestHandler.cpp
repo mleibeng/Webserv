@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/30 00:32:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 02:52:42 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,141 +33,26 @@ void		RequestHandler::handleRequest(Client& client)
 		serveErrorPage(client, 405);
 		return;
 	}
+
+	ParsedPath parsed = parsePath(*route_conf, client.getRequest());
+
 	if (client.getRequest().getMethod() == "GET")
-		handleGetRequest(client, *route_conf);
+		handleGetRequest(client, *route_conf, parsed);
 	else if (client.getRequest().getMethod() == "POST")
-		handlePostRequest(client,*route_conf);
+		handlePostRequest(client,*route_conf, parsed);
 	else if (client.getRequest().getMethod() == "DELETE")
-		handleDeleteRequest(client, *route_conf);
+		handleDeleteRequest(client, *route_conf, parsed);
 	else
 		serveErrorPage(client, 501);
 }
 
-/// @brief Get request handling logic // CURRENTLY MISSING CGI AND ERRORPAGE SUPPORT!!!!
-/// @param client client including the fd and request. Ultimately receives requests and sends the built responses.
-/// @param route_conf correct route configuration for the request. Hands over available resources, flags and path configurations
-void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_conf)
-{
-	std::string uri = client.getRequest().getUri();
-	std::string file_path = route_conf.root + uri;
-
-	std::cout << "Current file_path " << file_path << std::endl;
-	std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
-
-	std::string query = "";
-	size_t query_point = uri.find('?');
-	if (query_point != std::string::npos)
-	{
-		query = uri.substr(query_point + 1);
-		std::cout << query << "\n\n";
-		file_path = route_conf.root + uri.substr(0, query_point);
-		std::cout << file_path << "\n\n";
-	}
-
-	if (!route_conf.cgi_extension.empty())
-	{
-		std::string extension = getFileExtension(file_path);
-		std::cout << "cgi_extension: " << extension << std::endl;
-		if (extension == route_conf.cgi_extension)
-		{
-			if (!std::filesystem::exists(file_path))
-			{
-				serveErrorPage(client, 404);
-				return;
-			}
-			handleCGI(client, file_path, query);
-			return;
-		}
-	}
-
-	if (std::filesystem::is_directory(file_path))
-	{
-		if (!route_conf.default_file.empty())
-		{
-			if (file_path.back() != '/')
-				file_path += '/';
-			file_path += route_conf.default_file;
-			if (std::filesystem::exists(file_path))
-				sendFile(client, file_path);
-			else
-				serveErrorPage(client, 404);
-		}
-		else if (route_conf.dir_listing_active)
-			sendDirListing(client, file_path);
-		else
-			serveErrorPage(client, 403);
-		return;
-	}
-	sendFile(client, file_path);
-}
-
-/// @brief Function to build a directory listing to send back to the client with hyperlinks to available resources
-/// @param client serverside representation of the client including the fd and request. Ultimately receives requests and sends the built responses.
-/// @param dir_path built directory path configured out of route_config and request URI.
-void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
-{
-	HttpResponse response;
-	std::stringstream html;
-
-	html << "<html><head><title>Directory listing</title></head><body><h1>Directory listing for "
-			<< client.getRequest().getUri() << "</h1><ul>";
-	try
-	{
-		for (const auto& entry : std::filesystem::directory_iterator(dir_path))
-		{
-			std::string name = entry.path().filename().string();
-			std::string path = client.getRequest().getUri();
-			if (path.back() != '/') path += '/';
-
-			html << "<li><a href=\"" << path << name << "\">"
-					<< name << "</a></li>";
-		}
-	}
-	catch (const std::filesystem::filesystem_error& e)
-	{
-		std::cerr << "Directory listing error: " << e.what() << std::endl;
-		serveErrorPage(client, 500);
-		return;
-	}
-
-	html << "</ul></body></html>";
-
-	response.setStatus(200);
-	response.setBody(html.str());
-	response.setMimeType(getFileExtension(".html"));
-	client.send_response(response.buildResponse());
-}
-
-/// @brief Function to send back a static file response that was requested by the browser.
-/// @param client  serverside representation of the client including the fd and request. Ultimately receives requests and sends the built responses.
-/// @param file_path built file path configured out of route_config and request URI
-void RequestHandler::sendFile(Client& client, const std::string& file_path)
-{
-	HttpResponse response;
-
-	std::ifstream file(file_path, std::ios::binary);
-	if (!file.is_open())
-	{
-		std::cerr << "Could not open file in sendFile func: " << file_path << std::endl;
-		serveErrorPage(client, 500);
-		return;
-	}
-	std::stringstream fileBuf;
-	fileBuf << file.rdbuf();
-	file.close();
-
-	response.setStatus(200);
-	response.setBody(fileBuf.str());
-	response.setMimeType(getFileExtension(file_path));
-	client.send_response(response.buildResponse());
-}
-
 // und hier das argument nr2 so: ->  handleGetRequest(request, const RouteConf &route_conf)!
-void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_conf)
+void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed)
 {
 	// std::string file_path = route_conf.root + request.getUri();
 	(void)client;
 	(void)route_conf;
+	(void)parsed;
 	// HttpResponse response;
 
 	// DIESE LOGIK MUSS REIN <- filedescriptor koennte ein issue sein. weil CGI schickt selber zurueck und baut keine Nachricht!!
@@ -178,7 +63,7 @@ void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_c
 	// client.send_response(response.buildResponse());
 }
 
-void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route_conf)
+void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed)
 {
 	// std::string file_path = route_conf.root + request.getUri();
 
@@ -197,6 +82,7 @@ void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route
 
 	(void)client;
 	(void)route_conf;
+	(void)parsed;
 	// HttpResponse response;
 	// client.send_response(response.buildResponse());
 }

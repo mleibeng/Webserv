@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 02:19:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 02:20:39 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ struct GlobalConf
 
 struct RouteConf
 {
+	std::unordered_map<std::string, RouteConf> routes_options;
 	std::vector<std::string> methods; // Define a list of accepted HTTPS methods for the route
 	std::optional<int> port;
 	std::optional<std::string> redirect; // Define a HTTP redirection

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/30 00:24:04 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 02:53:47 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,23 +109,36 @@ const ServerConf *RequestHandler::findServerConf(const HttpRequest &request)
 const RouteConf *RequestHandler::findRouteConf(const ServerConf &server_conf, const HttpRequest& request)
 {
 	const RouteConf *route_conf = nullptr;
-	// std::cout << "Number of routes: " << server_conf.routes.size() << std::endl;
+
+	size_t longest_match = 0;
+	std::string uri = request.getUri();
+
 	for (const auto& pair : server_conf.routes)
 	{
 		const std::string& path = pair.first;
-		const RouteConf& conf = pair.second;
+		if (path.length() > uri.length())
+			continue;
 
-		// Debug print
-		// std::cout << "Checking path: " << path << std::endl;
-
-		if (request.getUri().compare(0, path.length(), path) == 0)
+		if (uri.compare(0, path.length(), path) == 0)
 		{
-			route_conf = &conf;
-			break;
+			if (path.length() > longest_match)
+			{
+				longest_match = path.length();
+				route_conf = &pair.second;
+			}
 		}
 	}
 
+	if (!route_conf && server_conf.routes.find("/") != server_conf.routes.end())
+		route_conf = &server_conf.routes.at("/");
 	return route_conf;
+}
+
+bool startsWith(const std::string& str, const std::string& prefix)
+{
+	if (prefix.size() > str.size())
+		return false;
+	return str.compare(0, prefix.size(), prefix) == 0;
 }
 
 bool RequestHandler::isMethodAllowed(const RouteConf &route_conf, const std::string &method)
@@ -133,4 +146,45 @@ bool RequestHandler::isMethodAllowed(const RouteConf &route_conf, const std::str
 	if (std::find(route_conf.methods.begin(), route_conf.methods.end(), method) == route_conf.methods.end())
 		return false;
 	return true;
+}
+
+ParsedPath RequestHandler::parsePath(const RouteConf& route_conf, const HttpRequest& request)
+{
+	ParsedPath res;
+	std::string uri = request.getUri();
+
+	size_t query_point = uri.find('?');
+	if (query_point != std::string::npos)
+	{
+		res.query = uri.substr(query_point + 1);
+		uri = uri.substr(0, query_point);
+	}
+
+	std::string route_path = "/";
+	for (const auto& pair : route_conf.routes_options)
+	{
+		if (&pair.second == &route_conf)
+		{
+			route_path = pair.first;
+			break;
+		}
+	}
+
+	res.relative_uri = uri;
+	if (route_path != "/" && startsWith(uri, route_path))
+		res.relative_uri = uri.substr(route_path.length());
+	if (res.relative_uri.empty())
+		res.relative_uri = "/";
+
+	res.phys_path = route_conf.root;
+	if (res.phys_path.back() != '/')
+		res.phys_path += '/';
+
+	if (res.relative_uri != "/")
+	{
+		if (res.relative_uri[0] == '/')
+			res.relative_uri = res.relative_uri.substr(1);
+		res.phys_path += res.relative_uri;
+	}
+	return res;
 }

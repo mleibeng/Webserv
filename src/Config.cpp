@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 02:21:01 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 02:23:57 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,6 +186,7 @@ Config Config::parse(const std::string& conf_file)
 	{
 		for (auto& [path, route] : server.routes)
 		{
+			route.routes_options = current_server.routes;
 			if (!route.max_header_size) route.max_header_size = config.globuli.g_max_header_size;
 			if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
 			if (!route.timeout) route.timeout = config.globuli.g_timeout;
