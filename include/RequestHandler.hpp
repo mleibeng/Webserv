@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/30 02:38:59 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 05:50:21 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@
 struct ParsedPath
 {
 	std::string phys_path;
-	std::string relative_uri;
 	std::string query;
 };
 

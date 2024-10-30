@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/30 02:23:57 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 05:32:15 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ Config Config::parse(const std::string& conf_file)
 			in_route_block = true;
 			current_route = RouteConf();
 			current_route_path = trim(line.substr(6, line.find('{') - 7));
+			current_route.path = current_route_path;
 		}
 		else if (line == "}")
 		{
@@ -186,7 +187,6 @@ Config Config::parse(const std::string& conf_file)
 	{
 		for (auto& [path, route] : server.routes)
 		{
-			route.routes_options = current_server.routes;
 			if (!route.max_header_size) route.max_header_size = config.globuli.g_max_header_size;
 			if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
 			if (!route.timeout) route.timeout = config.globuli.g_timeout;

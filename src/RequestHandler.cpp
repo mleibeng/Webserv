@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/30 02:52:42 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 05:57:10 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,29 +18,23 @@ void		RequestHandler::handleRequest(Client& client)
 {
 	const ServerConf* server_conf = findServerConf(client.getRequest());
 	if (!server_conf)
-	{
-		serveErrorPage(client, 404);
-		return;
-	}
+		return serveErrorPage(client, 404);
 	const RouteConf* route_conf = findRouteConf(*server_conf, client.getRequest());
 	if (!route_conf)
-	{
-		serveErrorPage(client, 404);
-		return;
-	}
-	if (!isMethodAllowed(*route_conf, client.getRequest().getMethod()))
-	{
-		serveErrorPage(client, 405);
-		return;
-	}
+		return serveErrorPage(client, 404);
+
+	const std::string& method = client.getRequest().getMethod();
+
+	if (!isMethodAllowed(*route_conf, method))
+		return serveErrorPage(client, 405);
 
 	ParsedPath parsed = parsePath(*route_conf, client.getRequest());
 
-	if (client.getRequest().getMethod() == "GET")
+	if (method == "GET")
 		handleGetRequest(client, *route_conf, parsed);
-	else if (client.getRequest().getMethod() == "POST")
+	else if (method == "POST")
 		handlePostRequest(client,*route_conf, parsed);
-	else if (client.getRequest().getMethod() == "DELETE")
+	else if (method == "DELETE")
 		handleDeleteRequest(client, *route_conf, parsed);
 	else
 		serveErrorPage(client, 501);

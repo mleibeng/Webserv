@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/30 02:53:47 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/30 05:57:48 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,15 +71,17 @@ RequestHandler::~RequestHandler()
 {
 	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
+
+std::string extractHostname(const std::string& host)
+{
+	if (size_t pos = host.find(':'); pos != std::string::npos)
+		return host.substr(0, pos);
+	return host;
+}
+
 const ServerConf *RequestHandler::findServerConf(const HttpRequest &request)
 {
-	const ServerConf *server_conf = nullptr;
-	std::string host = request.getHeader("Host");
-
-	// Split host and port
-	std::string hostname = host;
-	if (size_t pos = host.find(':'); pos != std::string::npos)
-		hostname = host.substr(0, pos);
+	std::string hostname = extractHostname(request.getHeader("Host"));
 
 	// std::cout << "Looking for host: " << host << std::endl;
 	// std::cout << "Parsed hostname (without port): " << hostname << std::endl;
@@ -96,42 +98,32 @@ const ServerConf *RequestHandler::findServerConf(const HttpRequest &request)
 		if (conf.hostname == hostname ||
 			std::find(conf.server_names.begin(), conf.server_names.end(), hostname) != conf.server_names.end())
 		{
-			server_conf = &conf;
-			// std::cout << "Found matching server config!" << std::endl;
-			break;
+			return &conf;
 		}
 	}
 	// if (!server_conf)
 		// std::cout << "No matching server config found!" << std::endl;
-	return server_conf;
+	return nullptr;
 }
 
 const RouteConf *RequestHandler::findRouteConf(const ServerConf &server_conf, const HttpRequest& request)
 {
-	const RouteConf *route_conf = nullptr;
-
+	const std::string& uri = request.getUri();
+	const RouteConf *best_match = nullptr;
 	size_t longest_match = 0;
-	std::string uri = request.getUri();
 
-	for (const auto& pair : server_conf.routes)
+	for (const auto& [path, route] : server_conf.routes)
 	{
-		const std::string& path = pair.first;
-		if (path.length() > uri.length())
-			continue;
-
-		if (uri.compare(0, path.length(), path) == 0)
+		if (path.length() <= uri.length() &&
+		uri.compare(0, path.length(), path) == 0 &&
+		path.length() > longest_match)
 		{
-			if (path.length() > longest_match)
-			{
-				longest_match = path.length();
-				route_conf = &pair.second;
-			}
+			longest_match = path.length();
+			best_match = &route;
 		}
 	}
-
-	if (!route_conf && server_conf.routes.find("/") != server_conf.routes.end())
-		route_conf = &server_conf.routes.at("/");
-	return route_conf;
+	return best_match ? best_match :
+	(server_conf.routes.count("/") ? &server_conf.routes.at("/") : nullptr);
 }
 
 bool startsWith(const std::string& str, const std::string& prefix)
@@ -160,31 +152,21 @@ ParsedPath RequestHandler::parsePath(const RouteConf& route_conf, const HttpRequ
 		uri = uri.substr(0, query_point);
 	}
 
-	std::string route_path = "/";
-	for (const auto& pair : route_conf.routes_options)
-	{
-		if (&pair.second == &route_conf)
-		{
-			route_path = pair.first;
-			break;
-		}
-	}
-
-	res.relative_uri = uri;
-	if (route_path != "/" && startsWith(uri, route_path))
-		res.relative_uri = uri.substr(route_path.length());
-	if (res.relative_uri.empty())
-		res.relative_uri = "/";
-
 	res.phys_path = route_conf.root;
 	if (res.phys_path.back() != '/')
 		res.phys_path += '/';
 
-	if (res.relative_uri != "/")
+	if (route_conf.path == "/")
 	{
-		if (res.relative_uri[0] == '/')
-			res.relative_uri = res.relative_uri.substr(1);
-		res.phys_path += res.relative_uri;
+		if (uri != "/")
+			res.phys_path += (uri[0] == '/') ? uri.substr(1) : uri;
 	}
+	else if (uri.compare(0, route_conf.path.length(), route_conf.path) == 0)
+	{
+		std::string remain = uri.substr(route_conf.path.length());
+		if (!remain.empty())
+			res.phys_path += (remain[0] == '/') ? remain.substr(1) : remain;
+	}
+
 	return res;
 }
