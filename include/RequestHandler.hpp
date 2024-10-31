@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 00:33:39 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 00:49:02 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ class RequestHandler
 	};
 
 	bool setupPipes(PipeDescriptors &pipes, Client& client);
-	void handleCGIChild(const PipeDescriptors &pipes, const std::string& script_path, HttpRequest& request, const CGIHandler& handler);
+	void handleCGIChild(const PipeDescriptors &pipes, const std::string& script_path, const HttpRequest& request, const CGIHandler& handler);
 	void handleCGIParent(const PipeDescriptors &pipes, Client& client, const HttpRequest& request);
 	std::string readCGIOutput(int pipe_fd);
 	void writeCGIOutput(int pipe_fd, const std::string& body);

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 22:52:24 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 00:10:58 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 00:42:55 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ class PythonHandler : public CGIHandler
 class CGIHandleCreator
 {
 	public:
-	static std::unique_ptr<CGIHandler> createHandler(const RouteConf& route_conf, const std::string &file_extension);
+	static std::unique_ptr<CGIHandler> createHandler(const std::string &file_extension);
 };
 
 #endif
