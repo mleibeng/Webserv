@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/30 05:50:21 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 00:27:18 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 #include "Client.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
+#include "CGICreator.hpp"
 #include "Config.hpp"
 
 
@@ -38,32 +39,44 @@ struct ParsedPath
 
 class RequestHandler
 {
-	struct PipeDescriptors
-	{
-		int in_pipe[2];
-		int out_pipe[2];
+	private:
+		const Config& _config;
+		std::unordered_map<int, std::string> _error_pages;
 
-		void closeAll();
-	};
-
-	class CGIEnvironment
+	class CGIEnv
 	{
 		private:
-		static const size_t BUFFER_SIZE = 4096;
-		char req_method[BUFFER_SIZE];
-		char query_string[BUFFER_SIZE];
-		char content_length[BUFFER_SIZE];
-		char script_filename[BUFFER_SIZE];
-		char redirect_status[BUFFER_SIZE];
-		char content_type[BUFFER_SIZE];
+
+		static constexpr size_t BUFFER_SIZE = 4096;
 		std::vector<char*> env_array;
+		std::vector<std::unique_ptr<char[]>> env_bufs;
+
+		void setEnviron(const HttpRequest &request, const std::string& script_path, const CGIHandler& handler);
+		void addEnvStuff(const std::string &name, const std::string& value);
 
 		public:
-		void setupEnvironment(const std::string& query, const std::string& cgi_path);
-		char** getEnvpArray();
+		CGIEnv(const HttpRequest& request, const std::string& script_path, const CGIHandler& handler);
+		~CGIEnv();
 
-		~CGIEnvironment();
+		char **getEnv();
 	};
+
+	struct PipeDescriptors
+	{
+		int in_pipe[2] = {-1, -1};
+		int out_pipe[2] = {-1, -1};
+
+		void closeAll();
+		void closeParentPipes();
+		void closeChildPipes();
+	};
+
+	bool setupPipes(PipeDescriptors & pipes, Client& client);
+	void handleCGIChild(const PipeDescriptors &pipes, const std::string& script_path, HttpRequest& request, const CGIHandler& handler);
+	void handleCGIParent(const PipeDescriptors &pipes, Client& client, const HttpRequest& request);
+	std::string readCGIOutput(int pipe_fd);
+	void writeCGIOutput(int pipe_fd, const std::string& body);
+	void buildCGIResponse(const std::string& out, HttpResponse& response);
 
 	public:
 		RequestHandler() = delete;
@@ -89,16 +102,7 @@ class RequestHandler
 		void sendFile(Client& client, const std::string& file_path);
 		void handleCGI(Client& client, const std::string& cgi_path, const std::string& query);
 		void handleFileUpload(int client_fd, const std::string& upload_dir);
-
-	private:
-		const Config& _config;
-		std::unordered_map<int, std::string> _error_pages;
-
-	bool setupPipes(PipeDescriptors &pipes, Client& client);
-	void handleChildProc(const PipeDescriptors& pipes, const std::string& cgi_path, CGIEnvironment &env);
-	std::string readCGIOutput(int pipe_fd);
-	void parseCGIOutput(const std::string& cgi_output, HttpResponse& response);
 };
 std::string		getFileExtension(const std::string& filepath);
 
-#endif // REQUESTHANDLER_H
+#endif

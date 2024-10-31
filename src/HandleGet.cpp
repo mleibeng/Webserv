@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/30 05:57:29 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/31 22:39:37 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,45 +18,47 @@
 /// @param route_conf correct route configuration for the request. Hands over available resources, flags and path configurations
 void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed)
 {
-	std::cout << "phys path: "<< parsed.phys_path << " query: " << parsed.query << std::endl;
+	// std::cout << "phys path: "<< parsed.phys_path << " query: " << parsed.query << std::endl;
 
 	std::string final_path = parsed.phys_path;
 
 	// Case 1: Specific file check
 	if (std::filesystem::exists(parsed.phys_path) && !std::filesystem::is_directory(parsed.phys_path))
 	{
-		std::cout << "option 1 direct php  resource request" << std::endl;
+		// std::cout << "option 1 direct resource request" << std::endl;
 		std::string extension = getFileExtension(parsed.phys_path);
 		if (!extension.empty() && extension == route_conf.cgi_extension)
 		{
-			std::cout << "option 1 php cgi" << std::endl;
+			// std::cout << "option 1 php cgi" << std::endl;
 			handleCGI(client, parsed.phys_path, parsed.query);
 			return;
 		}
-		std::cout << "option 1 static file" << std::endl;
+		// std::cout << "option 1 static file" << std::endl;
 		sendFile(client, parsed.phys_path);
 		return;
 	}
 
 	// Case 2 Directory handling
 	std::string path_check = parsed.phys_path;
-	if (path_check.back() != '/')
-		path_check += '/';
+
+	// probably unecessary now since being utilizied in parsed already.
+	// if (path_check.back() != '/')
+	// 	path_check += '/';
 
 	if (std::filesystem::is_directory(path_check))
 	{
-		std::cout << "option 2: default file" << std::endl;
+		// std::cout << "option 2: default file" << std::endl;
 		// Default file check : Either PHP or static
 		if (!route_conf.default_file.empty())
 		{
 			std::string default_path = path_check + route_conf.default_file;
-			std::cout << "default path opt 2: " << default_path << std::endl;
+			// std::cout << "default path opt 2: " << default_path << std::endl;
 			if (std::filesystem::exists(default_path))
 			{
 				std::string extension = getFileExtension(default_path);
 				if (!route_conf.cgi_extension.empty() && extension == route_conf.cgi_extension)
 				{
-					std::cout << "option 2 cgi handler called" << std::endl;
+					// std::cout << "option 2 cgi handler called" << std::endl;
 					handleCGI(client, default_path, parsed.query);
 					return;
 				}
@@ -67,14 +69,14 @@ void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_co
 		// Directory listing
 		if (route_conf.dir_listing_active)
 		{
-			std::cout << "option 3: Dir_listing" << std::endl;
+			// std::cout << "option 3: Dir_listing" << std::endl;
 			sendDirListing(client, path_check);
 			return;
 		}
 		serveErrorPage(client, 403);
 		return;
 	}
-	std::cout << "option 4: Not found" << std::endl;
+	// std::cout << "option 4: Not found" << std::endl;
 	// Case not found
 	serveErrorPage(client, 404);
 }

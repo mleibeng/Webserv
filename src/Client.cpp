@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/29 23:00:30 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/31 21:48:24 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,9 @@ ssize_t Client::read_request()
 	else {
 		request.assign(buffer, nbytes);
 		std::cout << YELLOW << request << DEFAULT << std::endl;
-		_request.parse(request);
+		bool ok = _request.parse(request);
+		if (!ok)
+			return -1;
 	}
 	return nbytes;
 }

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/30 05:57:48 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/31 22:32:46 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,9 +97,7 @@ const ServerConf *RequestHandler::findServerConf(const HttpRequest &request)
 
 		if (conf.hostname == hostname ||
 			std::find(conf.server_names.begin(), conf.server_names.end(), hostname) != conf.server_names.end())
-		{
 			return &conf;
-		}
 	}
 	// if (!server_conf)
 		// std::cout << "No matching server config found!" << std::endl;
@@ -122,8 +120,15 @@ const RouteConf *RequestHandler::findRouteConf(const ServerConf &server_conf, co
 			best_match = &route;
 		}
 	}
-	return best_match ? best_match :
-	(server_conf.routes.count("/") ? &server_conf.routes.at("/") : nullptr);
+	if (best_match)
+		return best_match;
+	else
+	{
+		if(server_conf.routes.count("/"))
+			return &server_conf.routes.at("/");
+		else
+			return nullptr;
+	}
 }
 
 bool startsWith(const std::string& str, const std::string& prefix)
@@ -145,6 +150,7 @@ ParsedPath RequestHandler::parsePath(const RouteConf& route_conf, const HttpRequ
 	ParsedPath res;
 	std::string uri = request.getUri();
 
+	// split query from URI
 	size_t query_point = uri.find('?');
 	if (query_point != std::string::npos)
 	{
@@ -152,15 +158,18 @@ ParsedPath RequestHandler::parsePath(const RouteConf& route_conf, const HttpRequ
 		uri = uri.substr(0, query_point);
 	}
 
+	//set phys path to default path of the route_conf
 	res.phys_path = route_conf.root;
 	if (res.phys_path.back() != '/')
 		res.phys_path += '/';
 
+	// build a file resource request path from default path in config file,
+	// checking for leading "/" in the URI and preventing double "//" appending to the phys_path
 	if (route_conf.path == "/")
 	{
 		if (uri != "/")
 			res.phys_path += (uri[0] == '/') ? uri.substr(1) : uri;
-	}
+	}// checks whether or not the uri already leads with route config path and cuts it out, because phys path already includes it.
 	else if (uri.compare(0, route_conf.path.length(), route_conf.path) == 0)
 	{
 		std::string remain = uri.substr(route_conf.path.length());

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/29 23:56:15 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/31 22:33:42 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,10 +167,7 @@ void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 	Client client(client_fd);
 
 	std::cout << "request from " << client_fd << std::endl;
-	client.read_request();
-	// if (error in readin)
-	// {
-
-	// }
+	if (client.read_request() == -1)
+		return handler.serveErrorPage(client, 400);
 	handler.handleRequest(client);
 }

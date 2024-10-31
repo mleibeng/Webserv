@@ -6,14 +6,15 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/30 05:57:10 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/10/31 22:19:17 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
-/// @brief Entrypoint and management function for sorting Requests
-/// @param client client including the fd and request. Ultimately receives requests and sends the built responses.
+/// @brief Entrypoint and management function for sorting Requests.
+///		   Finds the most appropriate route and delegates the response to the specific type of request handler.
+/// @param client client including the fd and request. Ultimately receives requests and sends the response.
 void		RequestHandler::handleRequest(Client& client)
 {
 	const ServerConf* server_conf = findServerConf(client.getRequest());
@@ -33,7 +34,7 @@ void		RequestHandler::handleRequest(Client& client)
 	if (method == "GET")
 		handleGetRequest(client, *route_conf, parsed);
 	else if (method == "POST")
-		handlePostRequest(client,*route_conf, parsed);
+		handlePostRequest(client, *route_conf, parsed);
 	else if (method == "DELETE")
 		handleDeleteRequest(client, *route_conf, parsed);
 	else
