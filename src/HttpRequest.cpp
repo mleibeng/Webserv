@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 01:54:03 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 02:58:03 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ HttpRequest& HttpRequest::operator=(const HttpRequest &other)
 	{
 		AHttpMessage::operator=(other);
 		setMethod(other.getMethod());
-		setUri(other.getUri());
+		_uri = other.getUri();
+		setQuery(other.getQuery());
 	}
 	return (*this);
 }

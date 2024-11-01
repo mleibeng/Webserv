@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 22:52:24 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 01:38:35 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 03:18:43 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,9 @@
 #define CGICREATOR_HPP
 
 #include <vector>
+#include <memory>
 #include <string>
+#include <stdexcept>
 
 //made the handler code more modular
 class CGIHandler
