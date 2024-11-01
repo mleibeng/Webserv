@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 04:38:49 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 05:26:57 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,33 @@ void RequestHandler::handleCGIChild(PipeDescriptors& pipes, const std::string& c
 	std::exit(1);
 }
 
+void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, const HttpRequest& request)
+{
+	pipes.closeParentPipes();
+
+	if (request.getMethod() == "POST")
+		writeCGIInput(pipes.in_pipe[1], request.getBody());
+	close(pipes.in_pipe[1]);
+
+	std::string output = readCGIOutput(pipes.out_pipe[0]);
+	std::cout << "CGI Output: "<< output << std::endl;
+	close(pipes.out_pipe[0]);
+
+	int status;
+	waitpid(-1, &status, 0);
+
+	HttpResponse response;
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+		buildCGIResponse(output, response);
+	else
+	{
+		serveErrorPage(client, 500);
+		return;
+	}
+
+	client.send_response(response.buildResponse());
+}
+
 void RequestHandler::writeCGIInput(int pipe_fd, const std::string& request_body)
 {
 	write(pipe_fd, request_body.c_str(), request_body.length());
@@ -200,31 +227,4 @@ void RequestHandler::buildCGIResponse(const std::string& out, HttpResponse& resp
 	response.setBody(body.str());
 	if (response.getHeader("Content-Type").empty() && !response.getBody().empty())
 		response.setMimeType(".html");
-}
-
-void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, const HttpRequest& request)
-{
-	pipes.closeParentPipes();
-
-	if (request.getMethod() == "POST")
-		writeCGIInput(pipes.in_pipe[1], request.getBody());
-	close(pipes.in_pipe[1]);
-
-	std::string output = readCGIOutput(pipes.out_pipe[0]);
-	std::cout << "CGI Output: "<< output << std::endl;
-	close(pipes.out_pipe[0]);
-
-	int status;
-	waitpid(-1, &status, 0);
-
-	HttpResponse response;
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
-		buildCGIResponse(output, response);
-	else
-	{
-		serveErrorPage(client, 500);
-		return;
-	}
-
-	client.send_response(response.buildResponse());
 }

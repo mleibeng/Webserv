@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/31 22:33:42 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 05:33:13 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 /// @param conf_file Saves data structures and values read in from the config file
 WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false)
 {
-	// config.print();
+	config.print();
 }
 
 void WebServer::setupListeners()
