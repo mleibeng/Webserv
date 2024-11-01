@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 00:55:12 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 04:33:52 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 04:56:45 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,17 +30,16 @@ void RequestHandler::CGIEnv::setEnviron(const HttpRequest& request, const std::s
 {
 	std::string method = request.getMethod();
 
-	addEnvStuff("SCRIPT_FILENAME", cgi_path);  // Changed from SCRIPT_FILE
-	addEnvStuff("DOCUMENT_ROOT", "html_pages");  // Add your web root directory
-	addEnvStuff("REQUEST_URI", request.getUri());
-	addEnvStuff("SCRIPT_NAME", request.getUri());
-	addEnvStuff("SERVER_PROTOCOL", "HTTP/1.1");
-	addEnvStuff("REQUEST_METHOD", method);
-	addEnvStuff("QUERY_STRING", request.getQuery());
-	addEnvStuff("SCRIPT_FILENAME", cgi_path);
-	addEnvStuff("REDIRECT_STATUS", "200");
-	addEnvStuff("PATH_INFO", "");
-	addEnvStuff("SERVER_SOFTWARE", "WebServer/1.1");
+	//Python specific
+	addEnvStuff("PYTHONPATH", "html_pages"); // <--- could use improvement not hardcoding it
+	// addEnvStuff("PYTHONUNBUFFERED", "1"); // logging for immediate print output
+
+	addEnvStuff("SCRIPT_FILENAME", cgi_path); // Necessary to locate file for execution
+	addEnvStuff("DOCUMENT_ROOT", "html_pages"); // <--- could use improvement -> should actually take both doc root and py path from route_conf
+	addEnvStuff("REQUEST_URI", request.getUri()); // Necessary for request context
+	addEnvStuff("SCRIPT_NAME", request.getUri()); // Necessary for script to find itself within
+	addEnvStuff("REQUEST_METHOD", method); // Necessary for different handling of methods
+	addEnvStuff("QUERY_STRING", request.getQuery()); // Necessary for processing the query
 
 	if (method == "POST")
 	{
