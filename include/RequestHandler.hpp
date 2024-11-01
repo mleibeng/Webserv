@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 00:49:02 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 01:02:08 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,11 @@
 #include <filesystem>
 #include <fstream>
 #include <sys/wait.h>
+#include "Config.hpp"
 #include "Client.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "CGICreator.hpp"
-#include "Config.hpp"
 
 
 struct ParsedPath
@@ -51,7 +51,7 @@ class RequestHandler
 		std::vector<char*> env_array;
 		std::vector<std::unique_ptr<char[]>> env_bufs;
 
-		void setEnviron(const HttpRequest &request, const std::string& script_path, const CGIHandler& handler);
+		void setEnviron(const HttpRequest &request, const std::string& cgi_path, const CGIHandler& handler);
 		void addEnvStuff(const std::string &name, const std::string& value);
 
 		public:
