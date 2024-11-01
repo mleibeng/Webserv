@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 00:55:12 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 04:56:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 05:40:38 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ void RequestHandler::CGIEnv::setEnviron(const HttpRequest& request, const std::s
 	addEnvStuff("SCRIPT_NAME", request.getUri()); // Necessary for script to find itself within
 	addEnvStuff("REQUEST_METHOD", method); // Necessary for different handling of methods
 	addEnvStuff("QUERY_STRING", request.getQuery()); // Necessary for processing the query
+	addEnvStuff("REDIRECT_STATUS", "200"); // Necessary because PHP CGI binary was compiled with force-cgi-redirect enabled.
 
 	if (method == "POST")
 	{
