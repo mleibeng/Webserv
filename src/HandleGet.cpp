@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 01:57:17 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 02:03:20 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,7 @@
 /// @param route_conf correct route configuration for the request. Hands over available resources, flags and path configurations
 void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)
 {
-	// std::cout << "phys path: "<< parsed.phys_path << " query: " << parsed.query << std::endl;
-
-	std::string final_path = parsed;
+	// std::cout << "phys path: "<< parsed << " query: " << client.getRequest().getQuery() << std::endl;
 
 	// Case 1: Specific file check
 	if (std::filesystem::exists(parsed) && !std::filesystem::is_directory(parsed))

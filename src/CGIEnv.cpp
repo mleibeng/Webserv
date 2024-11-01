@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 00:55:12 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 01:41:58 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 02:14:35 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,21 +28,41 @@ char** RequestHandler::CGIEnv::getEnv()
 
 void RequestHandler::CGIEnv::setEnviron(const HttpRequest& request, const std::string& cgi_path, const CGIHandler& handler)
 {
-	addEnvStuff("REQUEST_METHOD", request.getMethod());
-	addEnvStuff("QUERY_STRING", request._query);
+	std::string method = request.getMethod();
+
+	addEnvStuff("REQUEST_METHOD", method);
+	addEnvStuff("QUERY_STRING", request.getQuery());
 	addEnvStuff("SCRIPT_FILE", cgi_path);
 	addEnvStuff("REDIRECT_STATUS", "200");
 	addEnvStuff("PATH_INFO", "");
 	addEnvStuff("SERVER_SOFTWARE", "WebServer/1.1");
 
-	if (request._method == "POST")
+	if (method == "POST")
 	{
-		addEnvStuff("CONTENT_LENGTH", std::to_string(request.getBody()));
+		addEnvStuff("CONTENT_LENGTH", std::to_string(request.getBody().length()));
 
 		auto content_type = request.getHeader("Content-Type");
 		if (!content_type.empty())
-			addEnvStuff("CONTENT_TYPE", content_type)
+			addEnvStuff("CONTENT_TYPE", content_type);
+		else
+			addEnvStuff("CONTENT_TYPE", "application/x-www-form-urlencoded");
 	}
+	else
+	{
+		addEnvStuff("CONTENT_LENGTH", "0");
+		addEnvStuff("CONTENT_TYPE", handler.getDefaultContent());
+	}
+
+	const auto& headers = request.getAllHeaders();
+	for (const auto& [header, value] : headers)
+	{
+		std::string env_name = "HTTP_ " + header;
+		std::transform(env_name.begin(), env_name.end(), env_name.begin(), ::toupper);
+		std::replace(env_name.begin(), env_name.end(), '-', '_');
+		addEnvStuff(env_name, value);
+	}
+
+	env_array.push_back(nullptr);
 }
 
 void RequestHandler::CGIEnv::addEnvStuff(const std::string &name, const std::string& value)

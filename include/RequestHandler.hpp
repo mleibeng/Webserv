@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 01:55:48 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 02:00:27 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ class RequestHandler
 		void addEnvStuff(const std::string &name, const std::string& value);
 
 		public:
-		CGIEnv(const HttpRequest& request, const std::string& script_path, const CGIHandler& handler);
+		CGIEnv(const HttpRequest& request, const std::string& cgi_path, const CGIHandler& handler);
 		~CGIEnv();
 
 		char **getEnv();
@@ -65,7 +65,7 @@ class RequestHandler
 	};
 
 	bool setupPipes(PipeDescriptors &pipes, Client& client);
-	void handleCGIChild(const PipeDescriptors &pipes, const std::string& script_path, const HttpRequest& request, const CGIHandler& handler);
+	void handleCGIChild(const PipeDescriptors &pipes, const std::string& cgi_path, const HttpRequest& request, const CGIHandler& handler);
 	void handleCGIParent(const PipeDescriptors &pipes, Client& client, const HttpRequest& request);
 	std::string readCGIOutput(int pipe_fd);
 	void writeCGIOutput(int pipe_fd, const std::string& body);
@@ -93,7 +93,7 @@ class RequestHandler
 
 		void sendDirListing(Client &client, const std::string& dir_path);
 		void sendFile(Client& client, const std::string& file_path);
-		void handleCGI(Client& client, const std::string& cgi_path, const std::string& query);
+		void handleCGI(Client& client, const std::string& cgi_path);
 		void handleFileUpload(int client_fd, const std::string& upload_dir);
 };
 std::string		getFileExtension(const std::string& filepath);
