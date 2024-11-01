@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 02:47:41 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 04:40:32 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ class RequestHandler
 		~CGIEnv();
 
 		char **getEnv();
+		void debugPrintEnv() const;
 	};
 
 	struct PipeDescriptors
@@ -62,6 +63,7 @@ class RequestHandler
 		void closeAll();
 		void closeParentPipes();
 		void closeChildPipes();
+		void checkClose(int& fd);
 	};
 
 		bool setupPipes(PipeDescriptors &pipes, Client& client);

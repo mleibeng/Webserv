@@ -6,11 +6,20 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 03:23:44 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 04:38:49 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+void RequestHandler::PipeDescriptors::checkClose(int& fd)
+{
+	if (fd != -1)
+	{
+		close(fd);
+		fd = -1;
+	}
+}
 
 /// @brief sets up pipes. Serve error page 500 on fail
 /// @return ok : not ok
@@ -27,24 +36,24 @@ bool RequestHandler::setupPipes(PipeDescriptors &pipes, Client& client)
 /// @brief close all pipes
 void RequestHandler::PipeDescriptors::closeAll()
 {
-	close(in_pipe[0]);
-	close(in_pipe[1]);
-	close(out_pipe[0]);
-	close(out_pipe[1]);
+	checkClose(in_pipe[0]);
+	checkClose(in_pipe[1]);
+	checkClose(out_pipe[0]);
+	checkClose(out_pipe[1]);
 }
 
 /// @brief close parent side pipes
 void RequestHandler::PipeDescriptors::closeParentPipes()
 {
-	close(in_pipe[0]);
-	close(out_pipe[1]);
+	checkClose(in_pipe[0]);
+	checkClose(out_pipe[1]);
 }
 
 /// @brief close child side pipes
 void RequestHandler::PipeDescriptors::closeChildPipes()
 {
-	close(in_pipe[1]);
-	close(out_pipe[0]);
+	checkClose(in_pipe[1]);
+	checkClose(out_pipe[0]);
 }
 
 /// @brief Central CGI handling function setting up pipes / forks for execution
@@ -54,6 +63,8 @@ void RequestHandler::PipeDescriptors::closeChildPipes()
 void RequestHandler::handleCGI(Client& client, const std::string& cgi_path)
 {
 	std::string file_extension = getFileExtension(cgi_path);
+	// std::cout << file_extension << std::endl;
+	// std::cout << "cgi path: " << cgi_path << std::endl;
 	try
 	{
 		auto handler = CGIHandleCreator::createHandler(file_extension);
@@ -63,7 +74,8 @@ void RequestHandler::handleCGI(Client& client, const std::string& cgi_path)
 			return;
 
 		const HttpRequest& request = client.getRequest();
-
+		// std::cout << request.getQuery() << std::endl;
+		// std::cout << request.getUri() << std::endl;
 		pid_t pid = fork();
 		if (pid == -1)
 		{
@@ -132,9 +144,10 @@ void RequestHandler::buildCGIResponse(const std::string& out, HttpResponse& resp
 	std::istringstream out_stream(out);
 	std::string line;
 	bool headers_done = false;
-
 	response.setStatus(200);
 
+
+	std::stringstream body;
 	while (std::getline(out_stream, line))
 	{
 		if (!line.empty() && line.back() == '\r')
@@ -160,16 +173,24 @@ void RequestHandler::buildCGIResponse(const std::string& out, HttpResponse& resp
 			size_t s_pos = header_value.find(' ');
 			if (s_pos != std::string::npos)
 			{
-				int status = std::stoi(header_value.substr(0, s_pos));
-				response.setStatus(status);
+				try
+				{
+					int status = std::stoi(header_value.substr(0, s_pos));
+					response.setStatus(status);
+				}
+				catch (const std::exception& e)
+				{}
 			}
 		}
 		else
 			response.setHeader(header_name, header_value);
 	}
-	std::stringstream body;
 	if (headers_done)
-		body << out_stream.rdbuf();
+	{
+		std::string bod_line;
+		while (std::getline(out_stream, bod_line))
+			body << bod_line << "\n";
+	}
 	else
 	{
 		out_stream.clear();
@@ -178,7 +199,7 @@ void RequestHandler::buildCGIResponse(const std::string& out, HttpResponse& resp
 	}
 	response.setBody(body.str());
 	if (response.getHeader("Content-Type").empty() && !response.getBody().empty())
-		response.setMimeType(".txt");
+		response.setMimeType(".html");
 }
 
 void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, const HttpRequest& request)
@@ -190,6 +211,7 @@ void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, con
 	close(pipes.in_pipe[1]);
 
 	std::string output = readCGIOutput(pipes.out_pipe[0]);
+	std::cout << "CGI Output: "<< output << std::endl;
 	close(pipes.out_pipe[0]);
 
 	int status;

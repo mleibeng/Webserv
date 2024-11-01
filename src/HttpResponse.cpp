@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/25 20:24:09 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 04:40:02 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ std::string	HttpResponse::buildResponse() const
 
 	response << "HTTP/1.1 " << _status << " " << _status << "\r\n";
 
-	std::cout << RED << this->getHeader("Content-Type") << RESET << std::endl;
+	// std::cout << RED << this->getHeader("Content-Type") << RESET << std::endl;
 	for (const auto& header : _header)
 	{
 		response << header.first << ": " << header.second << "\r\n";
@@ -147,7 +147,7 @@ std::string	HttpResponse::buildResponse() const
 	if (_header.find("Content-Length") == _header.end())
 		response << "Content-Length: " << _body.size() << "\r\n";
 	if (_header.find("Content-Type") == _header.end())
-		response << "Content-Type: text/plain\r\n";
+		response << "Content-Type: text/html\r\n";
 	response << "\r\n";
 	response << _body;
 

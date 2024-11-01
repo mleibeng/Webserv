@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 00:55:12 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 02:14:35 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 04:33:52 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,14 @@ void RequestHandler::CGIEnv::setEnviron(const HttpRequest& request, const std::s
 {
 	std::string method = request.getMethod();
 
+	addEnvStuff("SCRIPT_FILENAME", cgi_path);  // Changed from SCRIPT_FILE
+	addEnvStuff("DOCUMENT_ROOT", "html_pages");  // Add your web root directory
+	addEnvStuff("REQUEST_URI", request.getUri());
+	addEnvStuff("SCRIPT_NAME", request.getUri());
+	addEnvStuff("SERVER_PROTOCOL", "HTTP/1.1");
 	addEnvStuff("REQUEST_METHOD", method);
 	addEnvStuff("QUERY_STRING", request.getQuery());
-	addEnvStuff("SCRIPT_FILE", cgi_path);
+	addEnvStuff("SCRIPT_FILENAME", cgi_path);
 	addEnvStuff("REDIRECT_STATUS", "200");
 	addEnvStuff("PATH_INFO", "");
 	addEnvStuff("SERVER_SOFTWARE", "WebServer/1.1");
@@ -72,4 +77,15 @@ void RequestHandler::CGIEnv::addEnvStuff(const std::string &name, const std::str
 	std::strcpy(buffer.get(), env_var.c_str());
 	env_array.push_back(buffer.get());
 	env_bufs.push_back(std::move(buffer));
+}
+
+void RequestHandler::CGIEnv::debugPrintEnv() const
+{
+	std::cout << "=== CGI Environment Variables ===" << std::endl;
+	for (size_t i = 0; i < env_array.size() - 1; ++i) {
+		if (env_array[i]) {
+			std::cout << env_array[i] << std::endl;
+		}
+	}
+	std::cout << "===============================" << std::endl;
 }
