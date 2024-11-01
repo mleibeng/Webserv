@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/31 22:19:17 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 01:56:33 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void		RequestHandler::handleRequest(Client& client)
 	if (!isMethodAllowed(*route_conf, method))
 		return serveErrorPage(client, 405);
 
-	ParsedPath parsed = parsePath(*route_conf, client.getRequest());
+	std::string parsed = parsePath(*route_conf, client.getRequest());
 
 	if (method == "GET")
 		handleGetRequest(client, *route_conf, parsed);
@@ -42,7 +42,7 @@ void		RequestHandler::handleRequest(Client& client)
 }
 
 // und hier das argument nr2 so: ->  handleGetRequest(request, const RouteConf &route_conf)!
-void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed)
+void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)
 {
 	// std::string file_path = route_conf.root + request.getUri();
 	(void)client;
@@ -58,7 +58,7 @@ void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_c
 	// client.send_response(response.buildResponse());
 }
 
-void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed)
+void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)
 {
 	// std::string file_path = route_conf.root + request.getUri();
 

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/31 22:32:46 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 01:55:19 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,24 +83,12 @@ const ServerConf *RequestHandler::findServerConf(const HttpRequest &request)
 {
 	std::string hostname = extractHostname(request.getHeader("Host"));
 
-	// std::cout << "Looking for host: " << host << std::endl;
-	// std::cout << "Parsed hostname (without port): " << hostname << std::endl;
-	// std::cout << "Number of server configs: " << _config.getServerConfs().size() << std::endl;
-
 	for (const auto& conf : _config.getServerConfs())
 	{
-		// std::cout << "Checking server config - hostname: " << conf.hostname << std::endl;
-		// std::cout << "Server names: ";
-		// for (const auto& name : conf.server_names)
-		// 	std::cout << name << " ";
-		// std::cout << std::endl;
-
 		if (conf.hostname == hostname ||
 			std::find(conf.server_names.begin(), conf.server_names.end(), hostname) != conf.server_names.end())
 			return &conf;
 	}
-	// if (!server_conf)
-		// std::cout << "No matching server config found!" << std::endl;
 	return nullptr;
 }
 
@@ -145,37 +133,29 @@ bool RequestHandler::isMethodAllowed(const RouteConf &route_conf, const std::str
 	return true;
 }
 
-ParsedPath RequestHandler::parsePath(const RouteConf& route_conf, const HttpRequest& request)
+std::string RequestHandler::parsePath(const RouteConf& route_conf, const HttpRequest& request)
 {
-	ParsedPath res;
+	std::string phys_path;
 	std::string uri = request.getUri();
 
-	// split query from URI
-	size_t query_point = uri.find('?');
-	if (query_point != std::string::npos)
-	{
-		res.query = uri.substr(query_point + 1);
-		uri = uri.substr(0, query_point);
-	}
-
 	//set phys path to default path of the route_conf
-	res.phys_path = route_conf.root;
-	if (res.phys_path.back() != '/')
-		res.phys_path += '/';
+	phys_path = route_conf.root;
+	if (phys_path.back() != '/')
+		phys_path += '/';
 
 	// build a file resource request path from default path in config file,
 	// checking for leading "/" in the URI and preventing double "//" appending to the phys_path
 	if (route_conf.path == "/")
 	{
 		if (uri != "/")
-			res.phys_path += (uri[0] == '/') ? uri.substr(1) : uri;
+			phys_path += (uri[0] == '/') ? uri.substr(1) : uri;
 	}// checks whether or not the uri already leads with route config path and cuts it out, because phys path already includes it.
 	else if (uri.compare(0, route_conf.path.length(), route_conf.path) == 0)
 	{
 		std::string remain = uri.substr(route_conf.path.length());
 		if (!remain.empty())
-			res.phys_path += (remain[0] == '/') ? remain.substr(1) : remain;
+			phys_path += (remain[0] == '/') ? remain.substr(1) : remain;
 	}
 
-	return res;
+	return phys_path;
 }

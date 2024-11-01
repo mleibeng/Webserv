@@ -6,14 +6,15 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 22:52:24 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 00:42:55 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 01:38:35 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CGIHANDLER_HPP
-#define CGIHANDLER_HPP
+#ifndef CGICREATOR_HPP
+#define CGICREATOR_HPP
 
-#include "RequestHandler.hpp"
+#include <vector>
+#include <string>
 
 //made the handler code more modular
 class CGIHandler

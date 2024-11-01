@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 00:53:08 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 01:57:54 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void RequestHandler::PipeDescriptors::closeChildPipes()
 /// @param client Client holds request and response functionality
 /// @param cgi_path path to file that needs cgi execution
 /// @param query CGI modification sent through the URI
-void RequestHandler::handleCGI(Client& client, const std::string& cgi_path, const std::string& query)
+void RequestHandler::handleCGI(Client& client, const std::string& cgi_path)
 {
 	std::string file_extension = getFileExtension(cgi_path);
 	try

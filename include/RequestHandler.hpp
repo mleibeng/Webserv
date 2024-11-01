@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 01:02:08 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 01:55:48 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,6 @@
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "CGICreator.hpp"
-
-
-struct ParsedPath
-{
-	std::string phys_path;
-	std::string query;
-};
 
 class RequestHandler
 {
@@ -86,13 +79,13 @@ class RequestHandler
 		~RequestHandler();
 
 		void	handleRequest(Client& client);
-		void	handleGetRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed);
-		void	handlePostRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed);
-		void	handleDeleteRequest(Client& client, const RouteConf& route_conf, const ParsedPath& parsed);
+		void	handleGetRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
+		void	handlePostRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
+		void	handleDeleteRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
 
 		const ServerConf *findServerConf(const HttpRequest &request);
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
-		ParsedPath parsePath(const RouteConf& route_conf, const HttpRequest& request);
+		std::string parsePath(const RouteConf& route_conf, const HttpRequest& request);
 		bool isMethodAllowed(const RouteConf &route_conf, const std::string& method);
 
 		void loadErrorPages();

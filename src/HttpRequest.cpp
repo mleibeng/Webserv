@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/24 02:09:16 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/01 01:54:03 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,27 @@ const std::string&	HttpRequest::getUri() const
 	return (_uri);
 }
 
+const std::string& HttpRequest::getQuery() const
+{return (_query);}
+
 void	HttpRequest::setMethod(const std::string& method)
 {
 	_method = method;
 }
-void	HttpRequest::setUri(const std::string& uri)
+
+void	HttpRequest::setQuery(const std::string& uri)
 {
-	_uri = uri;
+	size_t query_point = uri.find('?');
+	if (query_point != std::string::npos)
+	{
+		_query = uri.substr(query_point + 1);
+		_uri = uri.substr(0, query_point);
+	}
+	else
+	{
+		_query.clear();
+		_uri = uri;
+	}
 }
 
 bool	HttpRequest::parse(const std::string& rawmsg)
@@ -70,7 +84,7 @@ bool	HttpRequest::parse(const std::string& rawmsg)
 		return (false);
 
 	setMethod(trimStr(method));
-	setUri(trimStr(uri));
+	setQuery(trimStr(uri)); // now splits query from uri and sets both.
 	setHttpVersion(trimStr(vers));
 
 	parseHeader(input);
