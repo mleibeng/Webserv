@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/31 21:48:24 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/02 00:46:55 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ Client::~Client() {
 	close(_client_fd);
 }
 
+/// @brief reads in the clientside data sent from the webbrowser
+/// @return returns length of request or -1 in case of error
 ssize_t Client::read_request()
 {
 	ssize_t nbytes;
@@ -49,6 +51,9 @@ ssize_t Client::read_request()
 	return nbytes;
 }
 
+/// @brief sends a response back to the client side
+/// @param response_string std::string response to send
+/// @return returns length of string sent or -1 in case of write error
 ssize_t Client::send_response(const std::string& response_string) {
 	ssize_t nbytes;
 
@@ -61,11 +66,15 @@ ssize_t Client::send_response(const std::string& response_string) {
 	return nbytes;
 }
 
+/// @brief get fd of client
+/// @return returns an integer
 const int& Client::getFd() const
 {
 	return _client_fd;
 }
 
+/// @brief get parsed request as object
+/// @return returns an HttpRequest object
 const HttpRequest& Client::getRequest() const
 {
 	return _request;

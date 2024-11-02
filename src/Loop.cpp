@@ -3,16 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/18 16:21:30 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/11/02 01:15:45 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Loop.hpp"
 #include <iostream>
 
+/// @brief create epoll/kqueue file descriptor / throw error in case of failure
 Loop::Loop()
 {
 // #ifdef __APPLE__
@@ -24,12 +25,16 @@ Loop::Loop()
 		throw std::runtime_error("Couldn't Create loop fd");
 }
 
+/// @brief close epoll/kqueue file descriptor
 Loop::~Loop()
 {
 	if (loop_fd != -1)
 		close(loop_fd);
 }
 
+/// @brief add file descriptor to epoll/kqueue event
+/// @param fd file descriptor to add to eventlist
+/// @param event event list for processing
 void Loop::addFd(int fd, uint32_t event)
 {
 // #ifdef __APPLE__
@@ -45,6 +50,8 @@ void Loop::addFd(int fd, uint32_t event)
 // #endif
 }
 
+/// @brief removes a file descriptor from event list
+/// @param fd file descriptor to remove
 void Loop::removeFd(int fd)
 {
 	// (void)fd;
@@ -56,6 +63,9 @@ void Loop::removeFd(int fd)
 // #endif
 }
 
+/// @brief wait for event to happen on registered file descriptors
+/// @param timeout time to wait before closing file descriptor in ms (not yet utilized)
+/// @return returns a vector of a pair of file descriptor/events being waited on.
 std::vector<std::pair<int, uint32_t>> Loop::wait(int timeout)
 {
 	// (void)timeout;

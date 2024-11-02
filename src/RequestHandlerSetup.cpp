@@ -3,20 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandlerSetup.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 01:55:19 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/02 01:28:45 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
+/// @brief save configuration file into request handler object and loads appropriate error pages
+/// @param config config file to save
 RequestHandler::RequestHandler(const Config& config) : _config(config)
 {
 	loadErrorPages();
 }
 
+/// @brief loads error pages specified in configuration file !Currently only works for last server processed
 void RequestHandler::loadErrorPages() // now this works for more than 1 page but doesn't work for more than 1 server!
 {
 	for (const auto &server : _config.getServerConfs())
@@ -44,7 +47,7 @@ void RequestHandler::loadErrorPages() // now this works for more than 1 page but
 				std::stringstream filebuf;
 				filebuf << content.rdbuf();
 				// std::cout << filebuf.str() << std::endl; // debugging
-				_error_pages[error_code] = filebuf.str();
+				_error_pages[error_code] = filebuf.str(); // <--- need to modify this into a vector of unordered maps for multiple server blocks
 
 				content.close();
 			}
@@ -57,6 +60,9 @@ void RequestHandler::loadErrorPages() // now this works for more than 1 page but
 	}
 }
 
+/// @brief utilizes loaded error page to build and send a response to client
+/// @param client client to send response back to
+/// @param error_code error code to serve
 void RequestHandler::serveErrorPage(Client& client, int error_code)
 {
 	HttpResponse response;
@@ -72,6 +78,9 @@ RequestHandler::~RequestHandler()
 	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
 
+/// @brief find host:port combination and split
+/// @param host host:port combination to split
+/// @return string including only the host portion
 std::string extractHostname(const std::string& host)
 {
 	if (size_t pos = host.find(':'); pos != std::string::npos)
@@ -79,6 +88,9 @@ std::string extractHostname(const std::string& host)
 	return host;
 }
 
+/// @brief find and extract correct server configuration out of vector of server configs for sent request
+/// @param request request to parse and respond to
+/// @return ServerConf struct with correct hostname/servername or nullptr in case of failure
 const ServerConf *RequestHandler::findServerConf(const HttpRequest &request)
 {
 	std::string hostname = extractHostname(request.getHeader("Host"));
@@ -92,6 +104,10 @@ const ServerConf *RequestHandler::findServerConf(const HttpRequest &request)
 	return nullptr;
 }
 
+/// @brief find longest matching string from uri to route.path
+/// @param server_conf serverconfig to parse for routes
+/// @param request request to process and compare to route
+/// @return best matching route/default route if not found/nullptr if no default
 const RouteConf *RequestHandler::findRouteConf(const ServerConf &server_conf, const HttpRequest& request)
 {
 	const std::string& uri = request.getUri();
@@ -119,6 +135,10 @@ const RouteConf *RequestHandler::findRouteConf(const ServerConf &server_conf, co
 	}
 }
 
+/// @brief check whether or not a string starts with a certain prefix (basic c++20 string function)
+/// @param str string to check
+/// @param prefix prefix to check at start of string
+/// @return true/false
 bool startsWith(const std::string& str, const std::string& prefix)
 {
 	if (prefix.size() > str.size())
@@ -126,6 +146,10 @@ bool startsWith(const std::string& str, const std::string& prefix)
 	return str.compare(0, prefix.size(), prefix) == 0;
 }
 
+/// @brief check whether or not configured route allows request method to be processed
+/// @param route_conf route to check
+/// @param method to check
+/// @return  true/false
 bool RequestHandler::isMethodAllowed(const RouteConf &route_conf, const std::string &method)
 {
 	if (std::find(route_conf.methods.begin(), route_conf.methods.end(), method) == route_conf.methods.end())
@@ -133,6 +157,10 @@ bool RequestHandler::isMethodAllowed(const RouteConf &route_conf, const std::str
 	return true;
 }
 
+/// @brief finds best complete path to file
+/// @param route_conf route config to build start of route
+/// @param request request to add resource requested
+/// @return built path to resource
 std::string RequestHandler::parsePath(const RouteConf& route_conf, const HttpRequest& request)
 {
 	std::string phys_path;

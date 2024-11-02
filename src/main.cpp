@@ -6,7 +6,7 @@
 /*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/28 00:57:30 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/02 01:17:38 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,19 @@
 
 static WebServer* g_server_ptr = nullptr;
 
+/// @brief signal handler to stop running webserver
+/// @param signum SIGINT causes webserver to stop running
 void sighandler(int signum)
 {
 	if (signum == SIGINT && g_server_ptr)
 		g_server_ptr->stop();
 }
 
-int main(int argc, char** argv) // now where to build a signal handler...
+/// @brief entrypoint for webserver logic
+/// @param argc less/more than 2 arguments cause default configuration file to be utilized
+/// @param argv specific configuration file to use instead
+/// @return ok/not ok in case of error
+int main(int argc, char** argv)
 {
 	std::string config_file;
 

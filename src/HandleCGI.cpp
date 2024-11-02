@@ -3,15 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   HandleCGI.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 05:26:57 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/02 01:10:57 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
+/// @brief checks before closing file descriptor
+/// @param fd pipe fd to close
 void RequestHandler::PipeDescriptors::checkClose(int& fd)
 {
 	if (fd != -1)
@@ -95,16 +97,22 @@ void RequestHandler::handleCGI(Client& client, const std::string& cgi_path)
 	}
 }
 
+/// @brief handles child cgi process execution logic
+/// @param pipes pipe for read input and write output
+/// @param cgi_path path to executable script
+/// @param request request including the script request
+/// @param handler handler specified for the correct file extension
 void RequestHandler::handleCGIChild(PipeDescriptors& pipes, const std::string& cgi_path, const HttpRequest& request, const CGIHandler& handler)
 {
 	pipes.closeChildPipes();
 
-	dup2(pipes.in_pipe[0], STDIN_FILENO);
-	dup2(pipes.out_pipe[1], STDOUT_FILENO);
+	dup2(pipes.in_pipe[0], STDIN_FILENO); //read from here from in_pipe[1] in main process (used by cgi program in execve)
+	dup2(pipes.out_pipe[1], STDOUT_FILENO); // write to here for outpipe[0] read in main process (result of cgi program in execve)
 
-	CGIEnv env(request, cgi_path, handler);
+	CGIEnv env(request, cgi_path, handler); // sets up cgi environment variables
 
 	std::vector<std::string> args_str = {handler.getCGIName(), cgi_path};
+	// python specific below
 	auto extra_args = handler.getArgList();
 	args_str.insert(args_str.begin() + 1, extra_args.begin(), extra_args.end());
 
@@ -113,31 +121,35 @@ void RequestHandler::handleCGIChild(PipeDescriptors& pipes, const std::string& c
 		argv.push_back(strdup(arg.c_str()));
 
 	argv.push_back(nullptr);
-	execve(handler.getCGIPath().c_str(), argv.data(), env.getEnv());
+	execve(handler.getCGIPath().c_str(), argv.data(), env.getEnv()); // executes the CGI program with set values
 
-	std::perror("execve error");
+	// std::perror("execve error");
 	for (char *arg : argv)
 		free(arg);
 	std::exit(1);
 }
 
+/// @brief handles the main process part of the cgi event
+/// @param pipes writes to requested data to child process or reads executed data from child process
+/// @param client client sending the request
+/// @param request request for processing in CGI
 void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, const HttpRequest& request)
 {
 	pipes.closeParentPipes();
 
 	if (request.getMethod() == "POST")
-		writeCGIInput(pipes.in_pipe[1], request.getBody());
+		writeCGIInput(pipes.in_pipe[1], request.getBody()); //write to read end of child process pipe for CGI processing
 	close(pipes.in_pipe[1]);
 
-	std::string output = readCGIOutput(pipes.out_pipe[0]);
+	std::string output = readCGIOutput(pipes.out_pipe[0]); // read from child process CGI
 	std::cout << "CGI Output: "<< output << std::endl;
 	close(pipes.out_pipe[0]);
 
 	int status;
-	waitpid(-1, &status, 0);
+	waitpid(-1, &status, 0); // wait for status information
 
 	HttpResponse response;
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 0)
+	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) // if ok format response for sending
 		buildCGIResponse(output, response);
 	else
 	{
@@ -145,14 +157,20 @@ void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, con
 		return;
 	}
 
-	client.send_response(response.buildResponse());
+	client.send_response(response.buildResponse()); // build response and send
 }
 
+/// @brief write to child process for execve program
+/// @param pipe_fd write end of in_pipe
+/// @param request_body string with content to post
 void RequestHandler::writeCGIInput(int pipe_fd, const std::string& request_body)
 {
 	write(pipe_fd, request_body.c_str(), request_body.length());
 }
 
+/// @brief read result of cgi program in main process
+/// @param pipe_fd read end of out_pipe
+/// @return returns processed cgi output as string
 std::string RequestHandler::readCGIOutput(int pipe_fd)
 {
 	std::string output;
@@ -166,6 +184,11 @@ std::string RequestHandler::readCGIOutput(int pipe_fd)
 	return output;
 }
 
+// not sure about function below, may need optimization
+
+/// @brief build a correctly formatted response for sending back to client
+/// @param out output to process
+/// @param response object to format response into
 void RequestHandler::buildCGIResponse(const std::string& out, HttpResponse& response)
 {
 	std::istringstream out_stream(out);

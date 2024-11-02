@@ -13,14 +13,10 @@
 #include "AHttpMessage.hpp"
 
 AHttpMessage::AHttpMessage()
-{
-
-}
+{}
 
 AHttpMessage::AHttpMessage(const AHttpMessage &other)
-{
-	*this = other;
-}
+{*this = other;}
 
 AHttpMessage& AHttpMessage::operator=(const AHttpMessage &other)
 {
@@ -34,27 +30,33 @@ AHttpMessage& AHttpMessage::operator=(const AHttpMessage &other)
 }
 
 AHttpMessage::~AHttpMessage()
-{
-}
+{}
 
 //SETTERS
 
+/// @brief set http version
+/// @param vers 
 void	AHttpMessage::setHttpVersion(const std::string& vers)
-{
-	_httpVersion = vers;
-}
+{_httpVersion = vers;}
 
+/// @brief set message body
+/// @param body 
 void	AHttpMessage::setBody(const std::string& body)
 {
 	_body = body;
 	setHeader("Content-Length", std::to_string(body.length()));
 }
 
+/// @brief set message headers as key[value] pair
+/// @param key 
+/// @param val 
 void	AHttpMessage::setHeader(const std::string& key, const std::string& val)
 {
 	_header[key] = val;
 }
 
+/// @brief set all message headers as key[value] pairs
+/// @param headers 
 void AHttpMessage::setAllHeaders(const std::map<std::string, std::string>& headers)
 {
 	_header.clear();
@@ -67,22 +69,32 @@ void AHttpMessage::setAllHeaders(const std::map<std::string, std::string>& heade
 
 //GETTERS
 
+/// @brief get version
+/// @return 
 std::string		AHttpMessage::getHttpVersion() const
 {
 	return (_httpVersion);
 }
 
+
+/// @brief get message body
+/// @return 
 std::string		AHttpMessage::getBody() const
 {
 	return (_body);
 }
 
+/// @brief get header value or nothing depending on key
+/// @param key 
+/// @return corresponding value to the requested key
 std::string		AHttpMessage::getHeader(const std::string& key) const
 {
 	auto iter = (_header.find(key));
 	return (iter != _header.end() ? iter->second : "");
 }
 
+/// @brief get the complete key[value] map not the individual values
+/// @return return an ordered map
 const std::map<std::string, std::string>&	AHttpMessage::getAllHeaders() const
 {
 	return (_header);
@@ -90,6 +102,8 @@ const std::map<std::string, std::string>&	AHttpMessage::getAllHeaders() const
 
 //PARSE
 
+/// @brief seperate key value pairs from the inputstream to save them in the ordered header map
+/// @param input 
 void	AHttpMessage::parseHeader(std::istringstream& input)
 {
 	std::string line;
@@ -106,6 +120,10 @@ void	AHttpMessage::parseHeader(std::istringstream& input)
 
 //UTILS
 
+
+/// @brief find first and last occurence of a whitespace
+/// @param str 
+/// @return return a substring without these whitespaces
 std::string	AHttpMessage::trimStr(const std::string& str)
 {
 	size_t first = str.find_first_not_of(" \t\n\r");

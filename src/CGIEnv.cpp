@@ -3,29 +3,41 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEnv.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 00:55:12 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 05:40:38 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/02 00:44:30 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
+
+/// @brief Constructor sets Environment using RAII
+/// @param request sent request of the client
+/// @param cgi_path path to the executable script
+/// @param handler type of handler responsible for executing the script
 RequestHandler::CGIEnv::CGIEnv(const HttpRequest& request, const std::string& cgi_path, const CGIHandler& handler)
 {
 	setEnviron(request, cgi_path, handler);
 }
 
+/// @brief clean up class contents
 RequestHandler::CGIEnv::~CGIEnv()
 {
 	env_array.clear();
 	env_bufs.clear();
 }
 
+/// @brief returns environment array data
+/// @return returns a char ** for easy execve use
 char** RequestHandler::CGIEnv::getEnv()
 {return env_array.data();}
 
+/// @brief sets the basic environment variables necessary for script execution in CGI's
+/// @param request request necessary to be executed
+/// @param cgi_path path to the executable script
+/// @param handler handler chosen for execution of script
 void RequestHandler::CGIEnv::setEnviron(const HttpRequest& request, const std::string& cgi_path, const CGIHandler& handler)
 {
 	std::string method = request.getMethod();
@@ -70,6 +82,10 @@ void RequestHandler::CGIEnv::setEnviron(const HttpRequest& request, const std::s
 	env_array.push_back(nullptr);
 }
 
+
+/// @brief adds an env variable to the environment
+/// @param name name of the variable
+/// @param value value of the variable
 void RequestHandler::CGIEnv::addEnvStuff(const std::string &name, const std::string& value)
 {
 	std::string env_var = name + "=" + value;
@@ -79,6 +95,7 @@ void RequestHandler::CGIEnv::addEnvStuff(const std::string &name, const std::str
 	env_bufs.push_back(std::move(buffer));
 }
 
+/// @brief print function for environment
 void RequestHandler::CGIEnv::debugPrintEnv() const
 {
 	std::cout << "=== CGI Environment Variables ===" << std::endl;

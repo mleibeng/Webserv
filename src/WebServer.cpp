@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 05:33:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/02 01:32:12 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_f
 	config.print();
 }
 
+/// @brief set up ports to listen for connections on each server
 void WebServer::setupListeners()
 {
 	for (const auto& server : config.getServerConfs())
@@ -90,6 +91,8 @@ void WebServer::acceptConnections(int fd)
 	event_loop.addFd(client_fd, EPOLLIN_FLAG);
 }
 
+/// @brief create and set sockets non blocking
+/// @return integer socket fd
 int WebServer::createNonBlockingSocket()
 {
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -100,6 +103,7 @@ int WebServer::createNonBlockingSocket()
 	return fd;
 }
 
+/// @brief check for set up server listeners and start loop
 void WebServer::start()
 {
 	if (server_listeners.empty())
@@ -108,6 +112,7 @@ void WebServer::start()
 	runLoop();
 }
 
+/// @brief stop loop and close necessary file descriptors
 void WebServer::stop()
 {
 	running = false;
@@ -122,6 +127,7 @@ void WebServer::stop()
 	server_listeners.clear();
 }
 
+/// @brief server loop waiting for events to happen and process
 void WebServer::runLoop()
 {
 	while (running)
@@ -162,6 +168,9 @@ void WebServer::initialize()
 	request_handler = std::make_unique<RequestHandler>(config);
 }
 
+/// @brief read request from client and either serve error or process it
+/// @param client_fd client to process
+/// @param handler handler instance for all processes
 void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 {
 	Client client(client_fd);
