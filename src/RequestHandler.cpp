@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 01:56:33 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 18:01:15 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,19 +17,30 @@
 /// @param client client including the fd and request. Ultimately receives requests and sends the response.
 void		RequestHandler::handleRequest(Client& client)
 {
+	std::cout << "reached 1" << std::endl;
 	const ServerConf* server_conf = findServerConf(client.getRequest());
 	if (!server_conf)
 		return serveErrorPage(client, 404);
+
+	std::cout << "reached 2" << std::endl;
 	const RouteConf* route_conf = findRouteConf(*server_conf, client.getRequest());
 	if (!route_conf)
 		return serveErrorPage(client, 404);
 
 	const std::string& method = client.getRequest().getMethod();
 
+	std::cout << "reached 3" << std::endl;
+
+	std::cout << "routeconfig chosen:" << route_conf->path << std::endl;
+	// std::cout << "routeconf info" << route_conf->upload_dir << std::endl;
+
 	if (!isMethodAllowed(*route_conf, method))
 		return serveErrorPage(client, 405);
+	std::cout << "Uri after method allowed "<< client.getRequest().getUri() << std::endl;
 
 	std::string parsed = parsePath(*route_conf, client.getRequest());
+
+	std::cout << "Phy path: " << parsed << std::endl;
 
 	if (method == "GET")
 		handleGetRequest(client, *route_conf, parsed);

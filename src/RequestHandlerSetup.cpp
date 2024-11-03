@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandlerSetup.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/02 01:28:45 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/03 18:06:43 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,6 +122,7 @@ const RouteConf *RequestHandler::findRouteConf(const ServerConf &server_conf, co
 		{
 			longest_match = path.length();
 			best_match = &route;
+			std::cout << best_match << std::endl;
 		}
 	}
 	if (best_match)
@@ -166,23 +167,33 @@ std::string RequestHandler::parsePath(const RouteConf& route_conf, const HttpReq
 	std::string phys_path;
 	std::string uri = request.getUri();
 
+	std::cout << "Uri: " << uri <<std::endl;
 	//set phys path to default path of the route_conf
 	phys_path = route_conf.root;
 	if (phys_path.back() != '/')
 		phys_path += '/';
 
+	std::cout << "Phys_path root: " << phys_path << std::endl;
 	// build a file resource request path from default path in config file,
 	// checking for leading "/" in the URI and preventing double "//" appending to the phys_path
 	if (route_conf.path == "/")
 	{
 		if (uri != "/")
 			phys_path += (uri[0] == '/') ? uri.substr(1) : uri;
+		std::cout << "Phys_path after // mod : " << phys_path << std::endl;
 	}// checks whether or not the uri already leads with route config path and cuts it out, because phys path already includes it.
 	else if (uri.compare(0, route_conf.path.length(), route_conf.path) == 0)
 	{
-		std::string remain = uri.substr(route_conf.path.length());
-		if (!remain.empty())
-			phys_path += (remain[0] == '/') ? remain.substr(1) : remain;
+		if (uri.length() == route_conf.path.length() || uri[route_conf.path.length()] == '/')
+		{
+			std::string remain = uri.substr(route_conf.path.length());
+			std::cout << "remain uri : " << remain << std::endl;
+			if (!remain.empty())
+				phys_path += (remain[0] == '/') ? remain.substr(1) : remain;
+			std::cout << "phys path after remain uri : " << phys_path << std::endl;
+		}
+		else
+			phys_path += (uri[0] == '/' ? uri.substr(1) : uri);
 	}
 
 	return phys_path;
