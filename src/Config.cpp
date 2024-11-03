@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 20:20:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 23:00:33 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,26 @@ void Config::parseGlobalBlock(GlobalConf& conf, const std::string& key, const st
 	else
 		throw std::runtime_error("Unknown Global Configuration key");
 }
+
+std::variant<int,size_t> GlobalConf::getConfig(ConfigKey key) const
+{
+	switch (key)
+	{
+		case ConfigKey::MAX_HEADER_SIZE:
+			return g_max_header_size;
+		case ConfigKey::MAX_BODY_SIZE:
+			return g_max_body_size;
+		case ConfigKey::MAX_CONNECTIONS:
+			return g_max_connects;
+		case ConfigKey::TIMEOUT:
+			return g_timeout;
+		default:
+			throw std::invalid_argument("invalid global config key");
+	}
+}
+
+std::variant<int, size_t> Config::getGlobalConf(GlobalConf::ConfigKey key) const
+{ return globuli.getConfig(key);}
 
 /// @brief parses the config file to save appropriate information
 /// @param conf_file config file to parse

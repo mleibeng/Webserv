@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 20:27:12 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 22:36:28 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ Handles: configuration of hosts, ports and route structure on server-side.
 #include <stdexcept>
 #include <unordered_map>
 #include <optional>
+#include <variant>
 
 // we could also implement max_client_header_size for buffering the headersize. NGINX does this as well!
 
@@ -34,6 +35,16 @@ struct GlobalConf
 	int g_timeout = 60;  // set timeout for closing connections
 	int g_max_connects = 1000; // set maximum number of connections (to prevent DDoS)
 	size_t g_max_body_size = 1024 * 1024; //limit client body size
+
+	enum class ConfigKey
+	{
+		MAX_HEADER_SIZE,
+		TIMEOUT,
+		MAX_CONNECTIONS,
+		MAX_BODY_SIZE,
+	};
+
+	std::variant<int,size_t> getConfig(ConfigKey key) const;
 };
 
 struct RouteConf
@@ -78,6 +89,8 @@ class Config
 	static std::string trim(const std::string &s);
 	static void parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::vector<std::string>& value);
 	void print() const;
+
+	std::variant<int, size_t> getGlobalConf(GlobalConf::ConfigKey key) const;
 };
 
 #endif

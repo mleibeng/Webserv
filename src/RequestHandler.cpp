@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 20:36:06 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 23:00:06 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 {
 	HttpResponse response;
 
-	client.getRequest().increaseRedirectCount();
+	client.increaseRedirectCount();
 
 	response.setStatus(*route_conf.redirect_code);
 	response.setHeader("Location", *route_conf.redirect);
@@ -39,8 +39,12 @@ void		RequestHandler::handleRequest(Client& client)
 
 	if (route_conf->redirect.has_value())
 	{
-		if (client.getRequest().getNumRedirects() >= route_conf->max_redirects)
+		if (client.getNumRedirects() >= route_conf->max_redirects)
+		{
+			std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
 			return serveErrorPage(client, 508);
+		}
+		std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
 		return handleRedirect(*route_conf, client);
 	}
 	const std::string& method = client.getRequest().getMethod();
@@ -50,7 +54,7 @@ void		RequestHandler::handleRequest(Client& client)
 
 	std::string parsed = parsePath(*route_conf, client.getRequest());
 
-	std::cout << "Phy path: " << parsed << std::endl;
+	// std::cout << "Phy path: " << parsed << std::endl;
 
 	if (method == "GET")
 		handleGetRequest(client, *route_conf, parsed);

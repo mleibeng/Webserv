@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 20:35:40 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 21:59:16 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,16 +65,11 @@ class HttpRequest : public AHttpMessage
 		const std::string&	getMethod() const; //check if ok with &!
 		const std::string&	getUri() const; // same
 		const std::string&	getQuery() const;
-		int getNumRedirects() const;
-
-		//incrementers
-		void increaseRedirectCount() const;
 
 	private:
 		std::string		_method;
 		std::string	_uri; //Uniform Resource Identifier
 		std::string _query;
-		mutable size_t redirect_count;
 
 };
 
