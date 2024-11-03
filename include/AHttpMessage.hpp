@@ -48,8 +48,6 @@ class AHttpMessage
 		//parse
 		void			parseHeader(std::istringstream& input);
 		virtual bool	parse(const std::string& rawMessage) = 0;
-
-	private:
 		static std::string	trimStr(const std::string& str);
 
 	protected:

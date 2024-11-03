@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/19 14:51:05 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/11/02 01:32:12 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_f
 	config.print();
 }
 
+/// @brief set up ports to listen for connections on each server
 void WebServer::setupListeners()
 {
 	for (const auto& server : config.getServerConfs())
@@ -38,12 +39,12 @@ void WebServer::setupListeners()
 		{
 			std::string server_key = server.hostname + ":" + std::to_string(port);
 
-			// int opt = 1;
-			// if (setsockopt(_server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
-			// 	std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
-			// }
-
 			int fd = createNonBlockingSocket();
+
+			int opt = 1;
+			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+				std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
+
 			struct sockaddr_in addr;
 			addr.sin_family = AF_INET;
 			addr.sin_addr.s_addr = INADDR_ANY;
@@ -90,6 +91,8 @@ void WebServer::acceptConnections(int fd)
 	event_loop.addFd(client_fd, EPOLLIN_FLAG);
 }
 
+/// @brief create and set sockets non blocking
+/// @return integer socket fd
 int WebServer::createNonBlockingSocket()
 {
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -100,6 +103,7 @@ int WebServer::createNonBlockingSocket()
 	return fd;
 }
 
+/// @brief check for set up server listeners and start loop
 void WebServer::start()
 {
 	if (server_listeners.empty())
@@ -108,6 +112,7 @@ void WebServer::start()
 	runLoop();
 }
 
+/// @brief stop loop and close necessary file descriptors
 void WebServer::stop()
 {
 	running = false;
@@ -122,13 +127,15 @@ void WebServer::stop()
 	server_listeners.clear();
 }
 
+/// @brief server loop waiting for events to happen and process
 void WebServer::runLoop()
 {
-	RequestHandler handler;
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
 		auto events = event_loop.wait();
+		if (!running)
+			break;
 		for (const auto& [fd, event] : events) {
 			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
 			{
@@ -148,7 +155,7 @@ void WebServer::runLoop()
 					}
 				}
 				if (!is_listener)
-					handleClientRequest(fd, handler);
+					handleClientRequest(fd, *request_handler);
 			}
 		}
 	}
@@ -158,39 +165,18 @@ void WebServer::runLoop()
 void WebServer::initialize()
 {
 	setupListeners();
-	loadErrorPages();
+	request_handler = std::make_unique<RequestHandler>(config);
 }
 
-void WebServer::loadErrorPages()
-{
-	for (const auto &server : config.getServerConfs())
-	{
-		if (!server.default_error_pages.empty())
-		{
-			std::ifstream file(server.default_error_pages);
-			std::string line;
-			while (std::getline(file, line))
-			{
-				std::istringstream iss(line);
-				int error_code;
-				std::string page_path;
-				if (iss >> error_code >> page_path)
-					error_pages[error_code] = page_path;
-			}
-		}
-	}
-}
-
+/// @brief read request from client and either serve error or process it
+/// @param client_fd client to process
+/// @param handler handler instance for all processes
 void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 {
-	// (void)client_fd;
 	Client client(client_fd);
 
 	std::cout << "request from " << client_fd << std::endl;
-	client.read_request();
-	HttpRequest request(client.getRawRequest());
-	std::string	response_str = handler.handleRequest(request);// might have to revisit later but this fixes the bug with missing headers
-
-	std::cout << "response to " << client_fd << std::endl;
-	client.send_response(response_str);
+	if (client.read_request() == -1)
+		return handler.serveErrorPage(client, 400);
+	handler.handleRequest(client);
 }

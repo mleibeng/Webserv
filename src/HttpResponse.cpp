@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 19:46:07 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/11/01 04:40:02 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ HttpResponse::~HttpResponse()
 
 //SETTERS
 
-void HttpResponse::setStatus(StatusCode status)
+void HttpResponse::setStatus(int status)
 {
 	_status = status;
 }
@@ -53,7 +53,7 @@ void		HttpResponse::setMimeType(std::string extension)
 }
 //GETTERS
 
-StatusCode	HttpResponse::getStatus() const
+int	HttpResponse::getStatus() const
 {
 	return (_status);
 }
@@ -107,8 +107,7 @@ bool	HttpResponse::parse(const std::string& rawmsg)
 
 	std::getline(status, status_txt);
 	setHttpVersion(vers);
-	int	code = std::stoi(status_code);
-	setStatus(static_cast<StatusCode>(code));
+	setStatus(std::stoi(status_code));
 	parseHeader(input);
 
 	std::string	body;
@@ -136,9 +135,9 @@ std::string	HttpResponse::buildResponse() const
 {
 	std::ostringstream	response;
 
-	response << "HTTP/1.1 " << statusCodeToInt() << " " << statusCodeToStr() << "\r\n";
+	response << "HTTP/1.1 " << _status << " " << _status << "\r\n";
 
-	std::cout << RED << this->getHeader("Content-Type") << RESET << std::endl;
+	// std::cout << RED << this->getHeader("Content-Type") << RESET << std::endl;
 	for (const auto& header : _header)
 	{
 		response << header.first << ": " << header.second << "\r\n";
@@ -148,7 +147,7 @@ std::string	HttpResponse::buildResponse() const
 	if (_header.find("Content-Length") == _header.end())
 		response << "Content-Length: " << _body.size() << "\r\n";
 	if (_header.find("Content-Type") == _header.end())
-		response << "Content-Type: text/plain\r\n";
+		response << "Content-Type: text/html\r\n";
 	response << "\r\n";
 	response << _body;
 
@@ -156,47 +155,47 @@ std::string	HttpResponse::buildResponse() const
 	return (response.str());
 }
 
-std::string	HttpResponse::statusCodeToStr() const
-{
-	switch(_status)
-	{
-		case StatusCode::OK:
-			return("OK");
-		case StatusCode::CREATED:
-			return("Created");
-		case StatusCode::ACCEPTED:
-			return("Accepted");
-		case StatusCode::NOCONTENT:
-			return("No Content");
-		case StatusCode::MOVED_PERM:
-			return("Moved Permanently");
-		case StatusCode::FOUND:
-			return("Found");
-		case StatusCode::NOT_MODIFIED:
-			return("Not Modified");
-		case StatusCode::BAD_REQUEST:
-			return("Bad Request");
-		case StatusCode::UNAUTHORIZED:
-			return("Unauthorized");
-		case StatusCode::FORBIDDEN:
-			return("Forbidden");
-		case StatusCode::NOT_FOUND:
-			return("Not Found");
-		case StatusCode::INTERNAL_SERV_ERR:
-			return("Internal Server Error");
-		case StatusCode::NOT_IMPLEMENTED:
-			return("Not implemented");
-		case StatusCode::BAD_GATEWAY:
-			return("Bad Gateway");
-		case StatusCode::SERVICE_UNAVAIL:
-			return("Service Unavailable");
-		default:
-			return("Unknown Status");
+// std::string	HttpResponse::statusCodeToStr() const
+// {
+// 	switch(_status)
+// 	{
+// 		case StatusCode::OK:
+// 			return("OK");
+// 		case StatusCode::CREATED:
+// 			return("Created");
+// 		case StatusCode::ACCEPTED:
+// 			return("Accepted");
+// 		case StatusCode::NOCONTENT:
+// 			return("No Content");
+// 		case StatusCode::MOVED_PERM:
+// 			return("Moved Permanently");
+// 		case StatusCode::FOUND:
+// 			return("Found");
+// 		case StatusCode::NOT_MODIFIED:
+// 			return("Not Modified");
+// 		case StatusCode::BAD_REQUEST:
+// 			return("Bad Request");
+// 		case StatusCode::UNAUTHORIZED:
+// 			return("Unauthorized");
+// 		case StatusCode::FORBIDDEN:
+// 			return("Forbidden");
+// 		case StatusCode::NOT_FOUND:
+// 			return("Not Found");
+// 		case StatusCode::INTERNAL_SERV_ERR:
+// 			return("Internal Server Error");
+// 		case StatusCode::NOT_IMPLEMENTED:
+// 			return("Not implemented");
+// 		case StatusCode::BAD_GATEWAY:
+// 			return("Bad Gateway");
+// 		case StatusCode::SERVICE_UNAVAIL:
+// 			return("Service Unavailable");
+// 		default:
+// 			return("Unknown Status");
 
-	}
-}
+// 	}
+// }
 
-int		HttpResponse::statusCodeToInt() const
-{
-	return (static_cast<int>(_status));
-}
+// int		HttpResponse::statusCodeToInt() const
+// {
+// 	return (static_cast<int>(_status));
+// }

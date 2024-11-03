@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/18 16:39:37 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/11/01 01:54:18 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,10 @@
 
 //      Hello World! My payload includes a trailing CRLF.
 
-enum class Method { GET, POST, DELETE };
-
-
 class HttpRequest : public AHttpMessage
 {
 	public:
-		HttpRequest() = delete;
-		HttpRequest(const std::string& raw_request);
+		HttpRequest();
 		HttpRequest(const HttpRequest &other);
 		HttpRequest& operator=(const HttpRequest &other);
 		~HttpRequest();
@@ -61,33 +57,19 @@ class HttpRequest : public AHttpMessage
 		//parse
 		bool	parse(const std::string& rawmsg) override;
 
+		void	setMethod(const std::string& method);
+		void	setQuery(const std::string& uri);
+
 		//getters
-		Method		getMethod() const;
-		std::string	getUri() const;
-		std::string	getFilePath() const;
-
-
-		class InvalidMethodException : public std::exception
-		{
-			std::string	_invalidMethod;
-			public:
-				explicit InvalidMethodException(const std::string& method);
-				const char*	what() const noexcept override;
-		};
+		const std::string&	getMethod() const; //check if ok with &!
+		const std::string&	getUri() const; // same
+		const std::string&	getQuery() const;
 
 	private:
-		Method		_method;
+		std::string		_method;
 		std::string	_uri; //Uniform Resource Identifier
-		std::string	_filePath;
+		std::string _query;
 
-		void		setMethod(Method method);
-		void		setUri(const std::string& uri);
-		void		setFilePath(const std::string& filepath);
-
-
-		//utils
-		Method		strToMethod(const std::string& methodStr);
-		std::string	methodToStr() const;
 };
 
 #endif // HTTPREQUEST_H

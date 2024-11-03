@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/12 02:21:01 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/02 00:51:56 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 #include <algorithm>
 #include <iostream>
 
+
+/// @brief modifies value notations like 10M or 8G to size_t
+/// @param sizeStr value notation to transform
+/// @return size_t value
 size_t parseSizeNotation(const std::string& sizeStr)
 {
 	std::unordered_map<char, size_t> multipliers =
@@ -46,6 +50,9 @@ size_t parseSizeNotation(const std::string& sizeStr)
 	return size;
 }
 
+/// @brief trim string when finding whitespace
+/// @param string to trim
+/// @return trimmmed string
 std::string Config::trim(const std::string &s)
 {
 	auto wsfront = std::find_if_not(s.begin(), s.end(), [](int c) { return std::isspace(c); });
@@ -53,6 +60,10 @@ std::string Config::trim(const std::string &s)
 	return (wsback <= wsfront ? std::string() : std::string(wsfront, wsback));
 }
 
+/// @brief saves information for the server block
+/// @param conf config to read out
+/// @param key key part of key/value pair
+/// @param values value part of key/value pair
 void Config::parseServerBlock(ServerConf& conf, const std::string& key, const std::vector<std::string>& values)
 {
 	if (key == "hostname")
@@ -67,6 +78,10 @@ void Config::parseServerBlock(ServerConf& conf, const std::string& key, const st
 		throw std::runtime_error("Unknown Server Configuration key");
 }
 
+/// @brief saves information for the route block
+/// @param conf config to read out
+/// @param key key part of key/value pair
+/// @param values value part of key/value pair
 void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std::vector<std::string>& values)
 {
 	if (key == "methods")
@@ -97,6 +112,10 @@ void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std:
 		throw std::runtime_error("Unknown Route Configuration key");
 }
 
+/// @brief saves global values
+/// @param conf config to read out
+/// @param key key part of key/value pair
+/// @param values value part of key/value pair
 void Config::parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::vector<std::string>& values)
 {
 	if (key == "timeout")
@@ -111,6 +130,9 @@ void Config::parseGlobalBlock(GlobalConf& conf, const std::string& key, const st
 		throw std::runtime_error("Unknown Global Configuration key");
 }
 
+/// @brief parses the config file to save appropriate information
+/// @param conf_file config file to parse
+/// @return parsed Config file
 Config Config::parse(const std::string& conf_file)
 {
 	Config config;
@@ -144,6 +166,7 @@ Config Config::parse(const std::string& conf_file)
 			in_route_block = true;
 			current_route = RouteConf();
 			current_route_path = trim(line.substr(6, line.find('{') - 7));
+			current_route.path = current_route_path;
 		}
 		else if (line == "}")
 		{
@@ -196,9 +219,12 @@ Config Config::parse(const std::string& conf_file)
 	return config;
 }
 
+/// @brief vector of server configurations
+/// @return std::vector of server conf struct
 const std::vector<ServerConf>& Config::getServerConfs() const
 {return servers;}
 
+/// @brief prints the parsed config file
 void Config::print() const
 {
 	std::cout << "Global Configuration:\n";

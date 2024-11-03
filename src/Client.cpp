@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/10/18 17:09:36 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/11/02 00:46:55 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,13 @@ Client::~Client() {
 	close(_client_fd);
 }
 
-ssize_t Client::read_request() {
+/// @brief reads in the clientside data sent from the webbrowser
+/// @return returns length of request or -1 in case of error
+ssize_t Client::read_request()
+{
 	ssize_t nbytes;
-	char buffer[BUFFER_SIZE];
+	char buffer[1024];
+	std::string request;
 
 	// do {
 		nbytes = read(_client_fd, buffer, sizeof(buffer));
@@ -38,13 +42,18 @@ ssize_t Client::read_request() {
 		close(_client_fd);
 	}
 	else {
-		_request.assign(buffer, nbytes);
-		std::cout << YELLOW << _request << DEFAULT << std::endl;
+		request.assign(buffer, nbytes);
+		std::cout << YELLOW << request << DEFAULT << std::endl;
+		bool ok = _request.parse(request);
+		if (!ok)
+			return -1;
 	}
-
 	return nbytes;
 }
 
+/// @brief sends a response back to the client side
+/// @param response_string std::string response to send
+/// @return returns length of string sent or -1 in case of write error
 ssize_t Client::send_response(const std::string& response_string) {
 	ssize_t nbytes;
 
@@ -57,11 +66,19 @@ ssize_t Client::send_response(const std::string& response_string) {
 	return nbytes;
 }
 
-std::string	Client::getRawRequest() const
+/// @brief get fd of client
+/// @return returns an integer
+const int& Client::getFd() const
 {
-	return (_request);
+	return _client_fd;
 }
 
+/// @brief get parsed request as object
+/// @return returns an HttpRequest object
+const HttpRequest& Client::getRequest() const
+{
+	return _request;
+}
 
 
 
@@ -137,59 +154,4 @@ std::string	Client::getRawRequest() const
 // 	// basically send confirmation back to the client that it got uploaded. -> should also be handled later by the HTTP Response Class
 // 	std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nFile uploaded successfully";
 // 	write(client_fd, response.c_str(), response.length());
-// }
-
-// void WebServer::handleCGI(int client_fd, const std::string& cgi_path, const std::string& query)
-// {
-// 	int in_pipe[2];
-// 	int out_pipe[2];
-
-// 	if (pipe(in_pipe) == -1 || pipe(out_pipe) == -1)
-// 	{
-// 		perror("pipe error");
-// 		return;
-// 	}
-// 	pid_t pid = fork();
-// 	if (pid == -1)
-// 	{
-// 		perror("fork");
-// 		close(in_pipe[0]);
-// 		close(in_pipe[1]);
-// 		close(out_pipe[0]);
-// 		close(out_pipe[1]);
-// 		return;
-// 	}
-// 	if (pid == 0)
-// 	{
-// 		close(out_pipe[0]);
-// 		close(in_pipe[1]);
-
-// 		dup2(in_pipe[0], STDIN_FILENO);
-// 		dup2(out_pipe[1], STDOUT_FILENO);
-
-// 		setenv("REQUEST_METHOD", "GET", 1);
-// 		setenv("QUERY_STRING", query.c_str(), 1);
-// 		setenv("CONTENT_LENGTH", "0", 1);
-
-// 		execl("/usr/bin/php", "php", cgi_path.c_str(), NULL);
-// 		perror("execl");
-// 		exit(1);
-// 	}
-// 	else
-// 	{
-// 		close(out_pipe[1]);
-// 		close(in_pipe[0]);
-
-// 		char buffer[4096];
-// 		int bytes_read;
-// 		while ((bytes_read = read(out_pipe[0], buffer, sizeof(buffer))) > 0) {
-// 			if (write(client_fd, buffer, bytes_read) == -1) {
-// 				perror("write");
-// 				break;
-// 			}
-// 		}
-// 		close(out_pipe[0]);
-
-// 		waitpid(pid, NULL, 0);
-// 	}
 // }
