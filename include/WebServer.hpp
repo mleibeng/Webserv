@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 22:24:39 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 23:05:16 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,9 +68,8 @@ class WebServer
 	void runLoop();
 	void acceptConnections(int listener_fd);
 	int	 createNonBlockingSocket();
-	void handleClientRequest(int client_fd, RequestHandler& handler);
-
 	void cleanInactiveClients();
+	void handleClientRequest(int client_fd, RequestHandler& handler);
 
 	public:
 	WebServer() = default;

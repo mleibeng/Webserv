@@ -6,11 +6,27 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 23:00:06 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 23:21:54 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+
+std::string RequestHandler::buildRedirWQuery(const RouteConf& route_conf, const HttpRequest& request)
+{
+	std::string redirect_with_query = *route_conf.redirect;
+
+	if (!request.getQuery().empty())
+	{
+		if (redirect_with_query.find('?') == std::string::npos)
+			redirect_with_query += "?" + request.getQuery();
+		else
+			redirect_with_query += "&" + request.getQuery();
+	}
+
+	return redirect_with_query;
+}
 
 void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 {
@@ -18,9 +34,11 @@ void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 
 	client.increaseRedirectCount();
 
+	std::string redirect = buildRedirWQuery(route_conf, client.getRequest());
+
 	response.setStatus(*route_conf.redirect_code);
-	response.setHeader("Location", *route_conf.redirect);
-	response.setBody("Redirecting to " + *route_conf.redirect);
+	response.setHeader("Location", redirect);
+	response.setBody("Redirecting to " + redirect);
 	client.send_response(response.buildResponse());
 }
 
@@ -41,10 +59,10 @@ void		RequestHandler::handleRequest(Client& client)
 	{
 		if (client.getNumRedirects() >= route_conf->max_redirects)
 		{
-			std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
+			// std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
 			return serveErrorPage(client, 508);
 		}
-		std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
+		// std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
 		return handleRedirect(*route_conf, client);
 	}
 	const std::string& method = client.getRequest().getMethod();

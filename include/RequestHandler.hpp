@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 19:54:27 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 23:19:22 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ class RequestHandler
 		void writeCGIInput(int pipe_fd, const std::string& body);
 		void buildCGIResponse(const std::string& out, HttpResponse& response);
 		void handleRedirect(const RouteConf& route_conf, Client& client);
+		std::string buildRedirWQuery(const RouteConf& route_conf, const HttpRequest& request);
 
 	public:
 		RequestHandler() = delete;
