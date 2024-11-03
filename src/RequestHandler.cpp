@@ -6,11 +6,21 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 19:45:35 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 20:09:51 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
+{
+	HttpResponse response;
+
+	response.setStatus(*route_conf.redirect_code);
+	response.setHeader("Location", *route_conf.redirect);
+	response.setBody("Redirecting to " + *route_conf.redirect);
+	client.send_response(response.buildResponse());
+}
 
 /// @brief Entrypoint and management function for sorting Requests.
 ///		   Finds the most appropriate route and delegates the response to the specific type of request handler.
@@ -25,19 +35,17 @@ void		RequestHandler::handleRequest(Client& client)
 	if (!route_conf)
 		return serveErrorPage(client, 404);
 
+	if (route_conf->redirect.has_value())
+		return handleRedirect(*route_conf, client);
+
 	const std::string& method = client.getRequest().getMethod();
 
 	if (!isMethodAllowed(*route_conf, method))
 		return serveErrorPage(client, 405);
 
-	if (route_conf->redirect.has_value())
-	{
-
-	}
-
 	std::string parsed = parsePath(*route_conf, client.getRequest());
 
-	// std::cout << "Phy path: " << parsed << std::endl;
+	std::cout << "Phy path: " << parsed << std::endl;
 
 	if (method == "GET")
 		handleGetRequest(client, *route_conf, parsed);

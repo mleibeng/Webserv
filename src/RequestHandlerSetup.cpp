@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 18:12:47 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 20:08:50 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,6 @@ const RouteConf *RequestHandler::findRouteConf(const ServerConf &server_conf, co
 		{
 			longest_match = path.length();
 			best_match = &route;
-			std::cout << best_match << std::endl;
 		}
 	}
 	if (best_match)

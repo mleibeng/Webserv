@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 19:49:56 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 20:03:25 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,6 +217,7 @@ Config Config::parse(const std::string& conf_file)
 	{
 		for (auto& [path, route] : server.routes)
 		{
+			if (route.redirect.has_value() && !route.redirect_code.has_value()) route.redirect_code = 301;
 			if (!route.max_header_size) route.max_header_size = config.globuli.g_max_header_size;
 			if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
 			if (!route.timeout) route.timeout = config.globuli.g_timeout;
