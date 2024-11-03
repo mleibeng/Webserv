@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/02 00:51:56 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/03 19:49:56 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,15 @@ void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std:
 	if (key == "methods")
 		conf.methods = values;
 	else if (key == "redirect")
-		conf.redirect = values[0];
+	{
+		if (values.size() == 1)
+			conf.redirect = values[0];
+		else if (values.size() == 2)
+		{
+			conf.redirect_code = std::stoi(values[0]);
+			conf.redirect = values[1];
+		}
+	}
 	else if (key == "port")
 		conf.port = std::stoi(values[0]);
 	else if (key == "root")
@@ -252,7 +260,10 @@ void Config::print() const
 				std::cout << method << " ";
 			std::cout << "\n";
 			if (route.redirect)
+			{
+				std::cout << "    Redirect code: " << *route.redirect_code << "\n";
 				std::cout << "    Redirect: " << *route.redirect << "\n";
+			}
 			std::cout << "    Route Port: " << *route.port << "\n";
 			std::cout << "    Root: " << route.root << "\n";
 			std::cout << "    Directory Listing: " << (route.dir_listing_active ? "On" : "Off") << "\n";

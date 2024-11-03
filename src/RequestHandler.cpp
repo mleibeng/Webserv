@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 18:13:54 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 19:45:35 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,11 @@ void		RequestHandler::handleRequest(Client& client)
 
 	if (!isMethodAllowed(*route_conf, method))
 		return serveErrorPage(client, 405);
+
+	if (route_conf->redirect.has_value())
+	{
+
+	}
 
 	std::string parsed = parsePath(*route_conf, client.getRequest());
 
@@ -73,10 +78,10 @@ void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route
 	// 	if (std::filesystem::remove(file_path))
 	// 		client.send_response(HttpResponse(200, "text/plain", "File deleted successfully"));
 	// 	else
-	// 		serveErrorPage(client.get_fd(), 500); // Internal Server Error
+	// 		serveErrorPage(client, 500); // Internal Server Error
 	// }
 	// else
-	// 	serveErrorPage(client.get_fd(), 404); // Not
+	// 	serveErrorPage(client, 404); // Not
 
 	(void)client;
 	(void)route_conf;
