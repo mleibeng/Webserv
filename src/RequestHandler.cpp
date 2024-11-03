@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 20:09:51 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 20:36:06 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 {
 	HttpResponse response;
+
+	client.getRequest().increaseRedirectCount();
 
 	response.setStatus(*route_conf.redirect_code);
 	response.setHeader("Location", *route_conf.redirect);
@@ -36,8 +38,11 @@ void		RequestHandler::handleRequest(Client& client)
 		return serveErrorPage(client, 404);
 
 	if (route_conf->redirect.has_value())
+	{
+		if (client.getRequest().getNumRedirects() >= route_conf->max_redirects)
+			return serveErrorPage(client, 508);
 		return handleRedirect(*route_conf, client);
-
+	}
 	const std::string& method = client.getRequest().getMethod();
 
 	if (!isMethodAllowed(*route_conf, method))

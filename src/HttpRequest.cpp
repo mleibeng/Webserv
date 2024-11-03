@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 02:58:03 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 20:35:31 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,16 @@ const std::string&	HttpRequest::getUri() const
 const std::string& HttpRequest::getQuery() const
 {return (_query);}
 
+int HttpRequest::getNumRedirects() const
+{ return (redirect_count);}
+
 void	HttpRequest::setMethod(const std::string& method)
 {
 	_method = method;
 }
+
+void HttpRequest::increaseRedirectCount() const
+{	redirect_count++; }
 
 void	HttpRequest::setQuery(const std::string& uri)
 {

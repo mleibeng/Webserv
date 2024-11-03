@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 20:02:20 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 20:27:12 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ struct RouteConf
 	std::optional<size_t> max_body_size; //limit client body size
 	std::optional<int> timeout; // set timeout for closing connections
 	std::optional<int> max_connects; // set maximum number of connections (to prevent DDoS)
-	//could also implement body buffer size for bigger bodies to control where they split;
+	std::optional<int> max_redirects; //could also implement body buffer size for bigger bodies to control where they split;
 };
 struct ServerConf
 {
