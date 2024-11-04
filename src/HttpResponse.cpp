@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/04 19:30:38 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/04 19:40:14 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,8 +175,8 @@ std::string	HttpResponse::stostr() const
 			return("No Content");
 		case StatusCode::MOVED_PERM:
 			return("Moved Permanently");
-		case StatusCode::FOUND:
-			return("Found");
+		case StatusCode::MOVED_TEMP:
+			return("Moved temporarily");
 		case StatusCode::NOT_MODIFIED:
 			return("Not Modified");
 		case StatusCode::BAD_REQUEST:
@@ -195,6 +195,8 @@ std::string	HttpResponse::stostr() const
 			return("Bad Gateway");
 		case StatusCode::SERVICE_UNAVAIL:
 			return("Service Unavailable");
+		case StatusCode::ENDLESS_LOOP:
+			return("Redirection Loop");
 		default:
 			return("Unknown Status");
 	}
