@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleCGI.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/02 01:10:57 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/04 19:02:55 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,10 +152,7 @@ void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, con
 	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) // if ok format response for sending
 		buildCGIResponse(output, response);
 	else
-	{
-		serveErrorPage(client, 500);
-		return;
-	}
+		return serveErrorPage(client, 500);
 
 	client.send_response(response.buildResponse()); // build response and send
 }

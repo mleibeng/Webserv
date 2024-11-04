@@ -24,7 +24,6 @@
 #include <map>
 #include <vector>
 
-
 class AHttpMessage
 {
 	public:

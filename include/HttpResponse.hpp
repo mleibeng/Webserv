@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/25 20:27:21 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/04 19:26:59 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,12 +83,13 @@ class HttpResponse : public AHttpMessage
 		int	getStatus() const;
 
 	private:
-		int	_status;
+		StatusCode	_status;
 		std::string	_mimeType;
 
 
-		std::string	statusCodeToStr() const;
-		int			statusCodeToInt() const;
+		std::string	stostr() const;
+		int			stoi() const;
+		StatusCode	itos(int code) const;
 };
 
 #endif // HTTPRESPONSE_H
