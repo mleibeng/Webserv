@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/04 19:26:59 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/04 19:29:51 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ class HttpResponse : public AHttpMessage
 		bool	parse(const std::string& rawmsg) override;
 
 		void		setStatus(int status);
+		void		setStatus(StatusCode status);
 		void		setMimeType(std::string extension);
 		std::string	getMimeType(const std::string extension);
 		int	getStatus() const;

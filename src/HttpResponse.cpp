@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/04 19:25:23 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/04 19:30:38 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,16 @@ HttpResponse::~HttpResponse()
 
 //SETTERS
 
-void HttpResponse::setStatus(int status)
+void	HttpResponse::setStatus(int status)
 {
 	_status = HttpResponse::itos(status);
 }
+
+void	HttpResponse::setStatus(StatusCode status)
+{
+	_status = status;
+}
+
 void		HttpResponse::setMimeType(std::string extension)
 {
 	this->setHeader("Content-Type", getMimeType(extension));
