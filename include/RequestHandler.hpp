@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 15:21:15 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 19:32:54 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,9 @@ class RequestHandler
 		void sendDirListing(Client &client, const std::string& dir_path);
 		void sendFile(Client& client, const std::string& file_path);
 		void handleCGI(Client& client, const std::string& cgi_path);
-		void handleFileUpload(int client_fd, const std::string& upload_dir);
+
+		void handleFileUpload(Client& client, const std::string& content_type, const std::string& body);
+		void handleFormSubmission(Client& client, const std::string& body);
 };
 
 std::string		getFileExtension(const std::string& filepath);
