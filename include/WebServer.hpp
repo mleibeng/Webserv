@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:27:12 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 20:13:14 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/wait.h>

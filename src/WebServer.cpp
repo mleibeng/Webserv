@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 19:15:05 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 21:54:44 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,26 @@ void WebServer::setupListeners()
 			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
 				std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
 
-			struct sockaddr_in addr;
-			addr.sin_family = AF_INET;
-			addr.sin_addr.s_addr = INADDR_ANY;
-			addr.sin_port = htons(port);
+			struct addrinfo hints, *res;
+			memset(&hints, 0, sizeof hints);
+			hints.ai_family = AF_INET;
+			hints.ai_socktype = SOCK_STREAM;
+			hints.ai_flags = AI_PASSIVE;
 
-			if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
+			int status = getaddrinfo(server.hostname.c_str(), std::to_string(port).c_str(), &hints, &res);
+			if (status != 0)
 			{
+				std::cerr << "getaddrinfo failed: " << gai_strerror(status) << std::endl;
 				close(fd);
+				throw std::runtime_error("Failed to resolve hostname: " + server.hostname);
+			}
+
+ 			if (bind(fd, res->ai_addr, res->ai_addrlen) < 0)
+			{
+				std::cerr << "Failed to bind to " << server.hostname << ":" << port
+							<< " - " << strerror(errno) << std::endl;
+				close(fd);
+				freeaddrinfo(res);
 				throw std::runtime_error("Failed to bind socket");
 			}
 

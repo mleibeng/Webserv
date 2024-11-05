@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:07:58 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 21:01:23 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void Loop::addFd(int fd, uint32_t event)
 	if (epoll_ctl(loop_fd, EPOLL_CTL_ADD, fd, &ev) == -1)
 		throw std::runtime_error("Couldn't add fd to epoll");
 	events[fd] = ev;
-	// std::cout << fd << std::endl;
+	std::cout << fd << std::endl;
 // #endif
 }
 
@@ -74,6 +74,8 @@ std::vector<std::pair<int, uint32_t>> Loop::wait(int timeout)
 	// don't know yet
 // #else
 	int nev = epoll_wait(loop_fd, event_list, MAX_EVENTS, timeout);
+	if (nev == -1)
+		std::cerr << "epoll_wait error " << std::endl;
 	for (int i = 0; i < nev; ++i)
 	{
 		int fd = event_list[i].data.fd;

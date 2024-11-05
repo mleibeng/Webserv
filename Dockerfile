@@ -12,11 +12,16 @@ RUN apt-get update && apt-get upgrade -y && \
     cmake \
     php \
     php-cgi \
+    curl \
     python3 && \
     apt-get clean && \
     rm -fr /var/lib/apt/lists/*
 
 WORKDIR /workspace
+
+# ENV LOOPBACK_ADDRESSES="127.0.0.1 127.0.0.2"
+
 EXPOSE 8080 8081
 
 CMD ["tail", "-f", "/dev/null"]
+# CMD ["./webserv"]

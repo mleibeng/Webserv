@@ -6,7 +6,7 @@
 #    By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/20 13:55:42 by mott              #+#    #+#              #
-#    Updated: 2024/11/05 02:36:24 by mleibeng         ###   ########.fr        #
+#    Updated: 2024/11/05 22:05:56 by mleibeng         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@
 # Compiler and flags
 CPP = c++
 CPPFLAGS = -Wall -Wextra -Werror -Iinclude -std=c++17
-# CPPFLAGS += -g -fsanitize=address
+CPPFLAGS += -g -fsanitize=address
 RM = rm -rf
 
 # Project names and directories
@@ -92,6 +92,8 @@ docker-up:
 	@docker run -itd \
 		--name WebServer \
 		-v $(CURDIR):/workspace \
+		--add-host local:127.0.0.1 \
+		--add-host local2:127.0.0.2 \
 		-p 8080:8080 \
 		-p 8081:8081 \
 		webserver

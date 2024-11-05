@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 18:29:17 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 22:07:28 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,6 @@ void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_c
 		if (file_start != std::string::npos && file_end != std::string::npos) {
 			size_t content_start = body.find("\r\n\r\n", file_start) + 4;
 			std::string file_data = body.substr(content_start, file_end - content_start);
-			
 
 			std::ofstream file("/workspace/42/projects/5_webserv/html_pages/uploads/uploaded_file", std::ios::binary);
 			if (file) {
@@ -154,10 +153,6 @@ void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_c
 	else {
 		std::cout << RED << "Content-Type not supported" << RESET << std::endl;
 	}
-
-	// DIESE LOGIK MUSS REIN <- filedescriptor koennte ein issue sein. weil CGI schickt selber zurueck und baut keine Nachricht!!
-	// if (!route_conf.cgi_extension.empty() && request.getUri().ends_with(route_conf.cgi_extension))
-	//		handleCGI(int fd, file_path, request.getBody());
 }
 
 void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)
