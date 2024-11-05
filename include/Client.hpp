@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/11/03 21:59:55 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 19:02:27 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,10 @@ class Client {
 
 		//incrementers
 		void increaseRedirectCount();
+		void setBuffer(size_t buffersize);
 
 	private:
+		size_t _buffersize;
 		int _client_fd;
 		HttpRequest _request;
 		size_t redirect_count;

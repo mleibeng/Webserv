@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:36:25 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 19:15:05 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,6 +220,7 @@ void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 
 	Client& client = *it->second.client;
 
+	client.setBuffer(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE)));
 	// std::cout << "request from " << client_fd << std::endl;
 	if (client.read_request() == -1)
 		return handler.serveErrorPage(client, 400);

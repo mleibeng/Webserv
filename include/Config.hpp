@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:24:46 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 19:11:48 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,9 @@ Handles: configuration of hosts, ports and route structure on server-side.
 
 struct GlobalConf
 {
-	int g_max_header_size = 1024; // limit client header size
+	size_t g_max_header_size = 1024; // limit client header size
 	int g_timeout = 60;  // set timeout for closing connections
-	int g_max_connects = 1000; // set maximum number of connections (to prevent DDoS)
+	size_t g_max_connects = 1000; // set maximum number of connections (to prevent DDoS)
 	size_t g_max_body_size = 1024 * 1024; //limit client body size
 
 	enum class ConfigKey

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/05 15:29:31 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 19:05:37 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,25 +25,31 @@ Client::~Client()
 	close(_client_fd);
 }
 
+void Client::setBuffer(size_t buffersize)
+{
+	_buffersize = buffersize;
+}
+
 /// @brief reads in the clientside data sent from the webbrowser
 /// @return returns length of request or -1 in case of error
 ssize_t Client::read_request()
 {
 	ssize_t nbytes;
-	char buffer[1024];
+	char buffer[_buffersize + 1];
 	std::string request;
 
 	// do {
 		nbytes = read(_client_fd, buffer, sizeof(buffer));
 	// } while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK));
 
-	if (nbytes == -1) {
+	if (nbytes == -1)
 		std::cerr << RED << "read(): " << strerror(errno) << DEFAULT << std::endl;
-	}
-	else if (nbytes == 0) {
+	else if (nbytes == 0)
 		close(_client_fd);
-	}
-	else {
+	else if (nbytes == (_buffersize + 1))
+		return -1;
+	else
+	{
 		request.assign(buffer, nbytes);
 		std::cout << YELLOW << request << DEFAULT << std::endl;
 		bool ok = _request.parse(request);
