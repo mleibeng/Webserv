@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 21:54:44 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/06 00:39:58 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,8 @@ void WebServer::setupListeners()
 				freeaddrinfo(res);
 				throw std::runtime_error("Failed to bind socket");
 			}
+
+			freeaddrinfo(res);
 
 			if (listen(fd, SOMAXCONN) < 0)
 			{

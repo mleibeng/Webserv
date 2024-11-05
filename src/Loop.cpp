@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 21:01:23 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/06 00:40:53 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,6 @@ std::vector<std::pair<int, uint32_t>> Loop::wait(int timeout)
 	// don't know yet
 // #else
 	int nev = epoll_wait(loop_fd, event_list, MAX_EVENTS, timeout);
-	if (nev == -1)
-		std::cerr << "epoll_wait error " << std::endl;
 	for (int i = 0; i < nev; ++i)
 	{
 		int fd = event_list[i].data.fd;
