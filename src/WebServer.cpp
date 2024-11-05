@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/02 01:32:12 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/03 22:54:41 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,12 @@ void WebServer::stop()
 		}
 	}
 	server_listeners.clear();
+	for (auto& [fd, _] : active_clients)
+	{
+		event_loop.removeFd(fd);
+		close(fd);
+	}
+	active_clients.clear();
 }
 
 /// @brief server loop waiting for events to happen and process
@@ -133,12 +139,16 @@ void WebServer::runLoop()
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
-		auto events = event_loop.wait();
+		auto events = event_loop.wait(5000);
 		if (!running)
 			break;
+
+		cleanInactiveClients();
+
 		for (const auto& [fd, event] : events) {
 			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
 			{
+				active_clients.erase(fd);
 				close(fd);
 				event_loop.removeFd(fd);
 			}
@@ -168,12 +178,46 @@ void WebServer::initialize()
 	request_handler = std::make_unique<RequestHandler>(config);
 }
 
+WebServer::ClientInfo::ClientInfo(int fd) : client(std::make_unique<Client>(fd)), last_active(std::time(nullptr))
+{}
+
+void WebServer::cleanInactiveClients()
+{
+	std::time_t current_time = std::time(nullptr);
+	auto it = active_clients.begin();
+	while (it != active_clients.end())
+	{
+		if (current_time - it->second.last_active > std::get<int>(config.getGlobalConf(GlobalConf::ConfigKey::TIMEOUT)))
+		{
+			std::cout << "Cleaning inactive clients" << it->first << std::endl;
+			event_loop.removeFd(it->first);
+			close(it->first);
+			it = active_clients.erase(it);
+		}
+		else
+			++it;
+	}
+}
+
 /// @brief read request from client and either serve error or process it
 /// @param client_fd client to process
 /// @param handler handler instance for all processes
 void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 {
-	Client client(client_fd);
+	auto it = active_clients.find(client_fd);
+	if (it == active_clients.end())
+	{
+		active_clients.emplace(
+			std::piecewise_construct,
+			std::forward_as_tuple(client_fd),
+			std::forward_as_tuple(client_fd)
+		);
+		it = active_clients.find(client_fd);
+	}
+
+	it->second.last_active = std::time(nullptr);
+
+	Client& client = *it->second.client;
 
 	std::cout << "request from " << client_fd << std::endl;
 	if (client.read_request() == -1)

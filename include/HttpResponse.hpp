@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/10/25 20:27:21 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/04 19:40:08 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ enum class StatusCode
 	ACCEPTED = 202,
 	NOCONTENT = 204,
 	MOVED_PERM = 301,
-	FOUND = 302,
+	MOVED_TEMP = 302,
 	NOT_MODIFIED = 304,
 	BAD_REQUEST = 400,
 	UNAUTHORIZED = 401,
@@ -62,7 +62,8 @@ enum class StatusCode
 	INTERNAL_SERV_ERR = 500,
 	NOT_IMPLEMENTED = 501,
 	BAD_GATEWAY = 502,
-	SERVICE_UNAVAIL = 503
+	SERVICE_UNAVAIL = 503,
+	ENDLESS_LOOP = 508
 };
 
 class HttpResponse : public AHttpMessage
@@ -78,17 +79,19 @@ class HttpResponse : public AHttpMessage
 		bool	parse(const std::string& rawmsg) override;
 
 		void		setStatus(int status);
+		void		setStatus(StatusCode status);
 		void		setMimeType(std::string extension);
 		std::string	getMimeType(const std::string extension);
 		int	getStatus() const;
 
 	private:
-		int	_status;
+		StatusCode	_status;
 		std::string	_mimeType;
 
 
-		std::string	statusCodeToStr() const;
-		int			statusCodeToInt() const;
+		std::string	stostr() const;
+		int			stoi() const;
+		StatusCode	itos(int code) const;
 };
 
 #endif // HTTPRESPONSE_H

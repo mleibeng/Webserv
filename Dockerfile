@@ -1,14 +1,22 @@
-FROM alpine:latest
-RUN apk update && \
-    apk add --no-cache \
-    build-base \
-    gcc \
+FROM debian:latest
+
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y \
+    build-essential \
+    libreadline-dev \
     g++ \
+    git \
     make \
-    valgrind
+    valgrind \
+    strace \
+    cmake \
+    php \
+    php-cgi \
+    python3 && \
+    apt-get clean && \
+    rm -fr /var/lib/apt/lists/*
+
 WORKDIR /workspace
-# docker build -t cpp-dev-env .
-# docker run -it --rm -v /Users/{$USER}/code/Webserv:/workspace cpp-dev-env
-# docker run -it --rm -v /Users/{$USER}/code/Webserv:/workspace -p 8080:8080 cpp-dev-env
-# valgrind --leak-check=full ./<program> <parameters>
-# valgrind --tool=helgrind ./<program> <parameters>
+EXPOSE 8080 8081
+
+CMD ["tail", "-f", "/dev/null"]

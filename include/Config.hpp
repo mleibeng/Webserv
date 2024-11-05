@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/31 22:33:14 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 22:36:28 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ Handles: configuration of hosts, ports and route structure on server-side.
 #include <stdexcept>
 #include <unordered_map>
 #include <optional>
+#include <variant>
 
 // we could also implement max_client_header_size for buffering the headersize. NGINX does this as well!
 
@@ -34,6 +35,16 @@ struct GlobalConf
 	int g_timeout = 60;  // set timeout for closing connections
 	int g_max_connects = 1000; // set maximum number of connections (to prevent DDoS)
 	size_t g_max_body_size = 1024 * 1024; //limit client body size
+
+	enum class ConfigKey
+	{
+		MAX_HEADER_SIZE,
+		TIMEOUT,
+		MAX_CONNECTIONS,
+		MAX_BODY_SIZE,
+	};
+
+	std::variant<int,size_t> getConfig(ConfigKey key) const;
 };
 
 struct RouteConf
@@ -41,6 +52,7 @@ struct RouteConf
 	std::string path;
 	std::vector<std::string> methods; // Define a list of accepted HTTPS methods for the route
 	std::optional<int> port;
+	std::optional<int> redirect_code;
 	std::optional<std::string> redirect; // Define a HTTP redirection
 	std::string root; //Define a directory or a file from where the file should be searched
 	bool dir_listing_active = false; // turn on or off directory listing
@@ -51,7 +63,7 @@ struct RouteConf
 	std::optional<size_t> max_body_size; //limit client body size
 	std::optional<int> timeout; // set timeout for closing connections
 	std::optional<int> max_connects; // set maximum number of connections (to prevent DDoS)
-	//could also implement body buffer size for bigger bodies to control where they split;
+	std::optional<int> max_redirects; //could also implement body buffer size for bigger bodies to control where they split;
 };
 struct ServerConf
 {
@@ -77,6 +89,8 @@ class Config
 	static std::string trim(const std::string &s);
 	static void parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::vector<std::string>& value);
 	void print() const;
+
+	std::variant<int, size_t> getGlobalConf(GlobalConf::ConfigKey key) const;
 };
 
 #endif

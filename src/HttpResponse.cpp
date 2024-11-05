@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 04:40:02 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/04 19:40:14 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,16 @@ HttpResponse::~HttpResponse()
 
 //SETTERS
 
-void HttpResponse::setStatus(int status)
+void	HttpResponse::setStatus(int status)
+{
+	_status = HttpResponse::itos(status);
+}
+
+void	HttpResponse::setStatus(StatusCode status)
 {
 	_status = status;
 }
+
 void		HttpResponse::setMimeType(std::string extension)
 {
 	this->setHeader("Content-Type", getMimeType(extension));
@@ -55,7 +61,7 @@ void		HttpResponse::setMimeType(std::string extension)
 
 int	HttpResponse::getStatus() const
 {
-	return (_status);
+	return (HttpResponse::stoi());
 }
 
 std::string		HttpResponse::getMimeType(const std::string extension)
@@ -135,7 +141,7 @@ std::string	HttpResponse::buildResponse() const
 {
 	std::ostringstream	response;
 
-	response << "HTTP/1.1 " << _status << " " << _status << "\r\n";
+	response << "HTTP/1.1 " << HttpResponse::stoi() << " " << HttpResponse::stostr() << "\r\n";
 
 	// std::cout << RED << this->getHeader("Content-Type") << RESET << std::endl;
 	for (const auto& header : _header)
@@ -155,47 +161,53 @@ std::string	HttpResponse::buildResponse() const
 	return (response.str());
 }
 
-// std::string	HttpResponse::statusCodeToStr() const
-// {
-// 	switch(_status)
-// 	{
-// 		case StatusCode::OK:
-// 			return("OK");
-// 		case StatusCode::CREATED:
-// 			return("Created");
-// 		case StatusCode::ACCEPTED:
-// 			return("Accepted");
-// 		case StatusCode::NOCONTENT:
-// 			return("No Content");
-// 		case StatusCode::MOVED_PERM:
-// 			return("Moved Permanently");
-// 		case StatusCode::FOUND:
-// 			return("Found");
-// 		case StatusCode::NOT_MODIFIED:
-// 			return("Not Modified");
-// 		case StatusCode::BAD_REQUEST:
-// 			return("Bad Request");
-// 		case StatusCode::UNAUTHORIZED:
-// 			return("Unauthorized");
-// 		case StatusCode::FORBIDDEN:
-// 			return("Forbidden");
-// 		case StatusCode::NOT_FOUND:
-// 			return("Not Found");
-// 		case StatusCode::INTERNAL_SERV_ERR:
-// 			return("Internal Server Error");
-// 		case StatusCode::NOT_IMPLEMENTED:
-// 			return("Not implemented");
-// 		case StatusCode::BAD_GATEWAY:
-// 			return("Bad Gateway");
-// 		case StatusCode::SERVICE_UNAVAIL:
-// 			return("Service Unavailable");
-// 		default:
-// 			return("Unknown Status");
+std::string	HttpResponse::stostr() const
+{
+	switch(_status)
+	{
+		case StatusCode::OK:
+			return("OK");
+		case StatusCode::CREATED:
+			return("Created");
+		case StatusCode::ACCEPTED:
+			return("Accepted");
+		case StatusCode::NOCONTENT:
+			return("No Content");
+		case StatusCode::MOVED_PERM:
+			return("Moved Permanently");
+		case StatusCode::MOVED_TEMP:
+			return("Moved temporarily");
+		case StatusCode::NOT_MODIFIED:
+			return("Not Modified");
+		case StatusCode::BAD_REQUEST:
+			return("Bad Request");
+		case StatusCode::UNAUTHORIZED:
+			return("Unauthorized");
+		case StatusCode::FORBIDDEN:
+			return("Forbidden");
+		case StatusCode::NOT_FOUND:
+			return("Not Found");
+		case StatusCode::INTERNAL_SERV_ERR:
+			return("Internal Server Error");
+		case StatusCode::NOT_IMPLEMENTED:
+			return("Not implemented");
+		case StatusCode::BAD_GATEWAY:
+			return("Bad Gateway");
+		case StatusCode::SERVICE_UNAVAIL:
+			return("Service Unavailable");
+		case StatusCode::ENDLESS_LOOP:
+			return("Redirection Loop");
+		default:
+			return("Unknown Status");
+	}
+}
 
-// 	}
-// }
+StatusCode HttpResponse::itos(int code) const
+{
+	return static_cast<StatusCode>(code);
+}
 
-// int		HttpResponse::statusCodeToInt() const
-// {
-// 	return (static_cast<int>(_status));
-// }
+int		HttpResponse::stoi() const
+{
+	return (static_cast<int>(_status));
+}

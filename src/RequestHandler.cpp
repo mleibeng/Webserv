@@ -6,41 +6,73 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 12:58:53 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 13:03:29 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+
+std::string RequestHandler::buildRedirWQuery(const RouteConf& route_conf, const HttpRequest& request)
+{
+	std::string redirect_with_query = *route_conf.redirect;
+
+	if (!request.getQuery().empty())
+	{
+		if (redirect_with_query.find('?') == std::string::npos)
+			redirect_with_query += "?" + request.getQuery();
+		else
+			redirect_with_query += "&" + request.getQuery();
+	}
+
+	return redirect_with_query;
+}
+
+void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
+{
+	HttpResponse response;
+
+	client.increaseRedirectCount();
+
+	std::string redirect = buildRedirWQuery(route_conf, client.getRequest());
+
+	response.setStatus(*route_conf.redirect_code);
+	response.setHeader("Location", redirect);
+	response.setBody("Redirecting to " + redirect);
+	client.send_response(response.buildResponse());
+}
 
 /// @brief Entrypoint and management function for sorting Requests.
 ///		   Finds the most appropriate route and delegates the response to the specific type of request handler.
 /// @param client client including the fd and request. Ultimately receives requests and sends the response.
 void		RequestHandler::handleRequest(Client& client)
 {
-	std::cout << "reached 1" << std::endl;
 	const ServerConf* server_conf = findServerConf(client.getRequest());
 	if (!server_conf)
 		return serveErrorPage(client, 404);
 
-	std::cout << "reached 2" << std::endl;
 	const RouteConf* route_conf = findRouteConf(*server_conf, client.getRequest());
 	if (!route_conf)
 		return serveErrorPage(client, 404);
 
+	if (route_conf->redirect.has_value())
+	{
+		if (client.getNumRedirects() >= route_conf->max_redirects)
+		{
+			// std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
+			return serveErrorPage(client, 508);
+		}
+		// std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
+		return handleRedirect(*route_conf, client);
+	}
 	const std::string& method = client.getRequest().getMethod();
-
-	std::cout << "reached 3" << std::endl;
-
-	std::cout << "routeconfig chosen:" << route_conf->path << std::endl;
-	// std::cout << "routeconf info" << route_conf->upload_dir << std::endl;
 
 	if (!isMethodAllowed(*route_conf, method))
 		return serveErrorPage(client, 405);
-	std::cout << "Uri after method allowed "<< client.getRequest().getUri() << std::endl;
 
 	std::string parsed = parsePath(*route_conf, client.getRequest());
 
-	std::cout << "Phy path: " << parsed << std::endl;
+	// std::cout << "Phy path: " << parsed << std::endl;
 
 	if (method == "GET")
 		handleGetRequest(client, *route_conf, parsed);
@@ -99,10 +131,10 @@ void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route
 	// 	if (std::filesystem::remove(file_path))
 	// 		client.send_response(HttpResponse(200, "text/plain", "File deleted successfully"));
 	// 	else
-	// 		serveErrorPage(client.get_fd(), 500); // Internal Server Error
+	// 		serveErrorPage(client, 500); // Internal Server Error
 	// }
 	// else
-	// 	serveErrorPage(client.get_fd(), 404); // Not
+	// 	serveErrorPage(client, 404); // Not
 
 	(void)client;
 	(void)route_conf;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/02 00:46:55 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/04 19:25:35 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 // Should to run through REQUEST and RESPONSE Classes
 // ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Client::Client(int client_fd) : _client_fd(client_fd) {
+Client::Client(int client_fd) : _client_fd(client_fd), redirect_count(0) {
 }
 
 Client::~Client() {
@@ -50,6 +50,12 @@ ssize_t Client::read_request()
 	}
 	return nbytes;
 }
+
+int Client::getNumRedirects() const
+{ return (redirect_count);}
+
+void Client::increaseRedirectCount()
+{	redirect_count++; }
 
 /// @brief sends a response back to the client side
 /// @param response_string std::string response to send

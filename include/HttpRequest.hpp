@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 01:54:18 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 21:59:16 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ class HttpRequest : public AHttpMessage
 		//parse
 		bool	parse(const std::string& rawmsg) override;
 
+		//setters
 		void	setMethod(const std::string& method);
 		void	setQuery(const std::string& uri);
 

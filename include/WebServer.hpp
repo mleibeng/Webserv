@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/25 22:16:01 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/03 23:05:16 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,17 @@ class Client;
 class WebServer
 {
 	private:
+
+	struct ClientInfo
+	{
+		std::unique_ptr<Client> client;
+		std::time_t last_active;
+
+		ClientInfo(int fd);
+	};
+
+	std::map<int, ClientInfo> active_clients;
+
 	Config config;
 	std::unordered_map<std::string, std::vector<int>> server_listeners;
 	Loop event_loop;
@@ -57,6 +68,7 @@ class WebServer
 	void runLoop();
 	void acceptConnections(int listener_fd);
 	int	 createNonBlockingSocket();
+	void cleanInactiveClients();
 	void handleClientRequest(int client_fd, RequestHandler& handler);
 
 	public:

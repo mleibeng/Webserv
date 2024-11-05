@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/02 00:51:56 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/05 02:00:34 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,17 @@ void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std:
 	if (key == "methods")
 		conf.methods = values;
 	else if (key == "redirect")
-		conf.redirect = values[0];
+	{
+		if (values.size() == 1)
+			conf.redirect = values[0];
+		else if (values.size() == 2)
+		{
+			conf.redirect_code = std::stoi(values[0]);
+			conf.redirect = values[1];
+		}
+	}
+	else if (key == "max_redirects")
+		conf.max_redirects = std::stoi(values[0]);
 	else if (key == "port")
 		conf.port = std::stoi(values[0]);
 	else if (key == "root")
@@ -129,6 +139,26 @@ void Config::parseGlobalBlock(GlobalConf& conf, const std::string& key, const st
 	else
 		throw std::runtime_error("Unknown Global Configuration key");
 }
+
+std::variant<int,size_t> GlobalConf::getConfig(ConfigKey key) const
+{
+	switch (key)
+	{
+		case ConfigKey::MAX_HEADER_SIZE:
+			return g_max_header_size;
+		case ConfigKey::MAX_BODY_SIZE:
+			return g_max_body_size;
+		case ConfigKey::MAX_CONNECTIONS:
+			return g_max_connects;
+		case ConfigKey::TIMEOUT:
+			return g_timeout;
+		default:
+			throw std::invalid_argument("invalid global config key");
+	}
+}
+
+std::variant<int, size_t> Config::getGlobalConf(GlobalConf::ConfigKey key) const
+{ return globuli.getConfig(key);}
 
 /// @brief parses the config file to save appropriate information
 /// @param conf_file config file to parse
@@ -209,11 +239,13 @@ Config Config::parse(const std::string& conf_file)
 	{
 		for (auto& [path, route] : server.routes)
 		{
+			if (!route.max_redirects) route.max_redirects = 10;
+			if (route.redirect.has_value() && !route.redirect_code.has_value()) route.redirect_code = 301;
 			if (!route.max_header_size) route.max_header_size = config.globuli.g_max_header_size;
 			if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
 			if (!route.timeout) route.timeout = config.globuli.g_timeout;
 			if (!route.max_connects) route.max_connects = config.globuli.g_max_connects;
-			if (!route.port) route.port = current_server.port;
+			if (!route.port) route.port = server.port;
 		}
 	}
 	return config;
@@ -252,7 +284,10 @@ void Config::print() const
 				std::cout << method << " ";
 			std::cout << "\n";
 			if (route.redirect)
+			{
+				std::cout << "    Redirect code: " << *route.redirect_code << "\n";
 				std::cout << "    Redirect: " << *route.redirect << "\n";
+			}
 			std::cout << "    Route Port: " << *route.port << "\n";
 			std::cout << "    Root: " << route.root << "\n";
 			std::cout << "    Directory Listing: " << (route.dir_listing_active ? "On" : "Off") << "\n";
