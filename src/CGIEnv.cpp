@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEnv.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 00:55:12 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/02 00:44:30 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/05 15:12:05 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
-
 
 /// @brief Constructor sets Environment using RAII
 /// @param request sent request of the client
@@ -32,7 +31,9 @@ RequestHandler::CGIEnv::~CGIEnv()
 /// @brief returns environment array data
 /// @return returns a char ** for easy execve use
 char** RequestHandler::CGIEnv::getEnv()
-{return env_array.data();}
+{
+	return env_array.data();
+}
 
 /// @brief sets the basic environment variables necessary for script execution in CGI's
 /// @param request request necessary to be executed
@@ -81,7 +82,6 @@ void RequestHandler::CGIEnv::setEnviron(const HttpRequest& request, const std::s
 
 	env_array.push_back(nullptr);
 }
-
 
 /// @brief adds an env variable to the environment
 /// @param name name of the variable

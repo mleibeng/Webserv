@@ -3,17 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 02:00:34 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:14:46 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 #include <algorithm>
 #include <iostream>
-
 
 /// @brief modifies value notations like 10M or 8G to size_t
 /// @param sizeStr value notation to transform
@@ -158,7 +157,9 @@ std::variant<int,size_t> GlobalConf::getConfig(ConfigKey key) const
 }
 
 std::variant<int, size_t> Config::getGlobalConf(GlobalConf::ConfigKey key) const
-{ return globuli.getConfig(key);}
+{
+	 return globuli.getConfig(key);
+}
 
 /// @brief parses the config file to save appropriate information
 /// @param conf_file config file to parse
@@ -254,7 +255,9 @@ Config Config::parse(const std::string& conf_file)
 /// @brief vector of server configurations
 /// @return std::vector of server conf struct
 const std::vector<ServerConf>& Config::getServerConfs() const
-{return servers;}
+{
+	return servers;
+}
 
 /// @brief prints the parsed config file
 void Config::print() const

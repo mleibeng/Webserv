@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 22:36:28 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:24:46 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ struct RouteConf
 	std::optional<int> max_connects; // set maximum number of connections (to prevent DDoS)
 	std::optional<int> max_redirects; //could also implement body buffer size for bigger bodies to control where they split;
 };
+
 struct ServerConf
 {
 	std::string hostname; //host for each 'server'
@@ -76,21 +77,21 @@ struct ServerConf
 
 class Config
 {
-	private:
-	GlobalConf globuli;
-	std::vector<ServerConf> servers;
-
 	public:
-	Config() = default;
-	static Config parse(const std::string& conf_file);
-	const std::vector<ServerConf>& getServerConfs() const;
-	static void parseServerBlock(ServerConf& conf, const std::string& key, const std::vector<std::string>& value);
-	static void parseRouteBlock(RouteConf& conf, const std::string& key, const std::vector<std::string>& value);
-	static std::string trim(const std::string &s);
-	static void parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::vector<std::string>& value);
-	void print() const;
+		Config() = default;
+		static Config parse(const std::string& conf_file);
+		const std::vector<ServerConf>& getServerConfs() const;
+		static void parseServerBlock(ServerConf& conf, const std::string& key, const std::vector<std::string>& value);
+		static void parseRouteBlock(RouteConf& conf, const std::string& key, const std::vector<std::string>& value);
+		static std::string trim(const std::string &s);
+		static void parseGlobalBlock(GlobalConf& conf, const std::string& key, const std::vector<std::string>& value);
+		void print() const;
 
-	std::variant<int, size_t> getGlobalConf(GlobalConf::ConfigKey key) const;
+		std::variant<int, size_t> getGlobalConf(GlobalConf::ConfigKey key) const;
+
+	private:
+		GlobalConf globuli;
+		std::vector<ServerConf> servers;
 };
 
 #endif

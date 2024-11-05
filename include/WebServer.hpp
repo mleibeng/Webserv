@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 23:05:16 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:27:12 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,41 +44,41 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 
 class Loop;
 class Client;
+
 class WebServer
 {
-	private:
-
-	struct ClientInfo
-	{
-		std::unique_ptr<Client> client;
-		std::time_t last_active;
-
-		ClientInfo(int fd);
-	};
-
-	std::map<int, ClientInfo> active_clients;
-
-	Config config;
-	std::unordered_map<std::string, std::vector<int>> server_listeners;
-	Loop event_loop;
-	std::atomic<bool> running;
-	std::unique_ptr<RequestHandler> request_handler;
-
-	void setupListeners();
-	void runLoop();
-	void acceptConnections(int listener_fd);
-	int	 createNonBlockingSocket();
-	void cleanInactiveClients();
-	void handleClientRequest(int client_fd, RequestHandler& handler);
-
 	public:
-	WebServer() = default;
-	explicit WebServer(const std::string& conf_file);
-	~WebServer();
+		WebServer() = default;
+		explicit WebServer(const std::string& conf_file);
+		~WebServer();
 
-	void initialize();
-	void start();
-	void stop();
+		void initialize();
+		void start();
+		void stop();
+
+	private:
+		struct ClientInfo
+		{
+			std::unique_ptr<Client> client;
+			std::time_t last_active;
+
+			ClientInfo(int fd);
+		};
+
+		std::map<int, ClientInfo> active_clients;
+
+		Config config;
+		std::unordered_map<std::string, std::vector<int>> server_listeners;
+		Loop event_loop;
+		std::atomic<bool> running;
+		std::unique_ptr<RequestHandler> request_handler;
+
+		void setupListeners();
+		void runLoop();
+		void acceptConnections(int listener_fd);
+		int	 createNonBlockingSocket();
+		void cleanInactiveClients();
+		void handleClientRequest(int client_fd, RequestHandler& handler);
 };
 
 #endif

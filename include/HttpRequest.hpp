@@ -3,18 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 21:59:16 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:25:06 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPREQUEST_H
 #define HTTPREQUEST_H
-
-#define	GREY  "\033[38;5;246m"
-#define	RESET "\033[0m"
 
 #include <iostream>
 #include <string>
@@ -67,10 +64,9 @@ class HttpRequest : public AHttpMessage
 		const std::string&	getQuery() const;
 
 	private:
-		std::string		_method;
+		std::string	_method;
 		std::string	_uri; //Uniform Resource Identifier
 		std::string _query;
-
 };
 
 #endif // HTTPREQUEST_H

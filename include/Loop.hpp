@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/10/13 23:18:55 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:26:21 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,24 +43,23 @@ Handles: I/O operations using kqueue, file descriptors, timers and async actions
 
 class Loop
 {
-	private:
-	int loop_fd;
-	static const int MAX_EVENTS = 10;
-#ifdef __APPLE__
-	// std::vector<struct kevent> change_list;
-	// struct kevent event_list[MAX_EVENTS];
-#else
-	std::unordered_map<int, epoll_event> events;
-	epoll_event event_list[MAX_EVENTS];
-#endif
-
 	public:
-	Loop();
-	~Loop();
-	void addFd(int fd, uint32_t events);
-	void removeFd(int fd);
-	std::vector<std::pair<int, uint32_t>> wait( int timeout = -1);
+		Loop();
+		~Loop();
+		void addFd(int fd, uint32_t events);
+		void removeFd(int fd);
+		std::vector<std::pair<int, uint32_t>> wait( int timeout = -1);
 
+	private:
+		int loop_fd;
+		static const int MAX_EVENTS = 10;
+		#ifdef __APPLE__
+			// std::vector<struct kevent> change_list;
+			// struct kevent event_list[MAX_EVENTS];
+		#else
+			std::unordered_map<int, epoll_event> events;
+			epoll_event event_list[MAX_EVENTS];
+		#endif
 };
 
 #endif

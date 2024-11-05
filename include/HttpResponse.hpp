@@ -3,18 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/04 19:40:08 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:25:38 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPRESPONSE_H
 #define HTTPRESPONSE_H
-
-#define	GREY  "\033[38;5;246m"
-#define	RESET "\033[0m"
 
 #include <iostream>
 #include <string>
@@ -47,7 +44,8 @@ Handles: Parsing, storage, handling of outgoing HTTP responses and methods (stat
 //    of HTTP services across multiple machines.
 
 enum class StatusCode
-{	OK = 200,
+{
+	OK = 200,
 	CREATED = 201,
 	ACCEPTED = 202,
 	NOCONTENT = 204,
@@ -85,13 +83,12 @@ class HttpResponse : public AHttpMessage
 		int	getStatus() const;
 
 	private:
-		StatusCode	_status;
-		std::string	_mimeType;
-
-
 		std::string	stostr() const;
 		int			stoi() const;
 		StatusCode	itos(int code) const;
+
+		StatusCode	_status;
+		std::string	_mimeType;
 };
 
 #endif // HTTPRESPONSE_H

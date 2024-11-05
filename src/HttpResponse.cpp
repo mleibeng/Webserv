@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/04 19:40:14 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:31:49 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,10 @@
 
 HttpResponse::HttpResponse() : AHttpMessage()
 {
-	// std::cout << GREY << "Default constructor called" << RESET << std::endl;
 }
 
 HttpResponse::HttpResponse(const HttpResponse &other) : AHttpMessage()
 {
-	// std::cout << GREY << "Copy constructor called" << RESET << std::endl;
 	*this = other;
 }
 
@@ -30,18 +28,15 @@ HttpResponse& HttpResponse::operator=(const HttpResponse &other)
 		AHttpMessage::operator=(other);
 		setStatus(other.getStatus());
 		setMimeType(other._mimeType);
-		// std::cout << GREY << "Copy assignment operator called" << RESET << std::endl;
 	}
 	return *this;
 }
 
 HttpResponse::~HttpResponse()
 {
-	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
 
 //SETTERS
-
 void	HttpResponse::setStatus(int status)
 {
 	_status = HttpResponse::itos(status);
@@ -55,10 +50,9 @@ void	HttpResponse::setStatus(StatusCode status)
 void		HttpResponse::setMimeType(std::string extension)
 {
 	this->setHeader("Content-Type", getMimeType(extension));
-	// return (iter->second);
 }
-//GETTERS
 
+//GETTERS
 int	HttpResponse::getStatus() const
 {
 	return (HttpResponse::stoi());
@@ -156,7 +150,6 @@ std::string	HttpResponse::buildResponse() const
 		response << "Content-Type: text/html\r\n";
 	response << "\r\n";
 	response << _body;
-
 
 	return (response.str());
 }

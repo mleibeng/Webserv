@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGICreator.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 22:52:24 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 03:18:43 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:23:31 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@
 class CGIHandler
 {
 	public:
-	virtual ~CGIHandler() = default;
-	virtual std::string getCGIPath() const = 0;
-	virtual std::string getCGIName() const = 0;
-	virtual std::vector<std::string> getArgList() const {return {};}
-	virtual std::string getDefaultContent() const = 0;
+		virtual ~CGIHandler() = default;
+		virtual std::string getCGIPath() const = 0;
+		virtual std::string getCGIName() const = 0;
+		virtual std::vector<std::string> getArgList() const {return {};}
+		virtual std::string getDefaultContent() const = 0;
 };
 
 class PHPHandler : public CGIHandler
@@ -54,7 +54,7 @@ class PythonHandler : public CGIHandler
 class CGIHandleCreator
 {
 	public:
-	static std::unique_ptr<CGIHandler> createHandler(const std::string &file_extension);
+		static std::unique_ptr<CGIHandler> createHandler(const std::string &file_extension);
 };
 
 #endif

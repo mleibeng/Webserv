@@ -3,17 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 22:00:41 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:31:22 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
 
 HttpRequest::HttpRequest()
-{}
+{
+}
 
 HttpRequest::HttpRequest(const HttpRequest &other) : AHttpMessage()
 {
@@ -33,7 +34,8 @@ HttpRequest& HttpRequest::operator=(const HttpRequest &other)
 }
 
 HttpRequest::~HttpRequest()
-{}
+{
+}
 
 const std::string& HttpRequest::getMethod() const
 {
@@ -46,7 +48,9 @@ const std::string&	HttpRequest::getUri() const
 }
 
 const std::string& HttpRequest::getQuery() const
-{return (_query);}
+{
+	return (_query);
+}
 
 void	HttpRequest::setMethod(const std::string& method)
 {

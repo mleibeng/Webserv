@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   HandleGet.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/01 05:35:28 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:31:09 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
-
 
 /// @brief Get request handling logic
 /// @param client client including the fd and request. Ultimately receives requests and sends the built responses.

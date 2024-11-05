@@ -6,12 +6,11 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 13:03:29 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 15:22:56 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
-
 
 std::string RequestHandler::buildRedirWQuery(const RouteConf& route_conf, const HttpRequest& request)
 {

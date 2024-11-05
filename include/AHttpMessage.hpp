@@ -13,10 +13,9 @@
 #ifndef AHTTPMESSAGE_H
 #define AHTTPMESSAGE_H
 
-#define RED			"\033[31m"
-#define YELLOW		"\033[33m"
-#define	GREY  "\033[38;5;246m"
-#define	RESET "\033[0m"
+#define RED		"\033[31m"
+#define YELLOW	"\033[33m"
+#define	RESET	"\033[0m"
 
 #include <iostream>
 #include <string>

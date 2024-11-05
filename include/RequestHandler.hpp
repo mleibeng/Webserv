@@ -3,18 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/03 23:19:22 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:21:15 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REQUESTHANDLER_H
 #define REQUESTHANDLER_H
-
-#define	GREY  "\033[38;5;246m"
-#define	RESET "\033[0m"
 
 #include <iostream>
 #include <functional>
@@ -100,6 +97,7 @@ class RequestHandler
 		void handleCGI(Client& client, const std::string& cgi_path);
 		void handleFileUpload(int client_fd, const std::string& upload_dir);
 };
+
 std::string		getFileExtension(const std::string& filepath);
 
 #endif

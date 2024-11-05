@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 22:54:41 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:32:31 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,8 @@ void WebServer::initialize()
 }
 
 WebServer::ClientInfo::ClientInfo(int fd) : client(std::make_unique<Client>(fd)), last_active(std::time(nullptr))
-{}
+{
+}
 
 void WebServer::cleanInactiveClients()
 {

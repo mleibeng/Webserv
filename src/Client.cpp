@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/04 19:25:35 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:29:31 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,14 @@
 
 // HTTP Functionalities -> ErrorPages, FileUpload, CGIs
 // Should to run through REQUEST and RESPONSE Classes
-// ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-Client::Client(int client_fd) : _client_fd(client_fd), redirect_count(0) {
+Client::Client(int client_fd) : _client_fd(client_fd), redirect_count(0)
+{
 }
 
-Client::~Client() {
+Client::~Client()
+{
 	close(_client_fd);
 }
 
@@ -52,18 +54,23 @@ ssize_t Client::read_request()
 }
 
 int Client::getNumRedirects() const
-{ return (redirect_count);}
+{
+	return (redirect_count);
+}
 
 void Client::increaseRedirectCount()
-{	redirect_count++; }
+{
+	redirect_count++;
+}
 
 /// @brief sends a response back to the client side
 /// @param response_string std::string response to send
 /// @return returns length of string sent or -1 in case of write error
-ssize_t Client::send_response(const std::string& response_string) {
+ssize_t Client::send_response(const std::string& response_string)
+{
 	ssize_t nbytes;
 
-	std::cout << response_string << std::endl;
+	// std::cout << response_string << std::endl;
 	nbytes = write(_client_fd, response_string.c_str(), response_string.size());
 	if (nbytes == -1) {
 		std::cerr << RED << "write(): " << strerror(errno) << DEFAULT << std::endl;
@@ -85,30 +92,6 @@ const HttpRequest& Client::getRequest() const
 {
 	return _request;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // /// @brief Sets up a default error message + error code in case no default error page path was given in the config file and otherwise outputs the content from the error page path
 // /// @param error_code Error codes like 404, 500 etc..

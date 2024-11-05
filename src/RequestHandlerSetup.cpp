@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandlerSetup.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/04 19:36:32 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:32:22 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ void RequestHandler::serveErrorPage(Client& client, int error_code)
 
 RequestHandler::~RequestHandler()
 {
-	// std::cout << GREY << "Destructor called" << RESET << std::endl;
 }
 
 /// @brief find host:port combination and split
