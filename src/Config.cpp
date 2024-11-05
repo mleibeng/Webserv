@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/03 23:00:33 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 02:00:34 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -245,7 +245,7 @@ Config Config::parse(const std::string& conf_file)
 			if (!route.max_body_size) route.max_body_size = config.globuli.g_max_body_size;
 			if (!route.timeout) route.timeout = config.globuli.g_timeout;
 			if (!route.max_connects) route.max_connects = config.globuli.g_max_connects;
-			if (!route.port) route.port = current_server.port;
+			if (!route.port) route.port = server.port;
 		}
 	}
 	return config;
