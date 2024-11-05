@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 15:22:56 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 18:29:17 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,36 +86,78 @@ void		RequestHandler::handleRequest(Client& client)
 // und hier das argument nr2 so: ->  handleGetRequest(request, const RouteConf &route_conf)!
 void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)
 {
-	// std::string file_path = route_conf.root + request.getUri();
 	(void)client;
 	(void)route_conf;
 	(void)parsed;
 
+	// Content-Type: application/x-www-form-urlencoded
+	// Content-Type: multipart/form-data; boundary=---------------------------127838523033760710562178097482
+
+	std::string content_type = client.getRequest().getHeader("Content-Type");
 	std::string body = client.getRequest().getBody();
-	// std::cout << RED << "body: " << body << RESET << std::endl;
+	std::cout << RED << "Content-Type: " << content_type << RESET << std::endl;
+	std::cout << RED << "Body: " << body << RESET << std::endl;
 
-	size_t pos_name = body.find("name=");
-	size_t pos_message = body.find("message=");
+	if (content_type.find("multipart/form-data") != std::string::npos) {
 
-	std::string name = body.substr(pos_name + 5, pos_message - (pos_name + 5) - 1);
-	std::string message = body.substr(pos_message + 8);
+		// handleFileUpload();
 
-	// std::cout << RED << "name: " << name << RESET << std::endl;
-	// std::cout << RED << "message: " << message << RESET << std::endl;
+		size_t pos_boundary = content_type.find("boundary=");
+		std::string boundary = content_type.substr(pos_boundary + 9);
+		// std::cout << RED << "boundary: " << boundary << RESET << std::endl;
 
-	HttpResponse response;
-	response.setStatus(201);
-	response.setBody("name: " + name + "<br>" + "message: " + message);
-	// response.setBody(body);
-	response.setMimeType(".html");
-	client.send_response(response.buildResponse());
+		size_t file_start = body.find(boundary);
+		size_t file_end = body.find(boundary, file_start + boundary.size());
+
+		if (file_start != std::string::npos && file_end != std::string::npos) {
+			size_t content_start = body.find("\r\n\r\n", file_start) + 4;
+			std::string file_data = body.substr(content_start, file_end - content_start);
+			
+
+			std::ofstream file("/workspace/42/projects/5_webserv/html_pages/uploads/uploaded_file", std::ios::binary);
+			if (file) {
+				file.write(file_data.data(), file_data.size());
+				file.close();
+
+				HttpResponse response;
+				response.setStatus(201);
+				response.setBody("upload successful");
+				response.setMimeType(".html");
+				client.send_response(response.buildResponse());
+			}
+			else {
+				std::cout << RED << "KO 1: " << std::strerror(errno) << RESET << std::endl;
+			}
+		}
+		else {
+			std::cout << RED << "KO 2: " << std::strerror(errno) << RESET << std::endl;
+		}
+	}
+	else if (content_type.find("application/x-www-form-urlencoded") != std::string::npos) {
+
+		// handleFormSubmission();
+
+		size_t pos_name = body.find("name=");
+		size_t pos_message = body.find("message=");
+
+		std::string name = body.substr(pos_name + 5, pos_message - (pos_name + 5) - 1);
+		std::string message = body.substr(pos_message + 8);
+		// std::cout << RED << "name: " << name << RESET << std::endl;
+		// std::cout << RED << "message: " << message << RESET << std::endl;
+
+		HttpResponse response;
+		response.setStatus(201);
+		response.setBody("name: " + name + "<br>" + "message: " + message);
+		response.setMimeType(".html");
+		client.send_response(response.buildResponse());
+	}
+	else {
+		std::cout << RED << "Content-Type not supported" << RESET << std::endl;
+	}
 
 	// DIESE LOGIK MUSS REIN <- filedescriptor koennte ein issue sein. weil CGI schickt selber zurueck und baut keine Nachricht!!
 	// if (!route_conf.cgi_extension.empty() && request.getUri().ends_with(route_conf.cgi_extension))
 	//		handleCGI(int fd, file_path, request.getBody());
-	// else
-	//		normale handler logik!
-	// client.send_response(response.buildResponse());
 }
 
 void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)

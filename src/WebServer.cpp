@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:32:31 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/05 15:36:25 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 /// @param conf_file Saves data structures and values read in from the config file
 WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false)
 {
-	config.print();
+	// config.print();
 }
 
 /// @brief set up ports to listen for connections on each server
@@ -220,7 +220,7 @@ void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 
 	Client& client = *it->second.client;
 
-	std::cout << "request from " << client_fd << std::endl;
+	// std::cout << "request from " << client_fd << std::endl;
 	if (client.read_request() == -1)
 		return handler.serveErrorPage(client, 400);
 	handler.handleRequest(client);
