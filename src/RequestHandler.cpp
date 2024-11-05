@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/01 01:56:33 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/04 17:36:47 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,25 @@ void		RequestHandler::handlePostRequest(Client& client, const RouteConf& route_c
 	(void)client;
 	(void)route_conf;
 	(void)parsed;
-	// HttpResponse response;
+
+	std::string body = client.getRequest().getBody();
+	// std::cout << RED << "body: " << body << RESET << std::endl;
+
+	size_t pos_name = body.find("name=");
+	size_t pos_message = body.find("message=");
+
+	std::string name = body.substr(pos_name + 5, pos_message - (pos_name + 5) - 1);
+	std::string message = body.substr(pos_message + 8);
+
+	// std::cout << RED << "name: " << name << RESET << std::endl;
+	// std::cout << RED << "message: " << message << RESET << std::endl;
+
+	HttpResponse response;
+	response.setStatus(201);
+	response.setBody("name: " + name + "<br>" + "message: " + message);
+	// response.setBody(body);
+	response.setMimeType(".html");
+	client.send_response(response.buildResponse());
 
 	// DIESE LOGIK MUSS REIN <- filedescriptor koennte ein issue sein. weil CGI schickt selber zurueck und baut keine Nachricht!!
 	// if (!route_conf.cgi_extension.empty() && request.getUri().ends_with(route_conf.cgi_extension))

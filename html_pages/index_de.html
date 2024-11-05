@@ -20,7 +20,7 @@
 
     <!-- Datei-Upload-Formular -->
     <div class="content">
-        <form action="upload.php" method="post" enctype="multipart/form-data">
+        <form action="http://127.0.0.1:8080/" method="post" enctype="multipart/form-data">
             <label>Wählen Sie eine Datei zum Hochladen:</label>
             <input type="file" name="fileToUpload">
             <input type="submit" value="Datei hochladen">
@@ -29,7 +29,8 @@
 
     <!-- Nachricht-Formular -->
     <div class="content">
-        <form action="upload.php" method="post">
+        <!-- <form action="http://127.0.0.1:8080/" method="post"> -->
+        <form action="/" method="post">
             <label for="name">Name:</label>
             <input type="text" id="name" name="name" required>
 
