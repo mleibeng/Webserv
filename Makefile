@@ -6,9 +6,17 @@
 #    By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/20 13:55:42 by mott              #+#    #+#              #
-#    Updated: 2024/11/05 01:03:44 by mleibeng         ###   ########.fr        #
+#    Updated: 2024/11/05 01:37:40 by mleibeng         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
+# Guide to using this Makefile:
+#	Call make dev-start to build the container, start it up and enter it automatically using bash
+#	Call make to create the project
+#	use ./(NAME) to execute the program
+
+#	call make clean/fclean to delete project files or make re to rebuild project files
+#	call make docker-re to stop the container, rebuild and reenter it
 
 # Compiler and flags
 CPP = c++
@@ -61,6 +69,8 @@ fclean: clean
 	@$(RM) $(NAME)
 	@echo -e "$(RED)Removed executable$(RESET)"
 
+re: fclean all
+
 # Docker rules
 docker-build:
 	@echo -e "$(BLUE)Building Docker image...$(RESET)"
@@ -88,18 +98,15 @@ docker-clean: docker-down
 	@docker rmi webserver || true
 	@echo -e "$(GREEN)Docker cleanup complete$(RESET)"
 
+docker-shell:
+	@echo "Entering Docker Container"
+	@docker exec -it WebServer /bin/bash
+
+dev-start: docker-build docker-up docker-shell
+
+docker-re: docker-clean dev-start
+
 # Combined rules
-re: fclean all
-
-docker-start: docker-build docker-up
-
-docker-re: docker-clean docker-start
-
-# Development workflow
-dev-start: docker-start
-	@make all
-	@echo -e "$(GREEN)Development environment ready!$(RESET)"
-	@echo -e "$(YELLOW)You can now run ./$(NAME) inside the container$(RESET)"
 
 .PHONY: all clean fclean re \
 	docker-build docker-up docker-down docker-clean \
