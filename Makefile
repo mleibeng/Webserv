@@ -6,17 +6,27 @@
 #    By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/20 13:55:42 by mott              #+#    #+#              #
-#    Updated: 2024/11/05 01:37:40 by mleibeng         ###   ########.fr        #
+#    Updated: 2024/11/05 02:36:24 by mleibeng         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 # Guide to using this Makefile:
-#	Call make dev-start to build the container, start it up and enter it automatically using bash
-#	Call make to create the project
-#	use ./(NAME) to execute the program
+# 	START UP:
+# 	If Outside Container:
+#		1. Call "make start" 			--> to build, start and enter the container
+#		2. Call "make"/"make all"		--> to create the program
+#		3. Use ./(NAME) 				--> to execute the program
 
-#	call make clean/fclean to delete project files or make re to rebuild project files
-#	call make docker-re to stop the container, rebuild and reenter it
+
+# 	CLEAN UP:
+# 	If Inside Container:
+#		1. call "make clean/fclean" 	--> to delete program files
+# 		2. call "make end" 				--> to leave && clean container + image.
+
+# 	REBUILD
+# 	If Inside Container:
+# 		1. call "make re" 				--> to rebuild the program
+#		2. call "make docker-re" 		--> to exit, stop, clean, rebuild, start & enter the container
 
 # Compiler and flags
 CPP = c++
@@ -71,7 +81,7 @@ fclean: clean
 
 re: fclean all
 
-# Docker rules
+# Docker base rules
 docker-build:
 	@echo -e "$(BLUE)Building Docker image...$(RESET)"
 	@docker build -t webserver .
@@ -98,16 +108,21 @@ docker-clean: docker-down
 	@docker rmi webserver || true
 	@echo -e "$(GREEN)Docker cleanup complete$(RESET)"
 
-docker-shell:
+docker-enter:
 	@echo "Entering Docker Container"
 	@docker exec -it WebServer /bin/bash
 
-dev-start: docker-build docker-up docker-shell
+docker-exit:
+	@exit
 
-docker-re: docker-clean dev-start
+# Docker management commands
+start: docker-build docker-up docker-enter
+
+end: docker-exit docker-clean
+
+docker-re: end start
 
 # Combined rules
-
 .PHONY: all clean fclean re \
 	docker-build docker-up docker-down docker-clean \
-	docker-start docker-re dev-start
+	docker-enter docker-exit start end docker-re
