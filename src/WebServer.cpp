@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/06 00:45:14 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/07 03:43:29 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,36 +50,11 @@ void WebServer::setupListeners()
 			addr.sin_addr.s_addr = INADDR_ANY;
 			addr.sin_port = htons(port);
 
-			// struct addrinfo hints, *res;
-			// memset(&hints, 0, sizeof hints);
-			// hints.ai_family = AF_INET;
-			// hints.ai_socktype = SOCK_STREAM;
-			// hints.ai_flags = AI_PASSIVE;
-
-			// int status = getaddrinfo(server.hostname.c_str(), std::to_string(port).c_str(), &hints, &res);
-			// if (status != 0)
-			// {
-			// 	std::cerr << "getaddrinfo failed: " << gai_strerror(status) << std::endl;
-			// 	close(fd);
-			// 	throw std::runtime_error("Failed to resolve hostname: " + server.hostname);
-			// }
-
 			if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
 			{
 				close(fd);
 				throw std::runtime_error("Failed to bind socket");
 			}
-
- 			// if (bind(fd, res->ai_addr, res->ai_addrlen) < 0)
-			// {
-			// 	std::cerr << "Failed to bind to " << server.hostname << ":" << port
-			// 				<< " - " << strerror(errno) << std::endl;
-			// 	close(fd);
-			// 	// freeaddrinfo(res);
-			// 	throw std::runtime_error("Failed to bind socket");
-			// }
-
-			// freeaddrinfo(res);
 
 			if (listen(fd, SOMAXCONN) < 0)
 			{
@@ -190,7 +165,7 @@ void WebServer::runLoop()
 					}
 				}
 				if (!is_listener)
-					handleClientRequest(fd, *request_handler);
+					handleClientRequest(fd);
 			}
 		}
 	}
@@ -203,7 +178,7 @@ void WebServer::initialize()
 	request_handler = std::make_unique<RequestHandler>(config);
 }
 
-WebServer::ClientInfo::ClientInfo(int fd) : client(std::make_unique<Client>(fd)), last_active(std::time(nullptr))
+WebServer::ClientInfo::ClientInfo(int fd, const Config& config) : client(std::make_unique<Client>(fd, config)), last_active(std::time(nullptr))
 {
 }
 
@@ -228,26 +203,50 @@ void WebServer::cleanInactiveClients()
 /// @brief read request from client and either serve error or process it
 /// @param client_fd client to process
 /// @param handler handler instance for all processes
-void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
+void WebServer::handleClientRequest(int client_fd)
 {
 	auto it = active_clients.find(client_fd);
-	if (it == active_clients.end())
-	{
+	if (it == active_clients.end()) {
 		active_clients.emplace(
 			std::piecewise_construct,
 			std::forward_as_tuple(client_fd),
-			std::forward_as_tuple(client_fd)
+			std::forward_as_tuple(client_fd, config)
 		);
 		it = active_clients.find(client_fd);
 	}
 
 	it->second.last_active = std::time(nullptr);
-
 	Client& client = *it->second.client;
 
-	client.setBuffer(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE)));
-	// std::cout << "request from " << client_fd << std::endl;
-	if (client.read_request() == -1)
-		return handler.serveErrorPage(client, 400);
-	handler.handleRequest(client);
+	// In edge-triggered mode, we need to read until EAGAIN
+	while (true)
+	{
+		ssize_t result = client.read_request();
+		if (result < 0)
+		{
+			if (errno == EAGAIN || errno == EWOULDBLOCK)
+			{
+				// No more data available right now
+				break;
+			}
+			// Real error occurred
+			request_handler->serveErrorPage(client, 400);
+			return;
+		}
+
+		if (result == 0)
+		{
+			// Connection closed by peer
+			active_clients.erase(client_fd);
+			event_loop.removeFd(client_fd);
+			return;
+		}
+
+		// If request is complete, handle it
+		if (client.getRequest().getState() == HttpRequest::State::COMPLETE)
+		{
+			request_handler->handleRequest(client);
+			break;
+		}
+	}
 }

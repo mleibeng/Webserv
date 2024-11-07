@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:26:21 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/07 03:36:48 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,28 +18,7 @@ Handles: I/O operations using kqueue, file descriptors, timers and async actions
 #ifndef LOOP_HPP
 #define LOOP_HPP
 
-#ifdef __APPLE__
-#include <sys/event.h>
-#define EPOLLIN_FLAG EVFILT_READ
-#define EPOLLERR_FLAG EVFILT_EXCEPT
-#define EPOLLHUP_FLAG EVFILT_READ
-#define EPOLLOUT_FLAG EVFILT_WRITE
-#define EPOLLET_FLAG EV_CLEAR
-#else
-#include <sys/epoll.h>
-#define EPOLLIN_FLAG EPOLLIN
-#define EPOLLERR_FLAG EPOLLERR
-#define EPOLLHUP_FLAG EPOLLHUP
-#define EPOLLOUT_FLAG EPOLLOUT
-#define EPOLLET_FLAG EPOLLET
-#endif
-
-#include <vector>
-#include <unordered_map>
-#include <chrono>
-#include <functional>
-#include <sys/types.h>
-#include <unistd.h>
+#include "HeaderIncludes.hpp"
 
 class Loop
 {
@@ -49,6 +28,8 @@ class Loop
 		void addFd(int fd, uint32_t events);
 		void removeFd(int fd);
 		std::vector<std::pair<int, uint32_t>> wait( int timeout = -1);
+		void modifyFd(int fd, uint32_t event);
+		bool hasFd(int fd) const;
 
 	private:
 		int loop_fd;

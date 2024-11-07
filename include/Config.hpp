@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 19:11:48 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 01:16:33 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,7 @@ Handles: configuration of hosts, ports and route structure on server-side.
 #ifndef CONFIG_HPP
 #define CONFIG_HPP
 
-#include <vector>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <unordered_map>
-#include <optional>
-#include <variant>
+#include "HeaderIncludes.hpp"
 
 // we could also implement max_client_header_size for buffering the headersize. NGINX does this as well!
 

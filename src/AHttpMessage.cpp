@@ -108,17 +108,25 @@ const std::map<std::string, std::string>&	AHttpMessage::getAllHeaders() const
 
 /// @brief seperate key value pairs from the inputstream to save them in the ordered header map
 /// @param input
-void	AHttpMessage::parseHeader(std::istringstream& input)
+bool	AHttpMessage::parseHeader(std::istringstream& input)
 {
 	std::string line;
-	while (std::getline(input, line) && !line.empty() && line != "\r") {
+	while (std::getline(input, line) && !line.empty())
+	{
+		if (line == "\r" || line == "\n" || line == "\r\n")
+			break;
+
 		size_t separator = line.find(':');
-		if (separator != std::string::npos) {
+		if (separator != std::string::npos)
+		{
 			std::string key = trimStr(line.substr(0, separator));
 			std::string value = trimStr(line.substr(separator + 1));
 			setHeader(key,value);
 		}
+		else
+			return false;
 	}
+	return true;
 }
 
 //UTILS
