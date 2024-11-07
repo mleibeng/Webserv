@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/06 14:44:12 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/07 17:17:07 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,44 +77,56 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 
 std::string RequestHandler::extractBoundary(const std::string& content_type)
 {
-	size_t pos = content_type.find("boundary=");
-
-	if (pos != std::string::npos) {
-		return content_type.substr(pos + 9);
+	size_t boundary_start = content_type.find("boundary=");
+	if (boundary_start == std::string::npos) {
+		return "";
 	}
-	return "";
+
+	return content_type.substr(boundary_start + 9);
 }
 
 std::string RequestHandler::extractFile(const std::string& body, const std::string& boundary)
 {
-	size_t file_start = body.find(boundary) + boundary.size() + 2;	// +2 == \r\n
-	size_t file_end = body.find(boundary, file_start) - 4;			// -4 == \r\n--
-
-	if (file_start != std::string::npos && file_end != std::string::npos) {
-		return body.substr(file_start, file_end - file_start);
+	size_t file_start = body.find(boundary);
+	if (file_start == std::string::npos) {
+		return "";
 	}
-	return "";
+	file_start += boundary.size() + 2;   // +2 == \r\n
+
+	size_t file_end = body.find(boundary, file_start);
+	if (file_end == std::string::npos) {
+		return "";
+	}
+	file_end -=  4;   // -4 == \r\n--
+
+	return body.substr(file_start, file_end - file_start);
 }
 
 std::string RequestHandler::extractFilename(const std::string& file)
 {
-	size_t filename_start = file.find("filename=\"") + 10;	// +10 == filename="
-	size_t filename_end = file.find("\"", filename_start);
-
-	if (filename_start != std::string::npos && filename_end != std::string::npos) {
-		return file.substr(filename_start, filename_end - filename_start);
+	size_t filename_start = file.find("filename=\"");
+	if (filename_start == std::string::npos) {
+		return "";
 	}
-	return "";
+	filename_start += 10;   // +10 == filename="
+
+	size_t filename_end = file.find("\"", filename_start);
+	if (filename_start == std::string::npos) {
+		return "";
+	}
+
+	return file.substr(filename_start, filename_end - filename_start);
 }
 
 std::string RequestHandler::extractFileData(const std::string& file)
 {
-	size_t content_start = file.find("\r\n\r\n") + 4;	// +4 == \r\n\r\n
-
-	if (content_start != std::string::npos) {
-		return file.substr(content_start);
+	size_t content_start = file.find("\r\n\r\n");
+	if (content_start == std::string::npos) {
+		return "";
 	}
-	return "";
+	content_start += 4;	// +4 == \r\n\r\n
+
+	return file.substr(content_start);
 }
 
 void	RequestHandler::handleFormSubmission(Client& client, const std::string& body)
