@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandlePost.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/05 21:04:56 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/07 06:12:50 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,10 @@
 /// @param client
 /// @param route_conf
 /// @param parsed
-void	RequestHandler::handlePostRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)
+void	RequestHandler::handlePostRequest(Client& client)
 {
+	const RouteConf* route_conf = client.getRoute();
+	const std::string& parsed = client.getBestPath();
 	const std::string& content_type = client.getRequest().getHeader("Content-Type");
 	const std::string& body = client.getRequest().getBody();
 	// std::cout << RED << "Content-Type: " << content_type << RESET << std::endl;
@@ -31,7 +33,7 @@ void	RequestHandler::handlePostRequest(Client& client, const RouteConf& route_co
 	{
 		handleFormSubmission(client, body);
 	}
-	else if (!route_conf.cgi_extension.empty() && getFileExtension(parsed) == route_conf.cgi_extension)
+	else if (!route_conf->cgi_extension.empty() && getFileExtension(parsed) == route_conf->cgi_extension)
 	{
 		handleCGI(client, parsed);
 	}

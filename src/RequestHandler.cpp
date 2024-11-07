@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/06 00:49:50 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/07 06:06:43 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,44 +46,20 @@ void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 /// @param client client including the fd and request. Ultimately receives requests and sends the response.
 void		RequestHandler::handleRequest(Client& client)
 {
-	const ServerConf* server_conf = findServerConf(client.getRequest());
-	if (!server_conf)
-		return serveErrorPage(client, 404);
 
-	const RouteConf* route_conf = findRouteConf(*server_conf, client.getRequest());
-	if (!route_conf)
-		return serveErrorPage(client, 404);
-
-	if (route_conf->redirect.has_value())
-	{
-		if (client.getNumRedirects() >= route_conf->max_redirects)
-		{
-			// std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
-			return serveErrorPage(client, 508);
-		}
-		// std::cout << "num of redirects: "<< client.getNumRedirects() << std::endl;
-		return handleRedirect(*route_conf, client);
-	}
 	const std::string& method = client.getRequest().getMethod();
 
-	if (!isMethodAllowed(*route_conf, method))
-		return serveErrorPage(client, 405);
-
-	std::string parsed = parsePath(*route_conf, client.getRequest());
-
-	// std::cout << "Phy path: " << parsed << std::endl;
-
 	if (method == "GET")
-		handleGetRequest(client, *route_conf, parsed);
+		handleGetRequest(client);
 	else if (method == "POST")
-		handlePostRequest(client, *route_conf, parsed);
+		handlePostRequest(client);
 	else if (method == "DELETE")
-		handleDeleteRequest(client, *route_conf, parsed);
+		handleDeleteRequest(client);
 	else
 		serveErrorPage(client, 501);
 }
 
-void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)
+void		RequestHandler::handleDeleteRequest(Client& client)
 {
 	// std::string file_path = route_conf.root + request.getUri();
 
@@ -101,8 +77,6 @@ void		RequestHandler::handleDeleteRequest(Client& client, const RouteConf& route
 	// 	serveErrorPage(client, 404); // Not
 
 	(void)client;
-	(void)route_conf;
-	(void)parsed;
 	// HttpResponse response;
 	// client.send_response(response.buildResponse());
 }

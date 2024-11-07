@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 05:07:07 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 06:43:13 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,36 +50,11 @@ void WebServer::setupListeners()
 			addr.sin_addr.s_addr = INADDR_ANY;
 			addr.sin_port = htons(port);
 
-			// struct addrinfo hints, *res;
-			// memset(&hints, 0, sizeof hints);
-			// hints.ai_family = AF_INET;
-			// hints.ai_socktype = SOCK_STREAM;
-			// hints.ai_flags = AI_PASSIVE;
-
-			// int status = getaddrinfo(server.hostname.c_str(), std::to_string(port).c_str(), &hints, &res);
-			// if (status != 0)
-			// {
-			// 	std::cerr << "getaddrinfo failed: " << gai_strerror(status) << std::endl;
-			// 	close(fd);
-			// 	throw std::runtime_error("Failed to resolve hostname: " + server.hostname);
-			// }
-
 			if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
 			{
 				close(fd);
 				throw std::runtime_error("Failed to bind socket");
 			}
-
- 			// if (bind(fd, res->ai_addr, res->ai_addrlen) < 0)
-			// {
-			// 	std::cerr << "Failed to bind to " << server.hostname << ":" << port
-			// 				<< " - " << strerror(errno) << std::endl;
-			// 	close(fd);
-			// 	// freeaddrinfo(res);
-			// 	throw std::runtime_error("Failed to bind socket");
-			// }
-
-			// freeaddrinfo(res);
 
 			if (listen(fd, SOMAXCONN) < 0)
 			{
@@ -204,8 +179,7 @@ void WebServer::initialize()
 }
 
 WebServer::ClientInfo::ClientInfo(int fd, const Config& config) : client(std::make_unique<Client>(fd, config)), last_active(std::time(nullptr))
-{
-}
+{}
 
 void WebServer::cleanInactiveClients()
 {
@@ -246,7 +220,28 @@ void WebServer::handleClientRequest(int client_fd)
 	Client& client = *it->second.client;
 
 	// std::cout << "request from " << client_fd << std::endl;
-	if (client.read_request() == -1)
+	if (client.read_request() == -1) // should read in headers
 		return request_handler->serveErrorPage(client, 400);
+
+	// Logik zum finden der korrekten Route nach dem einlesen der header
+	int error = 0;
+	if ((error = client.setCourse()) && error != 0)
+		return request_handler->serveErrorPage(client, error);
+
+	const RouteConf* route = client.getRoute();
+	if (route && route->redirect.has_value())
+	{
+		if (client.getNumRedirects() >= route->max_redirects)
+			return request_handler->serveErrorPage(client, 508);
+
+		request_handler->handleRedirect(*route, client);
+		client.setRoute(nullptr);
+		return;
+	}
+
+	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
+		return request_handler->serveErrorPage(client, 508);
+
+	// logik zum handeln von teilweisen requests...
 	request_handler->handleRequest(client);
 }
