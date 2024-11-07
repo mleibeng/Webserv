@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/07 03:24:03 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 06:45:41 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ class RequestHandler
 		std::string readCGIOutput(int pipe_fd);
 		void writeCGIInput(int pipe_fd, const std::string& body);
 		void buildCGIResponse(const std::string& out, HttpResponse& response);
-		void handleRedirect(const RouteConf& route_conf, Client& client);
 		std::string buildRedirWQuery(const RouteConf& route_conf, const HttpRequest& request);
 
 	public:
@@ -74,16 +73,13 @@ class RequestHandler
 		~RequestHandler();
 
 		void	handleRequest(Client& client);
-		void	handleGetRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
-		void	handlePostRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
-		void	handleDeleteRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
+		void	handleGetRequest(Client& client);
+		void	handlePostRequest(Client& client);
+		void	handleDeleteRequest(Client& client);
+		void	handleRedirect(const RouteConf& route_conf, Client& client);
 
 		bool resolveRouting(Client& client);
 		void processCompleteRequest(Client& client);
-		const ServerConf *findServerConf(const HttpRequest &request);
-		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
-		std::string parsePath(const RouteConf& route_conf, const HttpRequest& request);
-		bool isMethodAllowed(const RouteConf &route_conf, const std::string& method);
 
 		void loadErrorPages();
 		void serveErrorPage(Client& client, int error_code);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleGet.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:31:09 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/07 06:11:25 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,11 @@
 /// @brief Get request handling logic
 /// @param client client including the fd and request. Ultimately receives requests and sends the built responses.
 /// @param route_conf correct route configuration for the request. Hands over available resources, flags and path configurations
-void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)
+void		RequestHandler::handleGetRequest(Client& client)
 {
+	const RouteConf* route_conf = client.getRoute();
+	const std::string& parsed = client.getBestPath();
+
 	std::cout << "phys path: "<< parsed << " query: " << client.getRequest().getQuery() << std::endl;
 
 	// Case 1: Specific file check
@@ -24,7 +27,7 @@ void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_co
 	{
 		std::cout << "option 1 direct resource request" << std::endl;
 		std::string extension = getFileExtension(parsed);
-		if (!extension.empty() && extension == route_conf.cgi_extension)
+		if (!extension.empty() && extension == route_conf->cgi_extension)
 		{
 			std::cout << "option 1 php cgi" << std::endl;
 			handleCGI(client, parsed);
@@ -46,14 +49,14 @@ void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_co
 	{
 		std::cout << "option 2: default file" << std::endl;
 		// Default file check : Either PHP or static
-		if (!route_conf.default_file.empty())
+		if (!route_conf->default_file.empty())
 		{
-			std::string default_path = path_check + route_conf.default_file;
+			std::string default_path = path_check + route_conf->default_file;
 			std::cout << "default path opt 2: " << default_path << std::endl;
 			if (std::filesystem::exists(default_path))
 			{
 				std::string extension = getFileExtension(default_path);
-				if (!route_conf.cgi_extension.empty() && extension == route_conf.cgi_extension)
+				if (!route_conf->cgi_extension.empty() && extension == route_conf->cgi_extension)
 				{
 					std::cout << "option 2 cgi handler called" << std::endl;
 					handleCGI(client, default_path);
@@ -64,7 +67,7 @@ void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_co
 			}
 		}
 		// Directory listing
-		if (route_conf.dir_listing_active)
+		if (route_conf->dir_listing_active)
 		{
 			std::cout << "option 3: Dir_listing" << std::endl;
 			sendDirListing(client, path_check);

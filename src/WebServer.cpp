@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 03:43:29 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 06:48:09 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,8 +179,7 @@ void WebServer::initialize()
 }
 
 WebServer::ClientInfo::ClientInfo(int fd, const Config& config) : client(std::make_unique<Client>(fd, config)), last_active(std::time(nullptr))
-{
-}
+{}
 
 void WebServer::cleanInactiveClients()
 {
@@ -218,35 +217,29 @@ void WebServer::handleClientRequest(int client_fd)
 	it->second.last_active = std::time(nullptr);
 	Client& client = *it->second.client;
 
-	// In edge-triggered mode, we need to read until EAGAIN
-	while (true)
+	// std::cout << "request from " << client_fd << std::endl;
+	if (client.read_request() == -1) // should read in headers
+		return request_handler->serveErrorPage(client, 400);
+
+	// Logik zum finden der korrekten Route nach dem einlesen der header
+	int error = 0;
+	if ((error = client.setCourse()) && error != 0)
+		return request_handler->serveErrorPage(client, error);
+
+	const RouteConf* route = client.getRoute();
+	if (route && route->redirect.has_value())
 	{
-		ssize_t result = client.read_request();
-		if (result < 0)
-		{
-			if (errno == EAGAIN || errno == EWOULDBLOCK)
-			{
-				// No more data available right now
-				break;
-			}
-			// Real error occurred
-			request_handler->serveErrorPage(client, 400);
-			return;
-		}
+		if (client.getNumRedirects() >= route->max_redirects)
+			return request_handler->serveErrorPage(client, 508);
 
-		if (result == 0)
-		{
-			// Connection closed by peer
-			active_clients.erase(client_fd);
-			event_loop.removeFd(client_fd);
-			return;
-		}
-
-		// If request is complete, handle it
-		if (client.getRequest().getState() == HttpRequest::State::COMPLETE)
-		{
-			request_handler->handleRequest(client);
-			break;
-		}
+		request_handler->handleRedirect(*route, client);
+		client.setRoute(nullptr);
+		return;
 	}
+
+	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
+		return request_handler->serveErrorPage(client, 508);
+
+	// logik zum handeln von teilweisen requests...
+	request_handler->handleRequest(client);
 }
