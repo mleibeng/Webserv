@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/05 19:51:04 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 05:07:30 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,8 @@
 // Should to run through REQUEST and RESPONSE Classes
 // -----------------------------------------------------------------------------
 
-Client::Client(int client_fd) : _client_fd(client_fd), redirect_count(0)
-{
-}
+Client::Client(int client_fd, const Config& config) : _client_fd(client_fd), _config(config), _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE))) , redirect_count(0), _keep_alive(true)
+{}
 
 Client::~Client()
 {

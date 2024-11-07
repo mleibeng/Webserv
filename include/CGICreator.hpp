@@ -3,20 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   CGICreator.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 22:52:24 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:23:31 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/07 01:16:36 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CGICREATOR_HPP
 #define CGICREATOR_HPP
 
-#include <vector>
-#include <memory>
-#include <string>
-#include <stdexcept>
+#include "HeaderIncludes.hpp"
 
 //made the handler code more modular
 class CGIHandler

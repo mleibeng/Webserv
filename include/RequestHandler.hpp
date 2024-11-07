@@ -3,30 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 19:32:54 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/07 03:24:03 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REQUESTHANDLER_H
 #define REQUESTHANDLER_H
 
-#include <iostream>
-#include <functional>
-#include <map>
-#include <string>
-#include <exception>
-#include <filesystem>
-#include <fstream>
-#include <sys/wait.h>
+#include "HeaderIncludes.hpp"
 #include "Config.hpp"
 #include "Client.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "CGICreator.hpp"
 
+class Client;
 class RequestHandler
 {
 	private:
@@ -84,6 +78,8 @@ class RequestHandler
 		void	handlePostRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
 		void	handleDeleteRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
 
+		bool resolveRouting(Client& client);
+		void processCompleteRequest(Client& client);
 		const ServerConf *findServerConf(const HttpRequest &request);
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
 		std::string parsePath(const RouteConf& route_conf, const HttpRequest& request);

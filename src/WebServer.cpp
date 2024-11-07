@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/06 00:45:14 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/07 05:07:07 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,7 +190,7 @@ void WebServer::runLoop()
 					}
 				}
 				if (!is_listener)
-					handleClientRequest(fd, *request_handler);
+					handleClientRequest(fd);
 			}
 		}
 	}
@@ -203,7 +203,7 @@ void WebServer::initialize()
 	request_handler = std::make_unique<RequestHandler>(config);
 }
 
-WebServer::ClientInfo::ClientInfo(int fd) : client(std::make_unique<Client>(fd)), last_active(std::time(nullptr))
+WebServer::ClientInfo::ClientInfo(int fd, const Config& config) : client(std::make_unique<Client>(fd, config)), last_active(std::time(nullptr))
 {
 }
 
@@ -228,7 +228,7 @@ void WebServer::cleanInactiveClients()
 /// @brief read request from client and either serve error or process it
 /// @param client_fd client to process
 /// @param handler handler instance for all processes
-void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
+void WebServer::handleClientRequest(int client_fd)
 {
 	auto it = active_clients.find(client_fd);
 	if (it == active_clients.end())
@@ -236,7 +236,7 @@ void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 		active_clients.emplace(
 			std::piecewise_construct,
 			std::forward_as_tuple(client_fd),
-			std::forward_as_tuple(client_fd)
+			std::forward_as_tuple(client_fd, config)
 		);
 		it = active_clients.find(client_fd);
 	}
@@ -245,9 +245,8 @@ void WebServer::handleClientRequest(int client_fd, RequestHandler& handler)
 
 	Client& client = *it->second.client;
 
-	client.setBuffer(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE)));
 	// std::cout << "request from " << client_fd << std::endl;
 	if (client.read_request() == -1)
-		return handler.serveErrorPage(client, 400);
-	handler.handleRequest(client);
+		return request_handler->serveErrorPage(client, 400);
+	request_handler->handleRequest(client);
 }

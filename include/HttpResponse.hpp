@@ -3,20 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 15:25:38 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/07 01:16:29 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HTTPRESPONSE_H
 #define HTTPRESPONSE_H
 
-#include <iostream>
-#include <string>
-#include <map>
-#include <filesystem>
+#include "HeaderIncludes.hpp"
 #include "AHttpMessage.hpp"
 
 /*

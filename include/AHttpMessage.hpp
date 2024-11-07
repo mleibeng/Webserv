@@ -17,11 +17,7 @@
 #define YELLOW	"\033[33m"
 #define	RESET	"\033[0m"
 
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <map>
-#include <vector>
+#include "HeaderIncludes.hpp"
 
 class AHttpMessage
 {
@@ -44,7 +40,7 @@ class AHttpMessage
 		const std::map<std::string, std::string>&	getAllHeaders() const;
 
 		//parse
-		void			parseHeader(std::istringstream& input);
+		bool			parseHeader(std::istringstream& input);
 		virtual bool	parse(const std::string& rawMessage) = 0;
 		static std::string	trimStr(const std::string& str);
 
