@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/07 02:43:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 10:42:19 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,13 +51,12 @@ class HttpRequest : public AHttpMessage
 			R_HEADER,
 			ROUTING,
 			R_BODY,
+			R_MULTIPART,
 			COMPLETE,
 			ERROR
 		};
 
 		HttpRequest();
-		HttpRequest(const HttpRequest &other);
-		HttpRequest& operator=(const HttpRequest &other);
 		~HttpRequest();
 
 		//parse
@@ -68,7 +67,7 @@ class HttpRequest : public AHttpMessage
 		//setters
 		void	setMethod(const std::string& method);
 		void	setQuery(const std::string& uri);
-		void	initUpload(const RouteConf& route);
+		bool	initUpload(const RouteConf& route);
 
 		//getters
 		const std::string&	getMethod() const; //check if ok with &!
@@ -78,7 +77,11 @@ class HttpRequest : public AHttpMessage
 		State getState() const { return _state; }
 		void setState(State state) { _state = state; }
 		const std::string& getUploadPath() const { return _upload_path; }
-		bool Complete() const { return _state == State::COMPLETE; }
+		bool isComplete() const { return _state == State::COMPLETE; }
+		size_t getExpectedLength() const { return _expected_content_len; }
+		size_t getBytesRead() const { return _byte_read; }
+		bool hasHeader(const std::string& header) const;
+
 
 	private:
 		State _state;
@@ -91,6 +94,10 @@ class HttpRequest : public AHttpMessage
 		size_t _expected_content_len;
 		size_t _byte_read;
 		std::string _boundary;
+
+		bool parseRequestLine(const std::string& line);
+		bool parseMultipartBoundary();
+		void handleMultipartChunk(const std::string& chunky);
 };
 
 #endif // HTTPREQUEST_H

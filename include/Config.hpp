@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:42:52 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 01:16:33 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 07:32:17 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ struct RouteConf
 	bool dir_listing_active = false; // turn on or off directory listing
 	std::string default_file; // set default file to answer if the request is a directory
 	std::string cgi_extension; //execute CGI based on certain file extension ex: .php
-	std::string upload_dir; // make the route able to accept uploaded file and configure where they should be saved.
+	std::optional<std::string> upload_dir; // make the route able to accept uploaded file and configure where they should be saved.
 	std::optional<int> max_header_size; // limit client header size
 	std::optional<size_t> max_body_size; //limit client body size
 	std::optional<int> timeout; // set timeout for closing connections

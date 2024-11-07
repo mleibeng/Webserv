@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 06:48:09 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 11:26:40 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,28 +218,39 @@ void WebServer::handleClientRequest(int client_fd)
 	Client& client = *it->second.client;
 
 	// std::cout << "request from " << client_fd << std::endl;
-	if (client.read_request() == -1) // should read in headers
+	ssize_t res = client.read_request();
+
+	if (res == -1) // should read in headers
 		return request_handler->serveErrorPage(client, 400);
 
-	// Logik zum finden der korrekten Route nach dem einlesen der header
-	int error = 0;
-	if ((error = client.setCourse()) && error != 0)
-		return request_handler->serveErrorPage(client, error);
+	if (res == 0)
+		return (void)active_clients.erase(it);
 
-	const RouteConf* route = client.getRoute();
-	if (route && route->redirect.has_value())
+	HttpRequest::State state = client.getRequest().getState();
+
+	if (state == HttpRequest::State::ERROR)
+		return request_handler->serveErrorPage(client, 400);
+
+	if (state == HttpRequest::State::COMPLETE)
 	{
-		if (client.getNumRedirects() >= route->max_redirects)
+		const RouteConf* route = client.getRoute();
+		if (!route)
+			return request_handler->serveErrorPage(client, 404);
+
+		if (route->redirect.has_value())
+		{
+			if (client.getNumRedirects() >= route->max_redirects)
+				return request_handler->serveErrorPage(client, 508);
+
+			request_handler->handleRedirect(*route, client);
+			client.setRoute(nullptr);
+			return;
+		}
+
+		if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
 			return request_handler->serveErrorPage(client, 508);
 
-		request_handler->handleRedirect(*route, client);
-		client.setRoute(nullptr);
-		return;
+		// logik zum handeln von teilweisen requests...
+		request_handler->handleRequest(client);
 	}
-
-	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
-		return request_handler->serveErrorPage(client, 508);
-
-	// logik zum handeln von teilweisen requests...
-	request_handler->handleRequest(client);
 }

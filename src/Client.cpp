@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/07 06:46:35 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 11:26:33 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,13 +72,38 @@ ssize_t Client::read_request()
 	char buffer[_buffersize];
 	std::string request;
 
-	ssize_t nbytes = read(_client_fd, buffer, _buffersize);
+	ssize_t nbytes = recv(_client_fd, buffer, _buffersize, 0);
 
-	if (nbytes < 0)
-	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-			return 0;
+	if (nbytes <= 0)
 		return -1;
+
+	std::string chunky(buffer, nbytes);
+
+	switch (_request.getState())
+	{
+		case HttpRequest::State::R_HEADER:
+			if (!_request.parseHeaderChunk(chunky))
+				return -1;
+			if (_request.getState() == HttpRequest::State::ROUTING)
+			{
+				if (setCourse() != 0)
+					return -1;
+
+				if (_route && _request.hasHeader("Content-Type") && _request.getHeader("Content-Type").find("multipart/form-data") != std::string::npos)
+				{
+					if (!_request.initUpload(*_route))
+						return -1;
+				}
+			}
+		break;
+
+		case HttpRequest::State::R_BODY:
+		case HttpRequest::State::R_MULTIPART:
+			if (!_request.parseBodyChunk(chunky))
+				return -1;
+			break;
+		default:
+			return -1;
 	}
 
 	if (nbytes == 0)
