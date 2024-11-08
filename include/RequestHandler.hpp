@@ -6,27 +6,21 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/06 14:20:19 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/08 18:26:22 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REQUESTHANDLER_H
 #define REQUESTHANDLER_H
 
-#include <iostream>
-#include <functional>
-#include <map>
-#include <string>
-#include <exception>
-#include <filesystem>
-#include <fstream>
-#include <sys/wait.h>
+#include "HeaderIncludes.hpp"
 #include "Config.hpp"
 #include "Client.hpp"
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "CGICreator.hpp"
 
+class Client;
 class RequestHandler
 {
 	private:
@@ -69,7 +63,6 @@ class RequestHandler
 		std::string readCGIOutput(int pipe_fd);
 		void writeCGIInput(int pipe_fd, const std::string& body);
 		void buildCGIResponse(const std::string& out, HttpResponse& response);
-		void handleRedirect(const RouteConf& route_conf, Client& client);
 		std::string buildRedirWQuery(const RouteConf& route_conf, const HttpRequest& request);
 
 	public:
@@ -80,13 +73,13 @@ class RequestHandler
 		~RequestHandler();
 
 		void	handleRequest(Client& client);
-		void	handleGetRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
-		void	handleDeleteRequest(Client& client, const RouteConf& route_conf, const std::string& parsed);
+		void	handleGetRequest(Client& client);
+		void	handlePostRequest(Client& client);
+		void	handleDeleteRequest(Client& client);
+		void	handleRedirect(const RouteConf& route_conf, Client& client);
 
-		const ServerConf *findServerConf(const HttpRequest &request);
-		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
-		std::string parsePath(const RouteConf& route_conf, const HttpRequest& request);
-		bool isMethodAllowed(const RouteConf &route_conf, const std::string& method);
+		bool resolveRouting(Client& client);
+		void processCompleteRequest(Client& client);
 
 		void loadErrorPages();
 		void serveErrorPage(Client& client, int error_code);

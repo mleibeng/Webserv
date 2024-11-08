@@ -6,14 +6,20 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/08 18:07:55 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/08 18:28:14 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
 
-void	RequestHandler::handlePostRequest(Client& client, const RouteConf& route_conf, const std::string& parsed)
+/// @brief
+/// @param client
+/// @param route_conf
+/// @param parsed
+void	RequestHandler::handlePostRequest(Client& client)
 {
+	const RouteConf* route_conf = client.getRoute();
+	const std::string& parsed = client.getBestPath();
 	const std::string& content_type = client.getRequest().getHeader("Content-Type");
 	const std::string& body = client.getRequest().getBody();
 
@@ -29,7 +35,12 @@ void	RequestHandler::handlePostRequest(Client& client, const RouteConf& route_co
 	else if (content_type.find("application/x-www-form-urlencoded") != std::string::npos) {
 		handleFormSubmission(client, body);
 	}
-	else {
+	else if (!route_conf->cgi_extension.empty() && getFileExtension(parsed) == route_conf->cgi_extension)
+	{
+		handleCGI(client, parsed);
+	}
+	else
+	{
 		std::cout << RED << "Content-Type not supported" << RESET << std::endl;
 	}
 }

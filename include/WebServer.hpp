@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 20:13:14 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 05:35:44 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,25 +18,7 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #ifndef WEBSERVER_HPP
 #define WEBSERVER_HPP
 
-#include <unordered_map>
-#include <string>
-#include <vector>
-#include <atomic>
-#include <stdexcept>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <netdb.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <errno.h>
-#include <cstring>
-#include <memory>
+#include "HeaderIncludes.hpp"
 #include "Config.hpp"
 #include "Loop.hpp"
 #include "Client.hpp"
@@ -46,6 +28,7 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 
 class Loop;
 class Client;
+class RequestHandler;
 
 class WebServer
 {
@@ -64,7 +47,7 @@ class WebServer
 			std::unique_ptr<Client> client;
 			std::time_t last_active;
 
-			ClientInfo(int fd);
+			ClientInfo(int fd, const Config& config);
 		};
 
 		std::map<int, ClientInfo> active_clients;
@@ -80,7 +63,8 @@ class WebServer
 		void acceptConnections(int listener_fd);
 		int	 createNonBlockingSocket();
 		void cleanInactiveClients();
-		void handleClientRequest(int client_fd, RequestHandler& handler);
+		void handleClientRequest(int client_fd);
+		void redirectTraffic(Client& client);
 };
 
 #endif
