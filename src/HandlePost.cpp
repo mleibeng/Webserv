@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/08 18:28:14 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/08 18:30:59 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,11 @@ void	RequestHandler::handlePostRequest(Client& client)
 	(void)route_conf;
 	std::string fileextension = getFileExtension(parsed);
 	// if (!route_conf.cgi_extension.empty() && getFileExtension(parsed) == route_conf.cgi_extension) {
-	if (fileextension == ".php") {
+	// if (fileextension == ".php") {
+	// 	handleCGI(client, parsed);
+	// }
+	if (!route_conf->cgi_extension.empty() && getFileExtension(parsed) == route_conf->cgi_extension)
+	{
 		handleCGI(client, parsed);
 	}
 	else if (content_type.find("multipart/form-data") != std::string::npos) {
@@ -34,10 +38,6 @@ void	RequestHandler::handlePostRequest(Client& client)
 	}
 	else if (content_type.find("application/x-www-form-urlencoded") != std::string::npos) {
 		handleFormSubmission(client, body);
-	}
-	else if (!route_conf->cgi_extension.empty() && getFileExtension(parsed) == route_conf->cgi_extension)
-	{
-		handleCGI(client, parsed);
 	}
 	else
 	{
