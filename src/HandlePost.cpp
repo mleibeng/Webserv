@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/07 17:17:07 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/08 18:07:55 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,17 @@ void	RequestHandler::handlePostRequest(Client& client, const RouteConf& route_co
 	const std::string& content_type = client.getRequest().getHeader("Content-Type");
 	const std::string& body = client.getRequest().getBody();
 
-	if (content_type.find("multipart/form-data") != std::string::npos) {
+	(void)route_conf;
+	std::string fileextension = getFileExtension(parsed);
+	// if (!route_conf.cgi_extension.empty() && getFileExtension(parsed) == route_conf.cgi_extension) {
+	if (fileextension == ".php") {
+		handleCGI(client, parsed);
+	}
+	else if (content_type.find("multipart/form-data") != std::string::npos) {
 		handleFileUpload(client, content_type, body);
 	}
 	else if (content_type.find("application/x-www-form-urlencoded") != std::string::npos) {
 		handleFormSubmission(client, body);
-	}
-	else if (!route_conf.cgi_extension.empty() && getFileExtension(parsed) == route_conf.cgi_extension) {
-		handleCGI(client, parsed);
 	}
 	else {
 		std::cout << RED << "Content-Type not supported" << RESET << std::endl;

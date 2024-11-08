@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:31:09 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/08 18:09:28 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@ void		RequestHandler::handleGetRequest(Client& client, const RouteConf& route_co
 	{
 		std::cout << "option 1 direct resource request" << std::endl;
 		std::string extension = getFileExtension(parsed);
-		if (!extension.empty() && extension == route_conf.cgi_extension)
+		// if (!extension.empty() && extension == route_conf.cgi_extension)
+		if (!extension.empty() &&  extension == ".php")
 		{
 			std::cout << "option 1 php cgi" << std::endl;
 			handleCGI(client, parsed);
