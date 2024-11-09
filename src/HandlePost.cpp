@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandlePost.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/07 06:12:50 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/08 18:30:59 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,22 @@ void	RequestHandler::handlePostRequest(Client& client)
 	const std::string& parsed = client.getBestPath();
 	const std::string& content_type = client.getRequest().getHeader("Content-Type");
 	const std::string& body = client.getRequest().getBody();
-	// std::cout << RED << "Content-Type: " << content_type << RESET << std::endl;
-	// std::cout << RED << "Body: " << body << RESET << std::endl;
 
-	if (content_type.find("multipart/form-data") != std::string::npos)
-	{
-		handleFileUpload(client, content_type, body);
-	}
-	else if (content_type.find("application/x-www-form-urlencoded") != std::string::npos)
-	{
-		handleFormSubmission(client, body);
-	}
-	else if (!route_conf->cgi_extension.empty() && getFileExtension(parsed) == route_conf->cgi_extension)
+	(void)route_conf;
+	std::string fileextension = getFileExtension(parsed);
+	// if (!route_conf.cgi_extension.empty() && getFileExtension(parsed) == route_conf.cgi_extension) {
+	// if (fileextension == ".php") {
+	// 	handleCGI(client, parsed);
+	// }
+	if (!route_conf->cgi_extension.empty() && getFileExtension(parsed) == route_conf->cgi_extension)
 	{
 		handleCGI(client, parsed);
+	}
+	else if (content_type.find("multipart/form-data") != std::string::npos) {
+		handleFileUpload(client, content_type, body);
+	}
+	else if (content_type.find("application/x-www-form-urlencoded") != std::string::npos) {
+		handleFormSubmission(client, body);
 	}
 	else
 	{
@@ -45,35 +47,100 @@ void	RequestHandler::handlePostRequest(Client& client)
 
 void	RequestHandler::handleFileUpload(Client& client, const std::string& content_type, const std::string& body)
 {
-	size_t pos_boundary = content_type.find("boundary=");
-	std::string boundary = content_type.substr(pos_boundary + 9);
-	// std::cout << RED << "boundary: " << boundary << RESET << std::endl;
+	std::string boundary = extractBoundary(content_type);
+	if (boundary.empty()) {
+		return serveErrorPage(client, 400); // Boundary not found in content type
+	}
 
-	size_t file_start = body.find(boundary) + boundary.size() + 2 ;	// "\r\n"
-	size_t file_end = body.find(boundary, file_start) - 4;			// "\r\n--"
+	std::string file = extractFile(body, boundary);
+	if (file.empty()) {
+		return serveErrorPage(client, 400); // File not found
+	}
 
-	if (file_start != std::string::npos && file_end != std::string::npos) {
-		size_t content_start = body.find("\r\n\r\n", file_start) + 4;
-		std::string file_data = body.substr(content_start, file_end - content_start);
+	std::string filename = extractFilename(file);
+	if (filename.empty()) {
+		return serveErrorPage(client, 400); // Filename not found
+	}
 
-		std::ofstream file("/workspace/42/projects/5_webserv/html_pages/uploads/uploaded_file", std::ios::binary);
-		if (file) {
-			file.write(file_data.data(), file_data.size());
-			file.close();
+	std::string file_data = extractFileData(file);
+	if (file_data.empty()) {
+		return serveErrorPage(client, 400); // File data not found
+	}
 
-			HttpResponse response;
-			response.setStatus(201);
-			response.setBody("upload successful");
-			response.setMimeType(".html");
-			client.send_response(response.buildResponse());
-		}
-		else {
-			std::cout << RED << "KO 1: " << std::strerror(errno) << RESET << std::endl;
-		}
+	std::filesystem::path upload_dir = std::filesystem::current_path() / "html_pages/uploads";
+	std::filesystem::path file_path = upload_dir / filename;
+	if (std::filesystem::exists(file_path)) {
+		return serveErrorPage(client, 409); // File already exists
+	}
+
+	std::ofstream new_file(file_path, std::ios::binary);
+	if (new_file) {
+		new_file.write(file_data.data(), file_data.size());
+		new_file.close();
+
+		HttpResponse response;
+		response.setStatus(201);
+		response.setBody("upload successful");
+		response.setMimeType(".html");
+		client.send_response(response.buildResponse());
 	}
 	else {
-		std::cout << RED << "KO 2: " << std::strerror(errno) << RESET << std::endl;
+		return serveErrorPage(client, 500); // Internal Server Error if file creation fails
 	}
+}
+
+std::string RequestHandler::extractBoundary(const std::string& content_type)
+{
+	size_t boundary_start = content_type.find("boundary=");
+	if (boundary_start == std::string::npos) {
+		return "";
+	}
+
+	return content_type.substr(boundary_start + 9);
+}
+
+std::string RequestHandler::extractFile(const std::string& body, const std::string& boundary)
+{
+	size_t file_start = body.find(boundary);
+	if (file_start == std::string::npos) {
+		return "";
+	}
+	file_start += boundary.size() + 2;   // +2 == \r\n
+
+	size_t file_end = body.find(boundary, file_start);
+	if (file_end == std::string::npos) {
+		return "";
+	}
+	file_end -=  4;   // -4 == \r\n--
+
+	return body.substr(file_start, file_end - file_start);
+}
+
+std::string RequestHandler::extractFilename(const std::string& file)
+{
+	size_t filename_start = file.find("filename=\"");
+	if (filename_start == std::string::npos) {
+		return "";
+	}
+	filename_start += 10;   // +10 == filename="
+
+	size_t filename_end = file.find("\"", filename_start);
+	if (filename_start == std::string::npos) {
+		return "";
+	}
+
+	return file.substr(filename_start, filename_end - filename_start);
+}
+
+std::string RequestHandler::extractFileData(const std::string& file)
+{
+	size_t content_start = file.find("\r\n\r\n");
+	if (content_start == std::string::npos) {
+		return "";
+	}
+	content_start += 4;	// +4 == \r\n\r\n
+
+	return file.substr(content_start);
 }
 
 void	RequestHandler::handleFormSubmission(Client& client, const std::string& body)
@@ -83,8 +150,6 @@ void	RequestHandler::handleFormSubmission(Client& client, const std::string& bod
 
 	std::string name = body.substr(pos_name + 5, pos_message - (pos_name + 5) - 1);
 	std::string message = body.substr(pos_message + 8);
-	// std::cout << RED << "name: " << name << RESET << std::endl;
-	// std::cout << RED << "message: " << message << RESET << std::endl;
 
 	HttpResponse response;
 	response.setStatus(201);
