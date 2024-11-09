@@ -103,3 +103,15 @@ input[type="submit"] {
 input[type="submit"]:hover {
 	background: #bda489; /* Darker beige on hover */
 }
+
+#fileList li {
+	display: flex;
+	justify-content: center; /* Centers the content horizontally */
+	align-items: center; /* Vertically aligns the content */
+	gap: 10px; /* Adds space between the file name and the delete button */
+  }
+
+  #fileList li span {
+	flex-grow: 1; /* Allows the file name to take up available space */
+	text-align: center; /* Centers the file name */
+  }
