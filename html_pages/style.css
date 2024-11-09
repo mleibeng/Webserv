@@ -1,29 +1,27 @@
-/* Universal box model settings */
 * {
-	margin: 0; /* Remove default margin */
-	padding: 0; /* Remove default padding */
-	box-sizing: border-box; /* Include padding and border in element's total width and height */
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
-/* Body styles */
 body {
 	font-family: system-ui, -apple-system, sans-serif; /* Set font for the body */
 	background: linear-gradient(135deg, #f5e8d4 0%, #e3d8c3 100%); /* Light beige gradient background */
 	min-height: 100vh; /* Full height for body */
 	display: flex; /* Use flexbox for centering */
+	flex-direction: column;
 	align-items: center; /* Center vertically */
 	justify-content: center; /* Center horizontally */
 	padding: 2rem; /* Padding around the body */
+	gap: 1rem; /
 }
 
-/* Language switcher positioning */
 .switch-lang {
-	position: absolute; /* Position in the top right corner */
-	top: 10px; /* 10 pixels from the top */
-	right: 10px; /* 10 pixels from the right */
+	position: absolute;
+	top: 15px;
+	right: 15px;
 }
 
-/* Main content box styles */
 .content {
 	background: #fffaf3; /* Light beige background for the content box */
 	padding: 2rem; /* Padding inside the content box */
@@ -34,13 +32,11 @@ body {
 	text-align: center; /* Center text inside the content box */
 }
 
-/* Contributors text styling */
 .contributors {
-	font-weight: normal; /* Regular weight for contributors' names */
-	margin-top: 10px; /* Space above the contributors' section */
+	font-weight: normal;
+	margin-top: 10px;
 }
 
-/* Flexbox for link buttons */
 .links {
 	display: flex; /* Use flexbox for layout */
 	flex-direction: column; /* Stack links vertically */
@@ -48,13 +44,6 @@ body {
 	margin-top: 20px; /* Space above the links section */
 }
 
-/* Return button section */
-.return-button {
-	margin-top: 1rem; /* Space above the return button */
-	align-items: center; /* Center align return button */
-}
-
-/* Button styling */
 .button {
 	margin: 5px 0; /* Space between buttons */
 	padding: 10px 15px; /* Padding inside the button */
@@ -65,12 +54,10 @@ body {
 	transition: background 0.3s; /* Smooth background change on hover */
 }
 
-/* Button hover effect */
 .button:hover {
 	background-color: #bda489; /* Darker beige on hover */
 }
 
-/* Label styling */
 label {
 	display: block; /* Block display for labels */
 	font-size: 1rem; /* Font size for labels */
@@ -78,7 +65,6 @@ label {
 	margin-bottom: 0.5rem; /* Space below each label */
 }
 
-/* Input and textarea styling */
 input[type="text"],
 textarea {
 	width: 100%; /* Full width for inputs */
@@ -90,7 +76,17 @@ textarea {
 	background-color: #faf3e7; /* Light beige background for inputs */
 }
 
-/* Submit button styling */
+input[type="number"],
+textarea {
+	width: 100%; /* Full width for inputs */
+	padding: 0.5rem; /* Padding inside inputs */
+	margin-bottom: 1rem; /* Space below each input */
+	border: 1px solid #d1bfa3; /* Soft beige border */
+	border-radius: 6px; /* Rounded corners */
+	font-size: 1rem; /* Font size for inputs */
+	background-color: #faf3e7; /* Light beige background for inputs */
+}
+
 input[type="submit"] {
 	display: inline-block; /* Inline block display */
 	width: 100%; /* Full width for submit button */
@@ -104,7 +100,6 @@ input[type="submit"] {
 	transition: background 0.2s; /* Smooth background change on hover */
 }
 
-/* Submit button hover effect */
 input[type="submit"]:hover {
 	background: #bda489; /* Darker beige on hover */
 }

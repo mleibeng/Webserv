@@ -31,7 +31,9 @@
 *.out
 *.app
 
+.DS_Store
 .vscode
 build
 webserv
 docker-compose.yml
+html_pages/uploads/*

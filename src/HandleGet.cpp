@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleGet.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 06:11:25 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/08 18:26:48 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void		RequestHandler::handleGetRequest(Client& client)
 	{
 		std::cout << "option 1 direct resource request" << std::endl;
 		std::string extension = getFileExtension(parsed);
-		if (!extension.empty() && extension == route_conf->cgi_extension)
+		if (!extension.empty() &&  extension == ".php")
 		{
 			std::cout << "option 1 php cgi" << std::endl;
 			handleCGI(client, parsed);

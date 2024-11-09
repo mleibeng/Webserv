@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>CGI Test</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<div class="switch-lang">
+		<a href="cgi_en.html" class="button">Wechseln zur englischen Version</a>
+	</div>
+
+	<div class="content">
+		<form action="/cgi-bin/php_script.php" method="get">
+			<label for="number1">Zahl 1:</label>
+			<input type="number" id="number1" name="number1" required>
+
+			<label for="number2">Zahl 2:</label>
+			<input type="number" id="number2" name="number2" required>
+
+			<input type="submit" value="Senden GET Request">
+		</form>
+	</div>
+
+	<div class="content">
+		<form action="/cgi-bin/php_script.php" method="post">
+			<label for="number1">Zahl 1:</label>
+			<input type="number" id="number1" name="number1" required>
+
+			<label for="number2">Zahl 2:</label>
+			<input type="number" id="number2" name="number2" required>
+
+			<input type="submit" value="Senden POST Request">
+		</form>
+	</div>
+
+	<div class="content">
+		<div class="links">
+			<a href="index_de.html" class="button">Zurück zur Startseite</a>
+		</div>
+	</div>
+</body>
+
+</html>
+
