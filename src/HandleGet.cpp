@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/10 03:01:23 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/10 04:05:03 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 void RequestHandler::sendFile(Client& client, const std::string& file_path)
 {
 	HttpResponse response;
+	const HttpRequest& request = client.getRequest();
 
 	std::ifstream file(file_path, std::ios::binary);
 	if (!file.is_open())
@@ -107,7 +108,17 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	fileBuf << file.rdbuf();
 	file.close();
 
+	//Cookie tryout
+	int visit_count = 1;
+
+	std::string visit_counter = request.getCookie("visit_count");
+	if (!visit_counter.empty())
+		visit_count = std::stoi(visit_counter) + 1;
+
 	response.setStatus(200);
+	response.setCookie("visit_count", std::to_string(visit_count));
+	std::time_t now = std::time(nullptr);
+	response.setCookie("lastVisit", std::ctime(&now));
 	response.setBody(fileBuf.str());
 	response.setMimeType(getFileExtension(file_path));
 	client.send_response(response.buildResponse());
