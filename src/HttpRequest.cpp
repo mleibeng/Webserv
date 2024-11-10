@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 15:31:22 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/10 03:24:35 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,5 +96,7 @@ bool	HttpRequest::parse(const std::string& rawmsg)
 
 	std::string body((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
 	setBody(trimStr(body));
+
+	parseCookies();
 	return (true);
 }

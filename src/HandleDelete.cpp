@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleDelete.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 17:57:22 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/08 18:24:44 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/11/10 02:58:26 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,12 @@ void	RequestHandler::handleDeleteRequest(Client& client)
 	const HttpRequest&	request = client.getRequest();
 	const RouteConf*	route_conf = client.getRoute();
 
+	//eigentlich schon pre checked
 	if (!client.isMethodAllowed(*route_conf, "DELETE"))
 		return (serveErrorPage(client, 405));
 
+	//probier hier anstatt file_path mal die getBestPath function aus, sollte klappen
+	// std::string _filepath = client.getBestPath();
 	std::string			uri_path = request.getUri();
 	std::string			filename = uri_path.substr(uri_path.find_last_of('/') + 1);
 	std::filesystem::path	upload_dir = std::filesystem::current_path() / "html_pages/uploads";

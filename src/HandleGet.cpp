@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleGet.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/08 18:26:48 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/10 03:01:23 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,64 +20,35 @@ void		RequestHandler::handleGetRequest(Client& client)
 	const RouteConf* route_conf = client.getRoute();
 	const std::string& parsed = client.getBestPath();
 
-	std::cout << "phys path: "<< parsed << " query: " << client.getRequest().getQuery() << std::endl;
-
 	// Case 1: Specific file check
 	if (std::filesystem::exists(parsed) && !std::filesystem::is_directory(parsed))
 	{
-		std::cout << "option 1 direct resource request" << std::endl;
 		std::string extension = getFileExtension(parsed);
-		if (!extension.empty() &&  extension == ".php")
-		{
-			std::cout << "option 1 php cgi" << std::endl;
-			handleCGI(client, parsed);
-			return;
-		}
-		std::cout << "option 1 static file" << std::endl;
-		sendFile(client, parsed);
-		return;
+		if (!extension.empty() && (extension == ".php" || extension == ".py"))
+			return handleCGI(client, parsed);
+		return sendFile(client, parsed);
 	}
 
 	// Case 2 Directory handling
-	std::string path_check = parsed;
-
-	// probably unecessary now since being utilizied in parsed already.
-	// if (path_check.back() != '/')
-	// 	path_check += '/';
-
-	if (std::filesystem::is_directory(path_check))
+	if (std::filesystem::is_directory(parsed))
 	{
-		std::cout << "option 2: default file" << std::endl;
 		// Default file check : Either PHP or static
 		if (!route_conf->default_file.empty())
 		{
-			std::string default_path = path_check + route_conf->default_file;
-			std::cout << "default path opt 2: " << default_path << std::endl;
+			std::string default_path = parsed + route_conf->default_file;
 			if (std::filesystem::exists(default_path))
 			{
 				std::string extension = getFileExtension(default_path);
 				if (!route_conf->cgi_extension.empty() && extension == route_conf->cgi_extension)
-				{
-					std::cout << "option 2 cgi handler called" << std::endl;
-					handleCGI(client, default_path);
-					return;
-				}
-				sendFile(client, default_path);
-				return;
+					return handleCGI(client, default_path);
+				return sendFile(client, default_path);
 			}
 		}
 		// Directory listing
 		if (route_conf->dir_listing_active)
-		{
-			std::cout << "option 3: Dir_listing" << std::endl;
-			sendDirListing(client, path_check);
-			return;
-		}
-		serveErrorPage(client, 403);
-		return;
+			return sendDirListing(client, parsed);
+		return serveErrorPage(client, 403);
 	}
-	std::cout << "option 4: Not found" << std::endl;
-	// Case not foundq
 	serveErrorPage(client, 404);
 }
 

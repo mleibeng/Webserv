@@ -63,10 +63,10 @@ void	AHttpMessage::setHeader(const std::string& key, const std::string& val)
 
 /// @brief set all message headers as key[value] pairs
 /// @param headers
-void AHttpMessage::setAllHeaders(const std::map<std::string, std::string>& headers)
+void AHttpMessage::setAllHeaders(const std::unordered_map<std::string, std::string>& headers)
 {
 	_header.clear();
-	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
+	for (std::unordered_map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
 	{
 		_header[it->first] = it->second;
 	}
@@ -99,7 +99,7 @@ std::string		AHttpMessage::getHeader(const std::string& key) const
 
 /// @brief get the complete key[value] map not the individual values
 /// @return return an ordered map
-const std::map<std::string, std::string>&	AHttpMessage::getAllHeaders() const
+const std::unordered_map<std::string, std::string>&	AHttpMessage::getAllHeaders() const
 {
 	return (_header);
 }
@@ -120,6 +120,51 @@ bool	AHttpMessage::parseHeader(std::istringstream& input)
 		}
 	}
 	return true;
+}
+
+std::string AHttpMessage::getCookie(const std::string& key) const
+{
+	auto it = _cookies.find(key);
+	return (it != _cookies.end()) ? it->second : "";
+}
+
+const std::unordered_map<std::string, std::string>& AHttpMessage::getAllCookies() const
+{
+	return _cookies;
+}
+
+bool AHttpMessage::hasCookie(const std::string& key) const
+{
+	return _cookies.find(key) != _cookies.end();
+}
+
+void AHttpMessage::parseCookiePair(const std::string &pair)
+{
+	size_t separator = pair.find('=');
+	if (separator != std::string::npos)
+	{
+		std::string key = trimStr(pair.substr(0, separator));
+		std::string value = trimStr(pair.substr(separator + 1));
+		_cookies[key] = value;
+	}
+}
+
+void AHttpMessage::parseCookies()
+{
+	auto it = _header.find("Cookie");
+	if (it == _header.end())
+		return;
+
+	const std::string& cookieHeader = it->second;
+	size_t start = 0;
+	size_t end = 0;
+	while ((end = cookieHeader.find(';', start)) != std::string::npos)
+	{
+		parseCookiePair(cookieHeader.substr(start, end - start));
+		start = end + 1;
+	}
+	if (start < cookieHeader.length())
+		parseCookiePair(cookieHeader.substr(start));
 }
 
 //UTILS

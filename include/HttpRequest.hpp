@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/07 02:43:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/10 03:24:22 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,10 @@ class HttpRequest : public AHttpMessage
 
 		//parse
 		bool	parse(const std::string& rawmsg) override;
-		bool	parseHeaderChunk(const std::string& chunky);
-		bool	parseBodyChunk(const std::string& chunky);
 
 		//setters
 		void	setMethod(const std::string& method);
 		void	setQuery(const std::string& uri);
-		void	initUpload(const RouteConf& route);
 
 		//getters
 		const std::string&	getMethod() const; //check if ok with &!
@@ -79,6 +76,7 @@ class HttpRequest : public AHttpMessage
 		void setState(State state) { _state = state; }
 		const std::string& getUploadPath() const { return _upload_path; }
 		bool Complete() const { return _state == State::COMPLETE; }
+
 
 	private:
 		State _state;
