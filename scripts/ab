@@ -1,0 +1,17 @@
+ab - https://httpd.apache.org/docs/2.4/programs/ab.html
+
+-c concurrency
+-H custom-header
+-n requests
+-p POST-file
+-T content-type
+
+1. GET-Request
+	ab http://localhost:8080
+	ab -n 100 -c 10 http://localhost:8080/
+	ab -H "User-Agent: webwerv-tester" http://localhost:8080/
+
+2. POST-Methodeh
+	ab -p post_data.txt -T "application/x-www-form-urlencoded" http://localhost:8080/uploads
+	ab -H "User-Agent: webwerv-tester" -p post_data.txt -T "application/x-www-form-urlencoded" http://localhost:8080/uploads
+	post_data.txt: name=42&message=Hello

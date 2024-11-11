@@ -1,0 +1,35 @@
+curl - https://curl.se/docs/manpage.html
+
+-A, --user-agent <name>
+-F, --form <name=content>
+-H, --header <header/@file>
+-X, --request <method>
+-b, --cookie <data|filename>
+-d, --data <data>
+	content-type application/x-www-form-urlencoded
+-v, --verbose
+--resolve <[+]host:port:addr[,addr]...>
+	<domain>:<port>:<ip-address>
+
+1. GET-Request
+	curl -X GET http://localhost:8080
+	curl -X GET http://127.0.0.1:8080
+	curl -X GET -v http://127.0.0.1:8080
+	curl -X GET -v -A "webserv-tester" http://127.0.0.1:8080
+	curl -X GET -H "User-Agent: curl-test" -H "Accept: application/json" http://localhost:8080
+	curl -X GET "http://localhost:8080/index_de.html?name=42&message=Hello"
+	curl -X GET -v -b "sessionid=42" http://localhost:8080
+	curl --resolve example.com:8080:127.0.0.1 http://example.com:8080
+
+2. POST-Methode
+	curl -X POST -d "name=42&message=Hello" http://localhost:8080
+	curl -X POST -F "file=@/Users/mott/Desktop/42_logo.png" http://localhost:8080/uploads
+	curl -X POST -H "Expect:" -F "file=@/Users/mott/Desktop/42_logo.png" http://localhost:8080/uploads
+	curl -X POST -F "file=@/Users/mott/Desktop/42_logo.png;filename=43_logo.png" http://localhost:8080/uploads
+
+3. DELETE-Methode
+	curl -X DELETE http://localhost:8080/uploads/delete.me
+
+4. CGI
+	curl -X GET "http://127.0.0.1:8080/cgi-bin/php_script.php?name=42&message=Hello"
+	curl -X POST -d "name=42&message=Hello" http://127.0.0.1:8080/cgi-bin/php_script.php
