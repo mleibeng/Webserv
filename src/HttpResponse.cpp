@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 15:31:49 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/11 20:10:49 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ std::string		HttpResponse::getMimeType(const std::string extension)
 		{".mp3", "audio/mpeg"},
 		{".mp4", "video/mp4"},
 		{".php", "application/x-httpd-php"}
+		// application/octet-stream ->download files
 	};
 	auto	iter = mimeTypes.find(extension);
 	if (iter == mimeTypes.end())

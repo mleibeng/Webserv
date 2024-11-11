@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 06:43:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/11 19:16:02 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,7 +240,7 @@ void WebServer::handleClientRequest(int client_fd)
 	}
 
 	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
-		return request_handler->serveErrorPage(client, 508);
+		return request_handler->serveErrorPage(client, 405);
 
 	// logik zum handeln von teilweisen requests...
 	request_handler->handleRequest(client);

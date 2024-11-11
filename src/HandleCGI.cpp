@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleCGI.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/04 19:02:55 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/11 20:25:10 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,8 @@ void RequestHandler::handleCGIChild(PipeDescriptors& pipes, const std::string& c
 	// python specific below
 	auto extra_args = handler.getArgList();
 	args_str.insert(args_str.begin() + 1, extra_args.begin(), extra_args.end());
+
+	// if/else GET POST
 
 	std::vector<char*> argv;
 	for (const auto& arg : args_str)
