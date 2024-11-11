@@ -33,3 +33,12 @@ curl - https://curl.se/docs/manpage.html
 4. CGI
 	curl -X GET "http://127.0.0.1:8080/cgi-bin/php_script.php?name=42&message=Hello"
 	curl -X POST -d "name=42&message=Hello" http://127.0.0.1:8080/cgi-bin/php_script.php
+
+
+
+curl -X GET -v http://127.0.0.1:8080/
+curl -X GET -v http://127.0.0.1:8081/
+curl -X GET -v http://localhost:8080/
+curl -X GET -v http://localhost:8081/
+curl -X GET -v --resolve www.42webserv.de:8080:127.0.0.1 http://www.42webserv.de:8080
+curl -X GET -v --resolve www.43webserv.de:8081:127.0.0.1 http://www.43webserv.de:8081
