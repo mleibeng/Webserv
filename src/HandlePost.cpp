@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandlePost.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/08 18:30:59 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/12 02:00:22 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ void	RequestHandler::handlePostRequest(Client& client)
 	const std::string& content_type = client.getRequest().getHeader("Content-Type");
 	const std::string& body = client.getRequest().getBody();
 
-	(void)route_conf;
 	std::string fileextension = getFileExtension(parsed);
 	// if (!route_conf.cgi_extension.empty() && getFileExtension(parsed) == route_conf.cgi_extension) {
 	// if (fileextension == ".php") {
@@ -80,6 +79,8 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 
 		HttpResponse response;
 		response.setStatus(201);
+		std::time_t now = std::time(nullptr);
+		response.setCookie("lastPostRequest", std::ctime(&now));
 		response.setBody("upload successful");
 		response.setMimeType(".html");
 		client.send_response(response.buildResponse());
@@ -143,6 +144,8 @@ std::string RequestHandler::extractFileData(const std::string& file)
 	return file.substr(content_start);
 }
 
+
+
 void	RequestHandler::handleFormSubmission(Client& client, const std::string& body)
 {
 	size_t pos_name = body.find("name=");
@@ -153,6 +156,8 @@ void	RequestHandler::handleFormSubmission(Client& client, const std::string& bod
 
 	HttpResponse response;
 	response.setStatus(201);
+	std::time_t now = std::time(nullptr);
+	response.setCookie("lastPostRequest", std::ctime(&now));
 	response.setBody("name: " + name + "<br>" + "message: " + message);
 	response.setMimeType(".html");
 	client.send_response(response.buildResponse());
