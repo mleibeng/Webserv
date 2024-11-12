@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleGet.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/12 02:17:07 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/12 19:26:25 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,10 +113,10 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	std::string visit_counter = request.getCookie("visit_count");
 	if (visit_counter.empty())
 		visit_count = 1;
-	else 
+	else
 	{
 		visit_count = std::stoi(visit_counter);
-		if (getFileExtension(file_path) != ".html")
+		if (getFileExtension(file_path) == ".html")
 			visit_count++;
 	}
 	response.setStatus(200);
