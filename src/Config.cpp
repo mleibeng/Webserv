@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 11:02:47 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/05 15:14:46 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -296,7 +296,7 @@ void Config::print() const
 			std::cout << "    Directory Listing: " << (route.dir_listing_active ? "On" : "Off") << "\n";
 			std::cout << "    Default File: " << route.default_file << "\n";
 			std::cout << "    CGI Extension: " << route.cgi_extension << "\n";
-			std::cout << "    Upload Directory: " << *route.upload_dir << "\n";
+			std::cout << "    Upload Directory: " << route.upload_dir << "\n";
 			std::cout << "    Max Header Size: " << *route.max_header_size << "\n";
 			std::cout << "    Max Body Size: " << *route.max_body_size << "\n";
 			std::cout << "    Timeout: " << *route.timeout << "\n";

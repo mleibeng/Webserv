@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/07 11:26:33 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 06:43:26 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,103 +32,33 @@ void Client::setBuffer(size_t buffersize)
 	_buffersize = buffersize;
 }
 
-ssize_t Client::processChunk(const std::string& chunky)
-{
-	try
-	{
-		switch (_request.getState())
-		{
-			case HttpRequest::State::R_HEADER:
-				if(!_request.parseHeaderChunk(chunky))
-					return -1;
-				break;
-			case HttpRequest::State::R_BODY:
-				if (!_route)
-				{
-					_request.setState(HttpRequest::State::ERROR);
-					return -1;
-				}
-				if (!_request.parseBodyChunk(chunky))
-					return -1;
-				break;
-			case HttpRequest::State::COMPLETE:
-			case HttpRequest::State::ROUTING:
-			case HttpRequest::State::ERROR:
-				return 0;
-		}
-		return chunky.size();
-	}
-	catch (const std::exception& e)
-	{
-		_request.setState(HttpRequest::State::ERROR);
-		return -1;
-	}
-}
-
 /// @brief reads in the clientside data sent from the webbrowser
 /// @return returns length of request or -1 in case of error
 ssize_t Client::read_request()
 {
-	char buffer[_buffersize];
+	ssize_t nbytes;
+	char buffer[_buffersize + 1];
 	std::string request;
 
-	ssize_t nbytes = recv(_client_fd, buffer, _buffersize, 0);
+	// do {
+		nbytes = read(_client_fd, buffer, sizeof(buffer));
+	// } while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK));
 
-	if (nbytes <= 0)
+	if (nbytes == -1)
+		std::cerr << RED << "read(): " << strerror(errno) << DEFAULT << std::endl;
+	else if (nbytes == 0)
+		close(_client_fd);
+	else if (nbytes == static_cast<ssize_t>(_buffersize + 1))
 		return -1;
-
-	std::string chunky(buffer, nbytes);
-
-	switch (_request.getState())
+	else
 	{
-		case HttpRequest::State::R_HEADER:
-			if (!_request.parseHeaderChunk(chunky))
-				return -1;
-			if (_request.getState() == HttpRequest::State::ROUTING)
-			{
-				if (setCourse() != 0)
-					return -1;
-
-				if (_route && _request.hasHeader("Content-Type") && _request.getHeader("Content-Type").find("multipart/form-data") != std::string::npos)
-				{
-					if (!_request.initUpload(*_route))
-						return -1;
-				}
-			}
-		break;
-
-		case HttpRequest::State::R_BODY:
-		case HttpRequest::State::R_MULTIPART:
-			if (!_request.parseBodyChunk(chunky))
-				return -1;
-			break;
-		default:
+		request.assign(buffer, nbytes);
+		std::cout << YELLOW << request << DEFAULT << std::endl;
+		bool ok = _request.parse(request);
+		if (!ok)
 			return -1;
 	}
-
-	if (nbytes == 0)
-	return 0;
-
-	return processChunk(std::string(buffer, nbytes));
-}
-
-bool Client::isFileUpload() const
-{
-	const std::string& content_type = _request.getHeader("Content-Type");
-	return content_type.find("multipart/form-data") != std::string::npos;
-}
-
-bool Client::needsRouteResolution() const
-{
-	return _request.getState() == HttpRequest::State::ROUTING;
-}
-
-void Client::setRoute(const RouteConf* route)
-{
-	_route = route;
-	if (isFileUpload())
-		_request.initUpload(*route);
-	_request.setState(HttpRequest::State::R_BODY);
+	return nbytes;
 }
 
 int Client::getNumRedirects() const

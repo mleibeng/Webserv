@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 11:26:40 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/07 06:43:13 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,8 @@ void WebServer::cleanInactiveClients()
 void WebServer::handleClientRequest(int client_fd)
 {
 	auto it = active_clients.find(client_fd);
-	if (it == active_clients.end()) {
+	if (it == active_clients.end())
+	{
 		active_clients.emplace(
 			std::piecewise_construct,
 			std::forward_as_tuple(client_fd),
@@ -215,42 +216,32 @@ void WebServer::handleClientRequest(int client_fd)
 	}
 
 	it->second.last_active = std::time(nullptr);
+
 	Client& client = *it->second.client;
 
 	// std::cout << "request from " << client_fd << std::endl;
-	ssize_t res = client.read_request();
-
-	if (res == -1) // should read in headers
+	if (client.read_request() == -1) // should read in headers
 		return request_handler->serveErrorPage(client, 400);
 
-	if (res == 0)
-		return (void)active_clients.erase(it);
+	// Logik zum finden der korrekten Route nach dem einlesen der header
+	int error = 0;
+	if ((error = client.setCourse()) && error != 0)
+		return request_handler->serveErrorPage(client, error);
 
-	HttpRequest::State state = client.getRequest().getState();
-
-	if (state == HttpRequest::State::ERROR)
-		return request_handler->serveErrorPage(client, 400);
-
-	if (state == HttpRequest::State::COMPLETE)
+	const RouteConf* route = client.getRoute();
+	if (route && route->redirect.has_value())
 	{
-		const RouteConf* route = client.getRoute();
-		if (!route)
-			return request_handler->serveErrorPage(client, 404);
-
-		if (route->redirect.has_value())
-		{
-			if (client.getNumRedirects() >= route->max_redirects)
-				return request_handler->serveErrorPage(client, 508);
-
-			request_handler->handleRedirect(*route, client);
-			client.setRoute(nullptr);
-			return;
-		}
-
-		if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
+		if (client.getNumRedirects() >= route->max_redirects)
 			return request_handler->serveErrorPage(client, 508);
 
-		// logik zum handeln von teilweisen requests...
-		request_handler->handleRequest(client);
+		request_handler->handleRedirect(*route, client);
+		client.setRoute(nullptr);
+		return;
 	}
+
+	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
+		return request_handler->serveErrorPage(client, 508);
+
+	// logik zum handeln von teilweisen requests...
+	request_handler->handleRequest(client);
 }

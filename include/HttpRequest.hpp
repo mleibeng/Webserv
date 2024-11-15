@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:33 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/15 02:48:26 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/10 03:24:22 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,13 @@ class HttpRequest : public AHttpMessage
 			R_HEADER,
 			ROUTING,
 			R_BODY,
-			R_MULTIPART,
 			COMPLETE,
 			ERROR
 		};
 
 		HttpRequest();
+		HttpRequest(const HttpRequest &other);
+		HttpRequest& operator=(const HttpRequest &other);
 		~HttpRequest();
 
 		//parse
@@ -74,12 +75,7 @@ class HttpRequest : public AHttpMessage
 		State getState() const { return _state; }
 		void setState(State state) { _state = state; }
 		const std::string& getUploadPath() const { return _upload_path; }
-		bool isComplete() const { return _state == State::COMPLETE; }
-		size_t getExpectedLength() const { return _expected_content_len; }
-		size_t getBytesRead() const { return _byte_read; }
-		bool hasHeader(const std::string& header) const;
-
-
+		bool Complete() const { return _state == State::COMPLETE; }
 
 
 	private:
@@ -93,10 +89,6 @@ class HttpRequest : public AHttpMessage
 		size_t _expected_content_len;
 		size_t _byte_read;
 		std::string _boundary;
-
-		bool parseRequestLine(const std::string& line);
-		bool parseMultipartBoundary();
-		void handleMultipartChunk(const std::string& chunky);
 };
 
 #endif // HTTPREQUEST_H

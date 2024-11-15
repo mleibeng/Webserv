@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/15 02:48:52 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/09 20:35:52 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,16 @@ void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 
 	std::string redirect = buildRedirWQuery(route_conf, client.getRequest());
 
-	response.setStatus(route_conf.redirect_code.value_or(302));
+	response.setStatus(*route_conf.redirect_code);
 	response.setHeader("Location", redirect);
 	response.setBody("Redirecting to " + redirect);
 	client.send_response(response.buildResponse());
 }
 
-bool RequestHandler::resolveRouting(Client& client)
+/// @brief Entrypoint and management function for sorting Requests.
+///		   Finds the most appropriate route and delegates the response to the specific type of request handler.
+/// @param client client including the fd and request. Ultimately receives requests and sends the response.
+void		RequestHandler::handleRequest(Client& client)
 {
 
 	const std::string& method = client.getRequest().getMethod();
