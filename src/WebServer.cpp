@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 06:43:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/15 03:03:13 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,11 +171,17 @@ void WebServer::runLoop()
 	}
 }
 
+RequestHandler& WebServer::getNextHandler()
+{
+	return *handler_pool[current_handler++ % handler_pool.size()];
+}
+
 /// @brief initializes epoll_fd and sets up the listening socket fds. Also loads the error pages into the WebServer class
-void WebServer::initialize()
+void WebServer::initialize(size_t pool)
 {
 	setupListeners();
-	request_handler = std::make_unique<RequestHandler>(config);
+	for (size_t i = 0; i < pool; ++i)
+		handler_pool.push_back(std::make_unique<RequestHandler>(config));
 }
 
 WebServer::ClientInfo::ClientInfo(int fd, const Config& config) : client(std::make_unique<Client>(fd, config)), last_active(std::time(nullptr))
@@ -221,27 +227,27 @@ void WebServer::handleClientRequest(int client_fd)
 
 	// std::cout << "request from " << client_fd << std::endl;
 	if (client.read_request() == -1) // should read in headers
-		return request_handler->serveErrorPage(client, 400);
+		return getNextHandler().serveErrorPage(client, 400);
 
 	// Logik zum finden der korrekten Route nach dem einlesen der header
 	int error = 0;
 	if ((error = client.setCourse()) && error != 0)
-		return request_handler->serveErrorPage(client, error);
+		return getNextHandler().serveErrorPage(client, error);
 
 	const RouteConf* route = client.getRoute();
 	if (route && route->redirect.has_value())
 	{
 		if (client.getNumRedirects() >= route->max_redirects)
-			return request_handler->serveErrorPage(client, 508);
+			return getNextHandler().serveErrorPage(client, 508);
 
-		request_handler->handleRedirect(*route, client);
+		getNextHandler().handleRedirect(*route, client);
 		client.setRoute(nullptr);
 		return;
 	}
 
 	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
-		return request_handler->serveErrorPage(client, 508);
+		return getNextHandler().serveErrorPage(client, 508);
 
 	// logik zum handeln von teilweisen requests...
-	request_handler->handleRequest(client);
+	getNextHandler().handleRequest(client);
 }

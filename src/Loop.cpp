@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/06 00:40:53 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/15 03:50:04 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ void Loop::addFd(int fd, uint32_t event)
 	if (epoll_ctl(loop_fd, EPOLL_CTL_ADD, fd, &ev) == -1)
 		throw std::runtime_error("Couldn't add fd to epoll");
 	events[fd] = ev;
-	std::cout << fd << std::endl;
+	// std::cout << fd << std::endl;
 // #endif
 }
 

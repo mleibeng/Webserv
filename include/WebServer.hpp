@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 05:35:44 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/15 03:03:10 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ class WebServer
 		explicit WebServer(const std::string& conf_file);
 		~WebServer();
 
-		void initialize();
+		void initialize(size_t pool_size);
+		RequestHandler& getNextHandler();
 		void start();
 		void stop();
 
@@ -56,7 +57,9 @@ class WebServer
 		std::unordered_map<std::string, std::vector<int>> server_listeners;
 		Loop event_loop;
 		std::atomic<bool> running;
-		std::unique_ptr<RequestHandler> request_handler;
+		// std::unique_ptr<RequestHandler> request_handler;
+		std::vector<std::unique_ptr<RequestHandler>> handler_pool;
+		std::atomic<size_t> current_handler{0};
 
 		void setupListeners();
 		void runLoop();

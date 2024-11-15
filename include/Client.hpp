@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/11/07 06:03:02 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/15 03:31:06 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,20 +41,18 @@ class Client {
 
 		void setRoute(const RouteConf* route);
 
-		ssize_t processChunk(const std::string& chunky);
-
 		//incrementers
 		void increaseRedirectCount();
 		void setBuffer(size_t buffersize);
 
-		bool isFileUpload() const;
-		bool needsRouteResolution() const;
-
+		//connection checkers
 		bool keepAlive() const;
+		bool checkKeepAliveHeaders();
+
+		//route mngmt
+		int setCourse();
 		const RouteConf* getRoute() const;
 		const std::string& getBestPath() const;
-
-		int setCourse();
 		const ServerConf *findServerConf(const HttpRequest &request);
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
 		std::string parsePath(const RouteConf& route_conf, const HttpRequest& request);

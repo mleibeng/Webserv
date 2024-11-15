@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/02 01:17:38 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/15 03:48:08 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <string>
 #include <csignal>
 #include "WebServer.hpp"
+#include <thread>
 
 #define DEFAULT	"\033[0m"
 #define RED		"\033[31m"
@@ -43,10 +44,11 @@ int main(int argc, char** argv)
 		config_file = argv[1];
 	try
 	{
+		// std::cout << "concurrency: " << std::thread::hardware_concurrency() << std::endl;
 		WebServer MainServ(config_file);
 		g_server_ptr = &MainServ;
 		std::signal(SIGINT, sighandler);
-		MainServ.initialize();
+		MainServ.initialize(std::thread::hardware_concurrency());
 		MainServ.start();
 		g_server_ptr = nullptr;
 	}
