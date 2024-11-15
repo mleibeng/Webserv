@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/15 04:07:20 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/15 04:09:35 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,10 @@ ssize_t Client::read_request()
 							buffer.size() - total_read);
 
 		if (bytes == -1) {
-			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				// No more data available right now
+			// if (errno == EAGAIN || errno == EWOULDBLOCK) {
+			// 	// No more data available right now
 				break;
-			}
+			// }
 			std::cerr << "read(): " << strerror(errno) << std::endl;
 			return -1;
 		}
@@ -141,10 +141,10 @@ ssize_t Client::send_response(const std::string& response_string)
 							remaining);
 
 		if (sent == -1) {
-			if (errno == EAGAIN || errno == EWOULDBLOCK) {
+			// if (errno == EAGAIN || errno == EWOULDBLOCK) {
 				// Would block, try again later
-				continue;
-			}
+			continue;
+			// }
 			std::cerr << "write(): " << strerror(errno) << std::endl;
 			return -1;
 		}
