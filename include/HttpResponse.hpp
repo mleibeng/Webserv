@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/07 01:16:29 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/10 03:53:56 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,10 @@ class HttpResponse : public AHttpMessage
 		HttpResponse& operator=(const HttpResponse &other);
 		~HttpResponse();
 
+		void setCookie(const std::string& key, const std::string& value,
+									int maxAge = -1, const std::string &path = "/",
+									bool secure = false, bool HttpOnly = false);
+		void removeCookie(const std::string& key, const std::string& path = "/");
 		std::string	buildResponse() const;
 
 		bool	parse(const std::string& rawmsg) override;
@@ -86,6 +90,7 @@ class HttpResponse : public AHttpMessage
 
 		StatusCode	_status;
 		std::string	_mimeType;
+		std::vector<std::string> _response_cookies;
 };
 
 #endif // HTTPRESPONSE_H

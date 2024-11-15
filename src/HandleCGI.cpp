@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleCGI.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/04 19:02:55 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/12 01:59:08 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,6 +192,8 @@ void RequestHandler::buildCGIResponse(const std::string& out, HttpResponse& resp
 	std::string line;
 	bool headers_done = false;
 	response.setStatus(200);
+	std::time_t now = std::time(nullptr);
+	response.setCookie("lastPostRequest", std::ctime(&now));
 
 
 	std::stringstream body;

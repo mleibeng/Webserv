@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/07 11:26:22 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/15 02:48:46 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,81 +154,11 @@ bool HttpRequest::parseRequestLine(const std::string& line)
 	setQuery(trimStr(uri)); // now splits query from uri and sets both.
 	setHttpVersion(trimStr(vers));
 
-	return true;
+	parseHeader(input);
+
+	std::string body((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+	setBody(trimStr(body));
+
+	parseCookies();
+	return (true);
 }
-
-bool HttpRequest::parseMultipartBoundary()
-{
-	std::string content_type = getHeader("Content-Type");
-	size_t boundary_pos = content_type.find("boundary=");
-	if (boundary_pos == std::string::npos)
-		return false;
-
-	_boundary = "--" + trimStr(content_type.substr(boundary_pos + 9));
-	_state = State::R_MULTIPART;
-	return true;
-}
-
-void HttpRequest::handleMultipartChunk(const std::string& chunky)
-{
-	size_t boundary_pos = chunky.find(_boundary);
-	if (boundary_pos == std::string::npos)
-	{
-		_body += chunky;
-		return;
-	}
-	if (boundary_pos > 0)
-		_body += chunky.substr(0, boundary_pos);
-
-	size_t next_boundary = chunky.find(_boundary, boundary_pos + _boundary.length());
-	if (next_boundary == std::string::npos)
-	{
-		_state = State::R_BODY;
-		return;
-	}
-	std::string part = chunky.substr(boundary_pos + _boundary.length(), next_boundary - boundary_pos - _boundary.length());
-	//handle later
-}
-
-bool	HttpRequest::hasHeader(const std::string& header) const
-{
-	if (_header.find(header) != _header.end())
-		return true;
-	return false;
-}
-
-std::string generateFilename()
-{
-	auto now = std::chrono::system_clock::now();
-	auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-
-	std::stringstream ss;
-	ss << "upload_" << now_ms << "_" << std::rand();
-	return ss.str();
-}
-
-bool HttpRequest::initUpload(const RouteConf& route) {
-	if (!route.upload_dir.has_value())
-		return false;
-
-	std::string filename = generateFilename();
-	_upload_path = route.path + "/" + filename;
-	_upload_file = std::make_unique<std::ofstream>(filename, std::ios::binary);
-
-	return _upload_file->is_open();
-}
-
-// bool	HttpRequest::parse(const std::string& rawmsg)
-// {
-// 	std::istringstream	input(rawmsg);
-// 	std::string			line;
-
-// 	if (!std::getline(input, line))
-// 		return (false);
-
-// 	parseHeader(input);
-
-// 	std::string body((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-// 	setBody(trimStr(body));
-// 	return (true);
-// }

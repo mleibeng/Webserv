@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 15:31:49 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/10 03:54:58 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,34 @@ bool	HttpResponse::parse(const std::string& rawmsg)
 	return (true);
 }
 
+void HttpResponse::removeCookie(const std::string& key, const std::string& path)
+{
+	setCookie(key, "", 0, path);
+}
+
+void HttpResponse::setCookie(const std::string& key, const std::string& value,
+	int maxAge,
+	const std::string &path,
+	bool secure,
+	bool HttpOnly)
+{
+
+
+	std::ostringstream cookie;
+	cookie << key << "=" << value;
+	if (!path.empty())
+		cookie << "; Path=" << path;
+	if (maxAge >= 0)
+		cookie << "; Max-Age=" << maxAge;
+	if (secure)
+		cookie << "; Secure";
+	if (HttpOnly)
+		cookie << "; HttpOnly";
+
+	_response_cookies.push_back(cookie.str());
+}
+
+
 std::string	HttpResponse::buildResponse() const
 {
 	std::ostringstream	response;
@@ -144,6 +172,11 @@ std::string	HttpResponse::buildResponse() const
 		// std::cout << header.first << std::endl;
 		// std::cout << header.second << std::endl;
 	}
+	for (const auto& cookie: _response_cookies)
+	{
+		response << "Set-Cookie: " << cookie << "\r\n";
+	}
+
 	if (_header.find("Content-Length") == _header.end())
 		response << "Content-Length: " << _body.size() << "\r\n";
 	if (_header.find("Content-Type") == _header.end())

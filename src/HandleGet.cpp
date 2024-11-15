@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/08 18:26:48 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/12 19:26:25 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,64 +20,35 @@ void		RequestHandler::handleGetRequest(Client& client)
 	const RouteConf* route_conf = client.getRoute();
 	const std::string& parsed = client.getBestPath();
 
-	std::cout << "phys path: "<< parsed << " query: " << client.getRequest().getQuery() << std::endl;
-
 	// Case 1: Specific file check
 	if (std::filesystem::exists(parsed) && !std::filesystem::is_directory(parsed))
 	{
-		std::cout << "option 1 direct resource request" << std::endl;
 		std::string extension = getFileExtension(parsed);
-		if (!extension.empty() &&  extension == ".php")
-		{
-			std::cout << "option 1 php cgi" << std::endl;
-			handleCGI(client, parsed);
-			return;
-		}
-		std::cout << "option 1 static file" << std::endl;
-		sendFile(client, parsed);
-		return;
+		if (!extension.empty() && (extension == ".php" || extension == ".py"))
+			return handleCGI(client, parsed);
+		return sendFile(client, parsed);
 	}
 
 	// Case 2 Directory handling
-	std::string path_check = parsed;
-
-	// probably unecessary now since being utilizied in parsed already.
-	// if (path_check.back() != '/')
-	// 	path_check += '/';
-
-	if (std::filesystem::is_directory(path_check))
+	if (std::filesystem::is_directory(parsed))
 	{
-		std::cout << "option 2: default file" << std::endl;
 		// Default file check : Either PHP or static
 		if (!route_conf->default_file.empty())
 		{
-			std::string default_path = path_check + route_conf->default_file;
-			std::cout << "default path opt 2: " << default_path << std::endl;
+			std::string default_path = parsed + route_conf->default_file;
 			if (std::filesystem::exists(default_path))
 			{
 				std::string extension = getFileExtension(default_path);
 				if (!route_conf->cgi_extension.empty() && extension == route_conf->cgi_extension)
-				{
-					std::cout << "option 2 cgi handler called" << std::endl;
-					handleCGI(client, default_path);
-					return;
-				}
-				sendFile(client, default_path);
-				return;
+					return handleCGI(client, default_path);
+				return sendFile(client, default_path);
 			}
 		}
 		// Directory listing
 		if (route_conf->dir_listing_active)
-		{
-			std::cout << "option 3: Dir_listing" << std::endl;
-			sendDirListing(client, path_check);
-			return;
-		}
-		serveErrorPage(client, 403);
-		return;
+			return sendDirListing(client, parsed);
+		return serveErrorPage(client, 403);
 	}
-	std::cout << "option 4: Not found" << std::endl;
-	// Case not foundq
 	serveErrorPage(client, 404);
 }
 
@@ -124,6 +95,7 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 void RequestHandler::sendFile(Client& client, const std::string& file_path)
 {
 	HttpResponse response;
+	const HttpRequest& request = client.getRequest();
 
 	std::ifstream file(file_path, std::ios::binary);
 	if (!file.is_open())
@@ -136,7 +108,21 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	fileBuf << file.rdbuf();
 	file.close();
 
+	//Cookie tryout
+	int visit_count;
+	std::string visit_counter = request.getCookie("visit_count");
+	if (visit_counter.empty())
+		visit_count = 1;
+	else
+	{
+		visit_count = std::stoi(visit_counter);
+		if (getFileExtension(file_path) == ".html")
+			visit_count++;
+	}
 	response.setStatus(200);
+	response.setCookie("visit_count", std::to_string(visit_count));
+	std::time_t now = std::time(nullptr);
+	response.setCookie("lastVisit", std::ctime(&now));
 	response.setBody(fileBuf.str());
 	response.setMimeType(getFileExtension(file_path));
 	client.send_response(response.buildResponse());
