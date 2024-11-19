@@ -45,16 +45,39 @@ void WebServer::setupListeners()
 			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
 				std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
 
-			struct sockaddr_in addr;
-			addr.sin_family = AF_INET;
-			addr.sin_addr.s_addr = INADDR_ANY;
-			addr.sin_port = htons(port);
+			struct addrinfo addr, *res;
+			memset(&addr, 0, sizeof addr);
+			addr.ai_family = AF_INET;
+			addr.ai_socktype = SOCK_STREAM;
+			addr.ai_flags = AI_PASSIVE;
 
-			if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
+			int status = getaddrinfo(server.hostname.c_str(), std::to_string(port).c_str(), &addr, &res);
+			if (status != 0)
 			{
 				close(fd);
+				throw std::runtime_error("Could not resolve hostname: " + server.hostname);
+			}
+
+			if (bind(fd, res->ai_addr, res->ai_addrlen) < 0)
+			{
+				std::cerr << "Failed to bind address to" << server.hostname << std::endl;
+				close(fd);
+				freeaddrinfo(res);
 				throw std::runtime_error("Failed to bind socket");
 			}
+
+			freeaddrinfo(res);
+
+			// struct sockaddr_in addr;
+			// addr.sin_family = AF_INET;
+			// addr.sin_addr.s_addr = INADDR_ANY;
+			// addr.sin_port = htons(port);
+
+			// if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
+			// {
+			// 	close(fd);
+			// 	throw std::runtime_error("Failed to bind socket");
+			// }
 
 			if (listen(fd, SOMAXCONN) < 0)
 			{
