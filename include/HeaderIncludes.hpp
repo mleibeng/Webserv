@@ -57,5 +57,6 @@
 #include <netdb.h>
 #include <errno.h>
 #include <thread>
+#include <algorithm>
 
 #endif
