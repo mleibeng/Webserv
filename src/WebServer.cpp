@@ -112,6 +112,7 @@ void WebServer::acceptConnections(int fd)
 	int flags = fcntl(client_fd, F_GETFL, 0);
 	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
 	event_loop.addFd(client_fd, EPOLLIN_FLAG);
+	//event_loop.addClient(client_fd, std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)));
 }
 
 /// @brief create and set sockets non blocking
@@ -159,6 +160,15 @@ void WebServer::stop()
 /// @brief server loop waiting for events to happen and process
 void WebServer::runLoop()
 {
+
+	/* while (running)
+	{
+		RequestHandler &handler = getNextHandler();
+		event_loop.processEvents(handler, 5000);
+		cleanInactiveClients();		
+	}
+	*/
+
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
