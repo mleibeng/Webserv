@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   HandlePost.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/12 02:00:22 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/25 17:03:53 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+
 
 /// @brief
 /// @param client
@@ -79,8 +81,7 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 
 		HttpResponse response;
 		response.setStatus(201);
-		std::time_t now = std::time(nullptr);
-		response.setCookie("lastPostRequest", std::ctime(&now));
+		response.setCookie("lastPostRequest", getTime());
 		response.setBody("upload successful");
 		response.setMimeType(".html");
 		client.send_response(response.buildResponse());
@@ -156,8 +157,7 @@ void	RequestHandler::handleFormSubmission(Client& client, const std::string& bod
 
 	HttpResponse response;
 	response.setStatus(201);
-	std::time_t now = std::time(nullptr);
-	response.setCookie("lastPostRequest", std::ctime(&now));
+	response.setCookie("lastPostRequest", getTime());
 	response.setBody("name: " + name + "<br>" + "message: " + message);
 	response.setMimeType(".html");
 	client.send_response(response.buildResponse());

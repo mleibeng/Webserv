@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/15 03:03:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/25 17:13:21 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ void WebServer::runLoop()
 	{
 		RequestHandler &handler = getNextHandler();
 		event_loop.processEvents(handler, 5000);
-		cleanInactiveClients();		
+		cleanInactiveClients();
 	}
 	*/
 

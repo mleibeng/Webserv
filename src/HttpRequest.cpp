@@ -6,11 +6,20 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/10 03:24:35 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/25 17:06:52 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
+
+//utils
+std::string getTime()
+{
+	std::time_t now = std::time(nullptr);
+	std::string form_time = std::ctime(&now);
+	form_time.erase(form_time.find_first_not_of("\n") + 1);
+	return form_time;
+}
 
 HttpRequest::HttpRequest()
 {

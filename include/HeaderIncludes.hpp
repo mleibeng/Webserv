@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 01:10:59 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/15 02:59:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/25 17:05:40 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,5 +58,10 @@
 #include <errno.h>
 #include <thread>
 #include <algorithm>
+
+
+//utils function
+
+std::string getTime();
 
 #endif
