@@ -19,6 +19,7 @@ Handles: I/O operations using kqueue, file descriptors, timers and async actions
 #define LOOP_HPP
 
 #include "HeaderIncludes.hpp"
+#include "Client.hpp"
 
 class Client;
 class HttpRequest;

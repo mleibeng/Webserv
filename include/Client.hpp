@@ -28,8 +28,8 @@ class Client {
 		~Client();
 
 		Client() = delete;
-		Client(const Client& other) = delete;
-		Client& operator=(const Client& other) = delete;
+		Client(const Client& other) = default;
+		Client& operator=(const Client& other) = default;
 
 		const HttpRequest& getRequest() const;
 		const int& getFd() const;

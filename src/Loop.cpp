@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "Loop.hpp"
-#include <iostream>
-
 
 ClientConnection::ClientConnection(int fd, const Config& config, size_t buffer_size) : client(std::make_unique<Client>(fd, config)), read_buffer(buffer_size), byte_read(0), byte_written(0), state(ClientState::READING_HEADERS), keep_alive(true)
 {} 
@@ -81,6 +79,78 @@ void Loop::removeFd(int fd)
 	events.erase(fd);
 	//connections.erase(fd);
 // #endif
+}
+
+bool Loop::isHeaderComplete(const std::vector<char>& buffer, size_t bytes_read)
+{
+	std::string data(buffer.data(), bytes_read);
+	return data.find("\r\n\r\n") != std::string::npos;
+}
+
+void Loop::handleRead(int fd, ClientConnection& conn)
+{
+	ssize_t bytes = read(fd, conn.read_buffer.data() + conn.byte_read, conn.read_buffer.size() - conn.byte_read);
+	
+	if (bytes > 0)
+		conn.byte_read += bytes;
+}
+
+void Loop::handleWrite(int fd, ClientConnection& conn)
+{
+	while (conn.byte_written < conn.pending_response.size())
+	{
+		ssize_t bytes = write(fd, conn.pending_response.c_str() + conn.byte_written, conn.pending_response.size() - conn.byte_written);
+
+		if (bytes <= 0)
+			break;
+
+		conn.byte_written += bytes;
+	}
+
+	if (conn.byte_written >= conn.pending_response.size())
+	{
+		conn.state = ClientState::COMPLETE;
+
+		if (!conn.keep_alive)
+			removeFd(fd);
+		else
+		{
+			conn.byte_read = 0;
+			conn.byte_written = 0;
+			conn.pending_response.clear();
+			conn.state = ClientState::READING_HEADERS;
+
+			epoll_event ev = events[fd];
+			ev.events = EPOLLIN_FLAG | EPOLLET;
+			epoll_ctl(loop_fd, EPOLL_CTL_MOD, fd, &ev);
+		}
+	}
+}
+
+void Loop::processRequest(int fd, ClientConnection& conn, RequestHandler& handler)
+{
+	std::string request_data(conn.read_buffer.data(), conn.byte_read);
+
+	Client& client = *conn.client;
+
+	if (client.read_request() == -1)
+	{
+		HttpResponse error_response;
+		error_response.setStatus(500);
+		// client.queueResponse()
+	}
+
+	int error = client.setCourse();
+	if (error)
+	{
+		HttpResponse error_response;
+		error_response.setStatus(500);
+		// client.queueResponse();
+	}
+
+	handler.handleRequest(client);
+
+	conn.keep_alive = client.keepAlive();
 }
 
 void Loop::processEvents(RequestHandler& handler, int timeout)

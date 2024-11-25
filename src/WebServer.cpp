@@ -18,7 +18,7 @@
 
 /// @brief Webserver Constructor -> Parses and prints config data and sets running to false
 /// @param conf_file Saves data structures and values read in from the config file
-WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false)
+WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false), event_loop(config)
 {
 	// config.print();
 }
