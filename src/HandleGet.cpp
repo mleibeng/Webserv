@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleGet.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/12 19:26:25 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/25 16:55:05 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void		RequestHandler::handleGetRequest(Client& client)
 	// Case 1: Specific file check
 	if (std::filesystem::exists(parsed) && !std::filesystem::is_directory(parsed))
 	{
+		// std::cout << "case 1" << std::endl;
 		std::string extension = getFileExtension(parsed);
 		if (!extension.empty() && (extension == ".php" || extension == ".py"))
 			return handleCGI(client, parsed);
@@ -30,6 +31,7 @@ void		RequestHandler::handleGetRequest(Client& client)
 	}
 
 	// Case 2 Directory handling
+	// std::cout << "case 2" << std::endl;
 	if (std::filesystem::is_directory(parsed))
 	{
 		// Default file check : Either PHP or static
@@ -44,11 +46,13 @@ void		RequestHandler::handleGetRequest(Client& client)
 				return sendFile(client, default_path);
 			}
 		}
+		// std::cout << "case 3" << std::endl;
 		// Directory listing
 		if (route_conf->dir_listing_active)
 			return sendDirListing(client, parsed);
 		return serveErrorPage(client, 403);
 	}
+	// std::cout << "case 4 error" << std::endl;
 	serveErrorPage(client, 404);
 }
 
@@ -122,7 +126,9 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	response.setStatus(200);
 	response.setCookie("visit_count", std::to_string(visit_count));
 	std::time_t now = std::time(nullptr);
-	response.setCookie("lastVisit", std::ctime(&now));
+	std::string form_time = std::ctime(&now);
+	form_time.erase(form_time.find_last_not_of("\n") + 1);
+	response.setCookie("lastVisit", form_time);
 	response.setBody(fileBuf.str());
 	response.setMimeType(getFileExtension(file_path));
 	client.send_response(response.buildResponse());

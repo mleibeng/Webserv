@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/15 03:03:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/25 16:47:09 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 
 /// @brief Webserver Constructor -> Parses and prints config data and sets running to false
 /// @param conf_file Saves data structures and values read in from the config file
+// event_loop(config)
 WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false)
 {
 	// config.print();
@@ -112,6 +113,7 @@ void WebServer::acceptConnections(int fd)
 	int flags = fcntl(client_fd, F_GETFL, 0);
 	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
 	event_loop.addFd(client_fd, EPOLLIN_FLAG);
+	//event_loop.addClient(client_fd, std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)));
 }
 
 /// @brief create and set sockets non blocking
@@ -159,6 +161,15 @@ void WebServer::stop()
 /// @brief server loop waiting for events to happen and process
 void WebServer::runLoop()
 {
+
+	/* while (running)
+	{
+		RequestHandler &handler = getNextHandler();
+		event_loop.processEvents(handler, 5000);
+		cleanInactiveClients();
+	}
+	*/
+
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
