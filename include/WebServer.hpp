@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/15 03:03:10 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/25 17:31:17 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ class WebServer
 		void cleanInactiveClients();
 		void handleClientRequest(int client_fd);
 		void redirectTraffic(Client& client);
+		bool portInUse(int port);
 };
 
 #endif
