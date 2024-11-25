@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/25 16:55:05 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/25 17:03:22 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,10 +125,7 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	}
 	response.setStatus(200);
 	response.setCookie("visit_count", std::to_string(visit_count));
-	std::time_t now = std::time(nullptr);
-	std::string form_time = std::ctime(&now);
-	form_time.erase(form_time.find_last_not_of("\n") + 1);
-	response.setCookie("lastVisit", form_time);
+	response.setCookie("lastVisit", getTime());
 	response.setBody(fileBuf.str());
 	response.setMimeType(getFileExtension(file_path));
 	client.send_response(response.buildResponse());
