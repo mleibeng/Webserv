@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/25 17:13:21 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/27 23:59:37 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,21 @@ WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_f
 	// config.print();
 }
 
+bool WebServer::portInUse(int port)
+{
+	for (const auto& [key, _] : server_listeners)
+	{
+		size_t pos = key.find(':');
+		if (pos != std::string::npos)
+		{
+			int blocked_port = std::stoi(key.substr(pos + 1));
+			if (blocked_port == port)
+				return true;
+		}
+	}
+	return false;
+}
+
 /// @brief set up ports to listen for connections on each server
 void WebServer::setupListeners()
 {
@@ -37,13 +52,18 @@ void WebServer::setupListeners()
 
 		for (const auto& port : ports)
 		{
+			if (portInUse(port))
+			{
+				std::cerr << "port: " << port << " already in use" << std::endl;
+				continue;
+			}
 			std::string server_key = server.hostname + ":" + std::to_string(port);
 
 			int fd = createNonBlockingSocket();
 
-			int opt = 1;
-			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
-				std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
+			// int opt = 1;
+			// if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
+			// 	std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
 
 			struct addrinfo addr, *res;
 			memset(&addr, 0, sizeof addr);
