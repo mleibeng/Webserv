@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/25 17:03:22 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 01:21:50 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,8 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 	response.setStatus(200);
 	response.setBody(html.str());
 	response.setMimeType(getFileExtension(".html"));
-	client.send_response(response.buildResponse());
+	// client.send_response(response.buildResponse());
+	client.queueResponse(response.buildResponse());
 }
 
 /// @brief Function to send back a static file response that was requested by the browser.
@@ -128,5 +129,6 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	response.setCookie("lastVisit", getTime());
 	response.setBody(fileBuf.str());
 	response.setMimeType(getFileExtension(file_path));
-	client.send_response(response.buildResponse());
+	// client.send_response(response.buildResponse());
+	client.queueResponse(response.buildResponse());
 }

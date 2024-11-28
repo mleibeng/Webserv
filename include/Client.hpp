@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/11/15 03:31:06 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 00:18:36 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,9 @@ class Client {
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
 		std::string parsePath(const RouteConf& route_conf, const HttpRequest& request);
 		bool isMethodAllowed(const RouteConf &route_conf, const std::string& method);
+		void queueResponse(const std::string& response);
+		bool hasResponse() const;
+		std::string getNextResponse();
 
 	private:
 		int _client_fd;
@@ -67,6 +70,7 @@ class Client {
 		const RouteConf *_route;
 		bool _keep_alive;
 		std::string _best_path;
+		std::queue<std::string> response_queue;
 };
 
 #endif // CLIENT_H

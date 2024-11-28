@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 03:36:48 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 01:29:14 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ class HttpResponse;
 class RequestHandler;
 class Config;
 
-enum class ClientState 
+enum class ClientState
 {
 	READING_HEADERS,
 	READING_BODY,
@@ -37,7 +37,7 @@ enum class ClientState
 };
 
 
-struct ClientConnection 
+struct ClientConnection
 {
 	std::unique_ptr<Client> client;
 	std::vector<char> read_buffer;
@@ -62,6 +62,7 @@ class Loop
 		bool hasFd(int fd) const;
 		void addClient(int fd, size_t buffersize);
 		void processEvents(RequestHandler& handler, int timeout);
+		void queueResponse(int fd, const std::string& response);
 
 	private:
 		int loop_fd;
@@ -79,7 +80,7 @@ class Loop
 		bool isHeaderComplete(const std::vector<char>& buffer, size_t byte_read);
 		void handleRead(int fd, ClientConnection& conn);
 		void handleWrite(int fd, ClientConnection& conn);
-		void processRequest(int fd, ClientConnection& conn, RequestHandler& handler);		
+		void processRequest(int fd, ClientConnection& conn, RequestHandler& handler);
 };
 
 #endif

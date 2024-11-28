@@ -6,14 +6,14 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/15 03:50:04 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 01:21:14 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Loop.hpp"
 
 ClientConnection::ClientConnection(int fd, const Config& config, size_t buffer_size) : client(std::make_unique<Client>(fd, config)), read_buffer(buffer_size), byte_read(0), byte_written(0), state(ClientState::READING_HEADERS), keep_alive(true)
-{} 
+{}
 
 /// @brief create epoll/kqueue file descriptor / throw error in case of failure
 Loop::Loop(const Config& conf) : config(conf)
@@ -90,7 +90,7 @@ bool Loop::isHeaderComplete(const std::vector<char>& buffer, size_t bytes_read)
 void Loop::handleRead(int fd, ClientConnection& conn)
 {
 	ssize_t bytes = read(fd, conn.read_buffer.data() + conn.byte_read, conn.read_buffer.size() - conn.byte_read);
-	
+
 	if (bytes > 0)
 		conn.byte_read += bytes;
 }
@@ -102,27 +102,32 @@ void Loop::handleWrite(int fd, ClientConnection& conn)
 		ssize_t bytes = write(fd, conn.pending_response.c_str() + conn.byte_written, conn.pending_response.size() - conn.byte_written);
 
 		if (bytes <= 0)
-			break;
-
+		{
+			// break;
+			conn.state = ClientState::COMPLETE;
+			removeFd(fd);
+			return;
+		}
 		conn.byte_written += bytes;
 	}
 
 	if (conn.byte_written >= conn.pending_response.size())
 	{
-		conn.state = ClientState::COMPLETE;
+		// conn.state = ClientState::COMPLETE;
+		conn.pending_response.clear();
+		conn.byte_written = 0;
 
-		if (!conn.keep_alive)
-			removeFd(fd);
+		if (conn.client->hasResponse())
+		{
+			conn.pending_response = conn.client->getNextResponse();
+			conn.byte_written = 0;
+		}
 		else
 		{
-			conn.byte_read = 0;
-			conn.byte_written = 0;
-			conn.pending_response.clear();
-			conn.state = ClientState::READING_HEADERS;
-
 			epoll_event ev = events[fd];
-			ev.events = EPOLLIN_FLAG | EPOLLET;
+			ev.events = EPOLLIN_FLAG;
 			epoll_ctl(loop_fd, EPOLL_CTL_MOD, fd, &ev);
+			conn.state = ClientState::READING_HEADERS;
 		}
 	}
 }
@@ -137,7 +142,7 @@ void Loop::processRequest(int fd, ClientConnection& conn, RequestHandler& handle
 	{
 		HttpResponse error_response;
 		error_response.setStatus(500);
-		// client.queueResponse()
+		client.queueResponse(error_response.buildResponse());
 	}
 
 	int error = client.setCourse();
@@ -145,10 +150,17 @@ void Loop::processRequest(int fd, ClientConnection& conn, RequestHandler& handle
 	{
 		HttpResponse error_response;
 		error_response.setStatus(500);
-		// client.queueResponse();
+		client.queueResponse(error_response.buildResponse());
 	}
 
 	handler.handleRequest(client);
+
+	if (client.hasResponse())
+	{
+		epoll_event ev = events[fd];
+		ev.events = EPOLLOUT_FLAG;
+		epoll_ctl(loop_fd, EPOLL_CTL_MOD, fd , &ev);
+	}
 
 	conn.keep_alive = client.keepAlive();
 }
@@ -166,15 +178,30 @@ void Loop::processEvents(RequestHandler& handler, int timeout)
 		auto it = connections.find(fd);
 		if (it == connections.end())
 			continue;
-		
+
 		auto &conn = *it->second;
 
-		if (events & EPOLLIN | EPOLLOUT && conn.state == ClientState::READING_HEADERS || conn.state == ClientState::READING_BODY)
+		if (events & EPOLLIN_FLAG)
+		{
 			handleRead(fd, conn);
-		
-		if (events & EPOLLIN | EPOLLOUT && conn.state == ClientState::SENDING_RESPONSE)
-			handleWrite(fd, conn);
-	
+			if (conn.state == ClientState::READING_HEADERS && isHeaderComplete(conn.read_buffer, conn.byte_read))
+				processRequest(fd, conn, handler);
+		}
+		if (events & EPOLLOUT_FLAG)
+		{
+			if (!conn.pending_response.empty())
+				handleWrite(fd, conn);
+			else if (conn.client->hasResponse())
+			{
+				conn.pending_response = conn.client->getNextResponse();
+				conn.byte_written = 0;
+				conn.state = ClientState::SENDING_RESPONSE;
+
+				epoll_event ev = events[fd];
+				ev.events = EPOLLOUT_FLAG;
+				epoll_ctl(loop_fd, EPOLL_CTL_MOD, fd, &ev);
+			}
+		}
 		if (conn.state == ClientState::READING_HEADERS && isHeaderComplete(conn.read_buffer, conn.byte_read))
 			processRequest(fd, conn, handler);
 	}
@@ -199,4 +226,16 @@ std::vector<std::pair<int, uint32_t>> Loop::wait(int timeout)
 	}
 // #endif
 	return result;
+}
+
+void Loop::queueResponse(int fd, const std::string& response)
+{
+	auto &conn = *connections[fd];
+	conn.pending_response = response;
+	conn.byte_written = 0;
+	conn.state = ClientState::SENDING_RESPONSE;
+
+	epoll_event ev = events[fd];
+	ev.events = EPOLLOUT_FLAG;
+	epoll_ctl(loop_fd, EPOLL_CTL_MOD, fd, &ev);
 }

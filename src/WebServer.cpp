@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/27 23:59:37 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 01:29:16 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,6 +219,12 @@ void WebServer::runLoop()
 				}
 				if (!is_listener)
 					handleClientRequest(fd);
+			}
+			else if (event & EPOLLOUT_FLAG)
+			{
+				auto it = active_clients.find(fd);
+				if (it != active_clients.end() && it->second.client->hasResponse())
+					event_loop.queueResponse(fd, it->second.client->getNextResponse());
 			}
 		}
 	}

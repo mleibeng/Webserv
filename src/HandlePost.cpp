@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/25 17:03:53 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 01:25:35 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,8 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 		response.setCookie("lastPostRequest", getTime());
 		response.setBody("upload successful");
 		response.setMimeType(".html");
-		client.send_response(response.buildResponse());
+		// client.send_response(response.buildResponse());
+		client.queueResponse(response.buildResponse());
 	}
 	else {
 		return serveErrorPage(client, 500); // Internal Server Error if file creation fails
@@ -160,5 +161,6 @@ void	RequestHandler::handleFormSubmission(Client& client, const std::string& bod
 	response.setCookie("lastPostRequest", getTime());
 	response.setBody("name: " + name + "<br>" + "message: " + message);
 	response.setMimeType(".html");
-	client.send_response(response.buildResponse());
+	// client.send_response(response.buildResponse());
+	client.queueResponse(response.buildResponse());
 }

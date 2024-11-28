@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/15 04:09:35 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 00:42:16 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -294,4 +294,23 @@ std::string Client::parsePath(const RouteConf& route_conf, const HttpRequest& re
 	}
 
 	return phys_path;
+}
+
+void Client::queueResponse(const std::string& response)
+{
+	response_queue.push(response);
+}
+
+bool Client::hasResponse() const
+{
+	return !response_queue.empty();
+}
+
+std::string Client::getNextResponse()
+{
+	if (!hasResponse())
+		return "";
+	std::string returnvalue = response_queue.front();
+	response_queue.pop();
+	return returnvalue;
 }

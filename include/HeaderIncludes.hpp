@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 01:10:59 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/25 17:05:40 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 00:17:27 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@
 #include <errno.h>
 #include <thread>
 #include <algorithm>
-
+#include <queue>
 
 //utils function
 
