@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/28 23:37:04 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 23:45:21 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,8 @@ ssize_t Client::read_request()
 	std::vector<char> buffer(_buffersize + 1);
 	ssize_t total_read = 0;
 
-	while (true) {
+	while (true)
+	{
 		ssize_t bytes = read(_client_fd,
 							buffer.data() + total_read,
 							buffer.size() - total_read);
