@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/28 03:31:12 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 23:05:08 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,10 @@ void		RequestHandler::handleGetRequest(Client& client)
 	{
 		// std::cout << "case 1" << std::endl;
 		std::string extension = getFileExtension(parsed);
-		if (!extension.empty() && (extension == ".php" || extension == ".py"))
+		if (!extension.empty() && (!route_conf->cgi_extensions.empty() &&
+			std::find(route_conf->cgi_extensions.begin(),
+			route_conf->cgi_extensions.end(),
+			extension) != route_conf->cgi_extensions.end()))
 			return handleCGI(client, parsed);
 		return sendFile(client, parsed);
 	}
@@ -41,7 +44,7 @@ void		RequestHandler::handleGetRequest(Client& client)
 			if (std::filesystem::exists(default_path))
 			{
 				std::string extension = getFileExtension(default_path);
-				if (!route_conf->cgi_extension.empty() && extension == route_conf->cgi_extension)
+				if (!route_conf->cgi_extensions.empty() && std::find(route_conf->cgi_extensions.begin(), route_conf->cgi_extensions.end(), extension) != route_conf->cgi_extensions.end()) //here doesn't work for example because extension is string and cgi_extensions is vector<string>
 					return handleCGI(client, default_path);
 				return sendFile(client, default_path);
 			}

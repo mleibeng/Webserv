@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:14:46 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/28 22:56:16 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std:
 	else if (key == "default_file")
 		conf.default_file = values[0];
 	else if (key == "cgi_extension")
-		conf.cgi_extension = values[0];
+		conf.cgi_extensions = values;
 	else if (key == "upload_dir")
 		conf.upload_dir = values[0];
 	else if (key == "max_body_size")
@@ -295,7 +295,9 @@ void Config::print() const
 			std::cout << "    Root: " << route.root << "\n";
 			std::cout << "    Directory Listing: " << (route.dir_listing_active ? "On" : "Off") << "\n";
 			std::cout << "    Default File: " << route.default_file << "\n";
-			std::cout << "    CGI Extension: " << route.cgi_extension << "\n";
+			for (const auto& cgi_extension : route.cgi_extensions)
+				std::cout << cgi_extension << " ";
+			std::cout << "\n";
 			std::cout << "    Upload Directory: " << route.upload_dir << "\n";
 			std::cout << "    Max Header Size: " << *route.max_header_size << "\n";
 			std::cout << "    Max Body Size: " << *route.max_body_size << "\n";

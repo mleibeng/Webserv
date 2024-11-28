@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/28 20:55:53 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 22:58:10 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,7 +179,7 @@ void WebServer::stop()
 }
 
 /// @brief server loop waiting for events to happen and process
-void WebServer::runLoop()
+void WebServer::runLoop() // maybe need to modify for more clear subject rules
 {
 
 	while (running)
@@ -198,7 +198,7 @@ void WebServer::runLoop()
 				close(fd);
 				event_loop.removeFd(fd);
 			}
-			else if (event & EPOLLIN_FLAG)
+			if (event & EPOLLIN_FLAG)
 			{
 				bool is_listener = false;
 				for (const auto& [_, fds] : server_listeners)
@@ -213,7 +213,7 @@ void WebServer::runLoop()
 				if (!is_listener)
 					handleClientRequest(fd);
 			}
-			else if (event & EPOLLOUT_FLAG)
+			if (event & EPOLLOUT_FLAG)
 			{
 				std::cout << fd << std::endl;
 				auto it = active_clients.find(fd);

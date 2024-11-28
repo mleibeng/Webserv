@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/28 20:51:45 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 23:09:08 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,8 @@ void	RequestHandler::handlePostRequest(Client& client)
 	const std::string& content_type = client.getRequest().getHeader("Content-Type");
 	const std::string& body = client.getRequest().getBody();
 
-	std::string fileextension = getFileExtension(parsed);
-	if (!route_conf->cgi_extension.empty() && getFileExtension(parsed) == route_conf->cgi_extension)
+	std::string file_extension = getFileExtension(parsed);
+	if (!route_conf->cgi_extensions.empty() && std::find(route_conf->cgi_extensions.begin(), route_conf->cgi_extensions.end(), file_extension) != route_conf->cgi_extensions.end())
 	{
 		handleCGI(client, parsed);
 	}
