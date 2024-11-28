@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/28 03:31:29 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 20:51:45 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,6 @@ void	RequestHandler::handlePostRequest(Client& client)
 	const std::string& body = client.getRequest().getBody();
 
 	std::string fileextension = getFileExtension(parsed);
-	// if (!route_conf.cgi_extension.empty() && getFileExtension(parsed) == route_conf.cgi_extension) {
-	// if (fileextension == ".php") {
-	// 	handleCGI(client, parsed);
-	// }
 	if (!route_conf->cgi_extension.empty() && getFileExtension(parsed) == route_conf->cgi_extension)
 	{
 		handleCGI(client, parsed);

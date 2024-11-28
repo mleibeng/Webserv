@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/28 04:14:33 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 21:28:04 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,17 +54,8 @@ ssize_t Client::read_request()
 							buffer.data() + total_read,
 							buffer.size() - total_read);
 
-		if (bytes == -1) {
-			// if (errno == EAGAIN || errno == EWOULDBLOCK) {
-			// 	// No more data available right now
-				break;
-			// }
-			std::cerr << "read(): " << strerror(errno) << std::endl;
-			return -1;
-		}
-
-		if (bytes == 0) {
-			// Client closed connection
+		if (bytes <= 0)
+		{
 			_keep_alive = false;
 			break;
 		}
@@ -150,14 +141,8 @@ ssize_t Client::send_response(const std::string& response_string)
 							response_string.c_str() + total_sent,
 							remaining);
 
-		if (sent == -1) {
-			// if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				// Would block, try again later
-			continue;
-			// }
-			std::cerr << "write(): " << strerror(errno) << std::endl;
+		if (sent <= 0)
 			return -1;
-		}
 
 		total_sent += sent;
 		remaining -= sent;
