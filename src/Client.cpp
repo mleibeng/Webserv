@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/28 02:56:03 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 04:13:24 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,11 +163,7 @@ ssize_t Client::send_response(const std::string& response_string)
 		remaining -= sent;
 	}
 
-	if (!_keep_alive)
-	{
-		// If Connection: close, shutdown the write end
-		close(_client_fd);
-	}
+	close(_client_fd);
 
 	return total_sent;
 }

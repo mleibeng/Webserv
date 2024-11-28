@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/28 03:22:14 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 04:02:08 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ class Loop
 
 	private:
 		int loop_fd;
-		static const int MAX_EVENTS = 10;
+		static const int MAX_EVENTS = 1024;
 		#ifdef __APPLE__
 			// std::vector<struct kevent> change_list;
 			// struct kevent event_list[MAX_EVENTS];
