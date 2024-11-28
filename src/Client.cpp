@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/15 04:09:35 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 02:56:03 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,16 @@ Client::Client(int client_fd, const Config& config) : _client_fd(client_fd),
 Client::~Client()
 {
 	close(_client_fd);
+}
+
+const	std::string& Client::getResponseString() const
+{
+	return _response_to_send;
+}
+
+void	Client::setResponseString(const std::string& built_response)
+{
+	_response_to_send = built_response;
 }
 
 void Client::setBuffer(size_t buffersize)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/12 01:59:15 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/11/28 03:12:34 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,16 +78,13 @@ class RequestHandler
 		void	handleDeleteRequest(Client& client);
 		void	handleRedirect(const RouteConf& route_conf, Client& client);
 
-		bool resolveRouting(Client& client);
-		void processCompleteRequest(Client& client);
-
 		void loadErrorPages();
 		void serveErrorPage(Client& client, int error_code);
 
 		void sendDirListing(Client &client, const std::string& dir_path);
 		void sendFile(Client& client, const std::string& file_path);
 		void handleCGI(Client& client, const std::string& cgi_path);
-		
+
 		void handleFileUpload(Client& client, const std::string& content_type, const std::string& body);
 		std::string extractBoundary(const std::string& content_type);
 		std::string extractFile(const std::string& body, const std::string& boundary);

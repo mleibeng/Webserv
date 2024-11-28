@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/09 20:35:52 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/11/28 03:31:45 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 	response.setStatus(*route_conf.redirect_code);
 	response.setHeader("Location", redirect);
 	response.setBody("Redirecting to " + redirect);
-	client.send_response(response.buildResponse());
+	client.setResponseString(response.buildResponse());
+	// client.send_response(response.buildResponse());
 }
 
 /// @brief Entrypoint and management function for sorting Requests.

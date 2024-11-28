@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 17:57:22 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/10 02:58:26 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 03:30:57 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ void	RequestHandler::handleDeleteRequest(Client& client)
 			response.setStatus(204);
 			response.setBody(filename + " successfully deleted");
 			response.setMimeType(".html");
-			client.send_response(response.buildResponse());
+			client.setResponseString(response.buildResponse());
+			// client.send_response(response.buildResponse());
 	}
 	else
 	{

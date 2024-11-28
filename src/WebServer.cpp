@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/25 17:33:57 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 03:29:11 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,14 +182,6 @@ void WebServer::stop()
 void WebServer::runLoop()
 {
 
-	/* while (running)
-	{
-		RequestHandler &handler = getNextHandler();
-		event_loop.processEvents(handler, 5000);
-		cleanInactiveClients();
-	}
-	*/
-
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
@@ -220,6 +212,14 @@ void WebServer::runLoop()
 				}
 				if (!is_listener)
 					handleClientRequest(fd);
+			}
+			else if (event & EPOLLOUT_FLAG)
+			{
+				auto it = active_clients.find(fd);
+				if (it != active_clients.end())
+				{
+					it->second.client->send_response(it->second.client->getResponseString());
+				}
 			}
 		}
 	}
@@ -281,27 +281,44 @@ void WebServer::handleClientRequest(int client_fd)
 
 	// std::cout << "request from " << client_fd << std::endl;
 	if (client.read_request() == -1) // should read in headers
-		return getNextHandler().serveErrorPage(client, 400);
-
+	{
+		getNextHandler().serveErrorPage(client, 400); // need to mod serverErrorPage!!!
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return;
+	}
 	// Logik zum finden der korrekten Route nach dem einlesen der header
 	int error = 0;
 	if ((error = client.setCourse()) && error != 0)
-		return getNextHandler().serveErrorPage(client, error);
+	{
+		getNextHandler().serveErrorPage(client, error); // need to mod serverErrorPage!!!
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return;
+	}
 
 	const RouteConf* route = client.getRoute();
 	if (route && route->redirect.has_value())
 	{
 		if (client.getNumRedirects() >= route->max_redirects)
-			return getNextHandler().serveErrorPage(client, 508);
+		{
+			getNextHandler().serveErrorPage(client, 508); // need to mod serverErrorPage!!!
+			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+			return;
+		}
 
 		getNextHandler().handleRedirect(*route, client);
 		client.setRoute(nullptr);
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 		return;
 	}
 
 	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
-		return getNextHandler().serveErrorPage(client, 508);
+	{
+		getNextHandler().serveErrorPage(client, 405); // need to mod serverErrorPage!!!
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return;
+	}
 
 	// logik zum handeln von teilweisen requests...
 	getNextHandler().handleRequest(client);
+	event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 }

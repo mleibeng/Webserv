@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/11/15 03:31:06 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 03:06:08 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,12 @@ class Client {
 		Client& operator=(const Client& other) = delete;
 
 		const HttpRequest& getRequest() const;
+		const std::string& getResponseString() const;
+		void  setResponseString(const std::string& built_response);
 		const int& getFd() const;
+
+		//bool checks
+		// bool hasResponse();
 
 		ssize_t read_request();
 		ssize_t send_response(const std::string& response_string);
@@ -67,6 +72,7 @@ class Client {
 		const RouteConf *_route;
 		bool _keep_alive;
 		std::string _best_path;
+		std::string _response_to_send;
 };
 
 #endif // CLIENT_H

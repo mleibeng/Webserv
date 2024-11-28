@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/15 03:50:04 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 03:21:15 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,4 +82,14 @@ std::vector<std::pair<int, uint32_t>> Loop::wait(int timeout)
 	}
 // #endif
 	return result;
+}
+
+void Loop::modifyFd(int fd, uint32_t event)
+{
+	epoll_event ev;
+	ev.events = event;
+	ev.data.fd = fd;
+	if (epoll_ctl(loop_fd, EPOLL_CTL_MOD, fd, &ev) == -1)
+		throw std::runtime_error("cant mod fd");
+	events[fd] = ev;
 }
