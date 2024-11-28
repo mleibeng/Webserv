@@ -17,7 +17,6 @@
 
 - POST CGI - nicht getestet
 
-- ab -n 100 -c 10 http://localhost:8080/ oder siege - 92/100 funkt nicht komplett !!! oder 956/1000
 -----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 - Setup multiple servers with different hostnames (use something like: curl --resolve example.com:80:127.0.0.1 http://example.com/). - funkt auch
@@ -28,6 +27,7 @@
  /home/buildozer/aports/main/gcc/src/build/x86_64-alpine-linux-musl/libstdc++-v3/include/bits/basic_string.h:1341: std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::reference std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::back() [with _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>; reference = char&]: Assertion '!empty()' failed.
 Aborted - keine ahnung wie ich das reproduziere, habe das problem nicht gehabt die letzten tage
 
+- ab -n 100 -c 10 http://localhost:8080/ oder siege - 92/100 funkt nicht komplett !!! oder 956/1000 <----- lag an EPOLLOUT | EPOLLIN waehrend addFd funktion call <----- wieder ok
 
 - In the configuration, try to setup the same port multiple times. It should not work. - gestern gemacht
 
