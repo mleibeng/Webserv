@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/25 17:13:26 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 01:35:35 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,8 @@ void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, con
 	else
 		return serveErrorPage(client, 500);
 
-	client.send_response(response.buildResponse()); // build response and send
+	// client.send_response(response.buildResponse()); // build response and send
+	client.queueResponse(response.buildResponse());
 }
 
 /// @brief write to child process for execve program

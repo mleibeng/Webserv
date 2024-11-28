@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/28 01:29:14 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 01:35:29 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ class Loop
 		void addClient(int fd, size_t buffersize);
 		void processEvents(RequestHandler& handler, int timeout);
 		void queueResponse(int fd, const std::string& response);
+		void registerFdEvents(int client_fd, uint32_t events);
 
 	private:
 		int loop_fd;

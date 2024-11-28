@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/28 01:21:14 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 01:35:01 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void Loop::addClient(int fd, size_t buffersize)
 {
 	epoll_event event;
 	event.events = EPOLLIN_FLAG | EPOLLOUT_FLAG;
-	event.data.fd - fd;
+	event.data.fd = fd;
 
 	if(epoll_ctl(loop_fd, EPOLL_CTL_ADD, fd, &event) == -1)
 		throw std::runtime_error("Could not add client to epoll event");
@@ -238,4 +238,13 @@ void Loop::queueResponse(int fd, const std::string& response)
 	epoll_event ev = events[fd];
 	ev.events = EPOLLOUT_FLAG;
 	epoll_ctl(loop_fd, EPOLL_CTL_MOD, fd, &ev);
+}
+
+void Loop::registerFdEvents(int client_fd, uint32_t events)
+{
+	epoll_event ev = events[fd];
+	ev.events = events;
+	if (epoll_ctl(loop_fd, EPOLL_CTL_MOD, fd, &ev) == -1)
+		throw std::runtime_error("Could not modify fd event")
+	events[fd] = ev;
 }

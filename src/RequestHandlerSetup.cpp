@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 05:39:37 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 01:32:36 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,8 @@ void RequestHandler::serveErrorPage(Client& client, int error_code)
 	response.setStatus(error_code);
 	response.setBody(_error_pages[error_code]);
 	response.setMimeType(getFileExtension("text/html"));
-	client.send_response(response.buildResponse());
+	// client.send_response(response.buildResponse());
+	client.queueResponse(response.buildResponse());
 }
 
 RequestHandler::~RequestHandler()
