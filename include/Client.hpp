@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/11/28 03:06:08 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 23:36:54 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ class Client {
 		const std::string& getResponseString() const;
 		void  setResponseString(const std::string& built_response);
 		const int& getFd() const;
+		bool  hasResponse();
 
 		//bool checks
 		// bool hasResponse();

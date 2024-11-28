@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/28 21:28:04 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 23:37:04 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,11 @@ void	Client::setResponseString(const std::string& built_response)
 void Client::setBuffer(size_t buffersize)
 {
 	_buffersize = buffersize;
+}
+
+bool Client::hasResponse()
+{
+	return !_response_to_send.empty();
 }
 
 /// @brief reads in the clientside data sent from the webbrowser

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/28 22:58:10 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 23:38:27 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,7 @@ void WebServer::acceptConnections(int fd)
 	}
 	int flags = fcntl(client_fd, F_GETFL, 0);
 	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
-	event_loop.addFd(client_fd, EPOLLIN_FLAG);
+	event_loop.addFd(client_fd, EPOLLIN_FLAG | EPOLLOUT_FLAG);
 	//event_loop.addClient(client_fd, std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)));
 }
 
@@ -217,10 +217,8 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 			{
 				std::cout << fd << std::endl;
 				auto it = active_clients.find(fd);
-				if (it != active_clients.end())
-				{
+				if (it != active_clients.end() && it->second.client->hasResponse())
 					it->second.client->send_response(it->second.client->getResponseString());
-				}
 			}
 		}
 	}
