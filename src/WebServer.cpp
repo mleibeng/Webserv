@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/29 00:43:32 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/29 18:26:32 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,14 +211,22 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 					}
 				}
 				if (!is_listener)
-					handleClientRequest(fd);
+				{
+					int status = handleClientRequest(fd);
+					if (status == -1)
+						event_loop.modifyFd(fd, EPOLLERR_FLAG);
+				}
 			}
 			if (event & EPOLLOUT_FLAG)
 			{
 				std::cout << fd << std::endl;
 				auto it = active_clients.find(fd);
 				if (it != active_clients.end() && it->second.client->hasResponse())
-					it->second.client->send_response(it->second.client->getResponseString());
+				{
+					ssize_t status = it->second.client->send_response(it->second.client->getResponseString());
+					if (status == -1)
+						event_loop.modifyFd(fd, EPOLLERR_FLAG);
+				}
 			}
 		}
 	}
@@ -261,7 +269,7 @@ void WebServer::cleanInactiveClients()
 /// @brief read request from client and either serve error or process it
 /// @param client_fd client to process
 /// @param handler handler instance for all processes
-void WebServer::handleClientRequest(int client_fd)
+ssize_t WebServer::handleClientRequest(int client_fd)
 {
 	auto it = active_clients.find(client_fd);
 	if (it == active_clients.end())
@@ -281,9 +289,9 @@ void WebServer::handleClientRequest(int client_fd)
 	// std::cout << "request from " << client_fd << std::endl;
 	if (client.read_request() == -1) // should read in headers
 	{
-		getNextHandler().serveErrorPage(client, 400); // need to mod serverErrorPage!!!
+		getNextHandler().serveErrorPage(client, 400);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return;
+		return -1;
 	}
 	// Logik zum finden der korrekten Route nach dem einlesen der header
 	int error = 0;
@@ -291,7 +299,7 @@ void WebServer::handleClientRequest(int client_fd)
 	{
 		getNextHandler().serveErrorPage(client, error); // need to mod serverErrorPage!!!
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return;
+		return -1;
 	}
 
 	const RouteConf* route = client.getRoute();
@@ -301,22 +309,23 @@ void WebServer::handleClientRequest(int client_fd)
 		{
 			getNextHandler().serveErrorPage(client, 508); // need to mod serverErrorPage!!!
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return;
+			return -1;
 		}
 
 		getNextHandler().handleRedirect(*route, client);
 		client.setRoute(nullptr);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return;
+		return 0;
 	}
 
 	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
 	{
 		getNextHandler().serveErrorPage(client, 405); // need to mod serverErrorPage!!!
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return;
+		return 0;
 	}
 
 	getNextHandler().handleRequest(client);
 	event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+	return 0;
 }
