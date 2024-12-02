@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/07 06:06:43 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 03:31:45 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 	response.setStatus(*route_conf.redirect_code);
 	response.setHeader("Location", redirect);
 	response.setBody("Redirecting to " + redirect);
-	client.send_response(response.buildResponse());
+	client.setResponseString(response.buildResponse());
+	// client.send_response(response.buildResponse());
 }
 
 /// @brief Entrypoint and management function for sorting Requests.
@@ -57,28 +58,6 @@ void		RequestHandler::handleRequest(Client& client)
 		handleDeleteRequest(client);
 	else
 		serveErrorPage(client, 501);
-}
-
-void		RequestHandler::handleDeleteRequest(Client& client)
-{
-	// std::string file_path = route_conf.root + request.getUri();
-
-	// LOGIK:
-	//  |
-	//  V
-	// if (std::filesystem::exists(file_path) && !std::filesystem::is_directory(file_path))
-	// {
-	// 	if (std::filesystem::remove(file_path))
-	// 		client.send_response(HttpResponse(200, "text/plain", "File deleted successfully"));
-	// 	else
-	// 		serveErrorPage(client, 500); // Internal Server Error
-	// }
-	// else
-	// 	serveErrorPage(client, 404); // Not
-
-	(void)client;
-	// HttpResponse response;
-	// client.send_response(response.buildResponse());
 }
 
 // UTILS

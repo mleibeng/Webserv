@@ -1,35 +1,37 @@
 
-- There should be only one read or one write per client per select() (or equivalent). Ask the group to show you the code from the select() (or equivalent) to the read and write of a client.
+- There should be only one read or one write per client per select() (or equivalent). Ask the group to show you the code from the select() (or equivalent) to the read and write of a client. - ok
 
-- Search for all read/recv/write/send on a socket and check that, if an error is returned, the client is removed.
+- Search for all read/recv/write/send on a socket and check that, if an error is returned, the client is removed. - ok
 
-- Search for all read/recv/write/send and check if the returned value is correctly checked (checking only -1 or 0 values is not enough, both should be checked).
+- Search for all read/recv/write/send and check if the returned value is correctly checked (checking only -1 or 0 values is not enough, both should be checked). - ok
 
-- Writing or reading ANY file descriptor without going through the select() (or equivalent) is strictly FORBIDDEN.
+- Writing or reading ANY file descriptor without going through the select() (or equivalent) is strictly FORBIDDEN. - ok
 
-- Setup multiple servers with different ports.
-	port 8080/8081
+- Setup default error page (try to change the error 404). - verstaendnis problem zwischen le moi und mott
 
-- Setup multiple servers with different hostnames (use something like: curl --resolve example.com:80:127.0.0.1 http://example.com/).
+- Limit the client body (use: curl -X POST -H "Content-Type: plain/text" --data "BODY IS HERE write something shorter or longer than body limit"). 100-continue - nicht probiert
 
-- Setup default error page (try to change the error 404).
+- Setup a default file to search for if you ask for a directory. - verstaendnisproblem, funktioniert aber
 
-- write(): Bad file descriptor
+- You need to test with files containing errors to see if the error handling works properly. You can use a script containing an infinite loop or an error; you are free to do whatever tests you want within the limits of acceptability that remain at your discretion. The group being evaluated should help you with this. - nicht probiert, aber sollte klappen <---- hier mal eine html/php page mit einem infinite loop als script testen
 
-- Limit the client body (use: curl -X POST -H "Content-Type: plain/text" --data "BODY IS HERE write something shorter or longer than body limit"). 100-continue
+- POST CGI - nicht getestet
 
-- Setup a default file to search for if you ask for a directory.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+- Setup multiple servers with different hostnames (use something like: curl --resolve example.com:80:127.0.0.1 http://example.com/). - funkt auch
+
+- write(): Bad file descriptor - fixed
 
 - # root html_pages/uploads
  /home/buildozer/aports/main/gcc/src/build/x86_64-alpine-linux-musl/libstdc++-v3/include/bits/basic_string.h:1341: std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::reference std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::back() [with _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>; reference = char&]: Assertion '!empty()' failed.
-Aborted
+Aborted - keine ahnung wie ich das reproduziere, habe das problem nicht gehabt die letzten tage
 
-- ab -n 100 -c 10 http://localhost:8080/ oder siege
+- ab -n 100 -c 10 http://localhost:8080/ oder siege - 92/100 funkt nicht komplett !!! oder 956/1000 <----- lag an EPOLLOUT | EPOLLIN waehrend addFd funktion call <----- wieder ok
 
-- You need to test with files containing errors to see if the error handling works properly. You can use a script containing an infinite loop or an error; you are free to do whatever tests you want within the limits of acceptability that remain at your discretion. The group being evaluated should help you with this.
+- In the configuration, try to setup the same port multiple times. It should not work. - gestern gemacht
 
-- In the configuration, try to setup the same port multiple times. It should not work.
+- TEST Cookie - sollte funktionieren laut letzten tests. hier hab ich auch die timepoints sanitized.
 
-- POST CGI
-
-- TEST Cookie
+- Setup multiple servers with different ports. - funkt
+	port 8080/8081

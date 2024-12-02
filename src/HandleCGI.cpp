@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/11 20:25:10 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/02 14:14:34 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,7 +156,8 @@ void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, con
 	else
 		return serveErrorPage(client, 500);
 
-	client.send_response(response.buildResponse()); // build response and send
+	// client.send_response(response.buildResponse()); // build response and send
+	client.setResponseString(response.buildResponse());
 }
 
 /// @brief write to child process for execve program
@@ -194,7 +195,7 @@ void RequestHandler::buildCGIResponse(const std::string& out, HttpResponse& resp
 	std::string line;
 	bool headers_done = false;
 	response.setStatus(200);
-
+	response.setCookie("lastPostRequest", getTime());
 
 	std::stringstream body;
 	while (std::getline(out_stream, line))

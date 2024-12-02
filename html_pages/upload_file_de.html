@@ -21,10 +21,38 @@
 			<input type="submit" value="Datei hochladen">
 		</form>
 
+		<h2>Hochgeladene Dateien</h2>
+		<ul id="fileList">
+			<li>
+				<span>test.txt</span>
+				<button class="delete-btn" onclick="deleteFile('test.txt')">Löschen</button>
+			</li>
+		</ul>
+
 		<div class="links">
 			<a href="index_de.html" class="button">Zurück zur Startseite</a>
 		</div>
 	</div>
+
+	<script>
+		async function deleteFile(filename) {
+			try {
+				const response = await fetch(`/${filename}`, {
+					method: 'DELETE',
+				});
+
+				if (response.ok) {
+					alert('File deleted successfully');
+					location.reload();
+				} else {
+					alert('Failed to delete file');
+				}
+			} catch (error) {
+				console.error('Error:', error);
+				alert('An error occurred');
+			}
+		}
+	</script>
 </body>
 
 </html>

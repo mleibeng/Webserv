@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/11 19:16:02 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/02 14:14:55 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,25 @@
 
 /// @brief Webserver Constructor -> Parses and prints config data and sets running to false
 /// @param conf_file Saves data structures and values read in from the config file
+// event_loop(config)
 WebServer::WebServer(const std::string &conf_file) : config(Config::parse(conf_file)), running(false)
 {
 	// config.print();
+}
+
+bool WebServer::portInUse(int port)
+{
+	for (const auto& [key, _] : server_listeners)
+	{
+		size_t pos = key.find(':');
+		if (pos != std::string::npos)
+		{
+			int blocked_port = std::stoi(key.substr(pos + 1));
+			if (blocked_port == port)
+				return true;
+		}
+	}
+	return false;
 }
 
 /// @brief set up ports to listen for connections on each server
@@ -37,6 +53,11 @@ void WebServer::setupListeners()
 
 		for (const auto& port : ports)
 		{
+			if (portInUse(port))
+			{
+				std::cerr << "port: " << port << " already in use" << std::endl;
+				continue;
+			}
 			std::string server_key = server.hostname + ":" + std::to_string(port);
 
 			int fd = createNonBlockingSocket();
@@ -45,16 +66,39 @@ void WebServer::setupListeners()
 			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
 				std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
 
-			struct sockaddr_in addr;
-			addr.sin_family = AF_INET;
-			addr.sin_addr.s_addr = INADDR_ANY;
-			addr.sin_port = htons(port);
+			struct addrinfo addr, *res;
+			memset(&addr, 0, sizeof addr);
+			addr.ai_family = AF_INET;
+			addr.ai_socktype = SOCK_STREAM;
+			addr.ai_flags = AI_PASSIVE;
 
-			if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
+			int status = getaddrinfo(server.hostname.c_str(), std::to_string(port).c_str(), &addr, &res);
+			if (status != 0)
 			{
 				close(fd);
+				throw std::runtime_error("Could not resolve hostname: " + server.hostname);
+			}
+
+			if (bind(fd, res->ai_addr, res->ai_addrlen) < 0)
+			{
+				std::cerr << "Failed to bind address to" << server.hostname << std::endl;
+				close(fd);
+				freeaddrinfo(res);
 				throw std::runtime_error("Failed to bind socket");
 			}
+
+			freeaddrinfo(res);
+
+			// struct sockaddr_in addr;
+			// addr.sin_family = AF_INET;
+			// addr.sin_addr.s_addr = INADDR_ANY;
+			// addr.sin_port = htons(port);
+
+			// if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
+			// {
+			// 	close(fd);
+			// 	throw std::runtime_error("Failed to bind socket");
+			// }
 
 			if (listen(fd, SOMAXCONN) < 0)
 			{
@@ -89,6 +133,7 @@ void WebServer::acceptConnections(int fd)
 	int flags = fcntl(client_fd, F_GETFL, 0);
 	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
 	event_loop.addFd(client_fd, EPOLLIN_FLAG);
+	//event_loop.addClient(client_fd, std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)));
 }
 
 /// @brief create and set sockets non blocking
@@ -134,8 +179,9 @@ void WebServer::stop()
 }
 
 /// @brief server loop waiting for events to happen and process
-void WebServer::runLoop()
+void WebServer::runLoop() // maybe need to modify for more clear subject rules
 {
+
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
@@ -152,7 +198,7 @@ void WebServer::runLoop()
 				close(fd);
 				event_loop.removeFd(fd);
 			}
-			else if (event & EPOLLIN_FLAG)
+			if (event & EPOLLIN_FLAG)
 			{
 				bool is_listener = false;
 				for (const auto& [_, fds] : server_listeners)
@@ -165,17 +211,38 @@ void WebServer::runLoop()
 					}
 				}
 				if (!is_listener)
-					handleClientRequest(fd);
+				{
+					int status = handleClientRequest(fd);
+					if (status == -1)
+						event_loop.modifyFd(fd, EPOLLERR_FLAG);
+				}
+			}
+			if (event & EPOLLOUT_FLAG)
+			{
+				std::cout << fd << std::endl;
+				auto it = active_clients.find(fd);
+				if (it != active_clients.end() && it->second.client->hasResponse())
+				{
+					ssize_t status = it->second.client->send_response(it->second.client->getResponseString());
+					if (status == -1)
+						event_loop.modifyFd(fd, EPOLLERR_FLAG);
+				}
 			}
 		}
 	}
 }
 
+RequestHandler& WebServer::getNextHandler()
+{
+	return *handler_pool[current_handler++ % handler_pool.size()];
+}
+
 /// @brief initializes epoll_fd and sets up the listening socket fds. Also loads the error pages into the WebServer class
-void WebServer::initialize()
+void WebServer::initialize(size_t pool)
 {
 	setupListeners();
-	request_handler = std::make_unique<RequestHandler>(config);
+	for (size_t i = 0; i < pool; ++i)
+		handler_pool.push_back(std::make_unique<RequestHandler>(config));
 }
 
 WebServer::ClientInfo::ClientInfo(int fd, const Config& config) : client(std::make_unique<Client>(fd, config)), last_active(std::time(nullptr))
@@ -202,7 +269,7 @@ void WebServer::cleanInactiveClients()
 /// @brief read request from client and either serve error or process it
 /// @param client_fd client to process
 /// @param handler handler instance for all processes
-void WebServer::handleClientRequest(int client_fd)
+ssize_t WebServer::handleClientRequest(int client_fd)
 {
 	auto it = active_clients.find(client_fd);
 	if (it == active_clients.end())
@@ -221,27 +288,44 @@ void WebServer::handleClientRequest(int client_fd)
 
 	// std::cout << "request from " << client_fd << std::endl;
 	if (client.read_request() == -1) // should read in headers
-		return request_handler->serveErrorPage(client, 400);
-
+	{
+		getNextHandler().serveErrorPage(client, 400);
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return -1;
+	}
 	// Logik zum finden der korrekten Route nach dem einlesen der header
 	int error = 0;
 	if ((error = client.setCourse()) && error != 0)
-		return request_handler->serveErrorPage(client, error);
+	{
+		getNextHandler().serveErrorPage(client, error); // need to mod serverErrorPage!!!
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return -1;
+	}
 
 	const RouteConf* route = client.getRoute();
 	if (route && route->redirect.has_value())
 	{
 		if (client.getNumRedirects() >= route->max_redirects)
-			return request_handler->serveErrorPage(client, 508);
+		{
+			getNextHandler().serveErrorPage(client, 508); // need to mod serverErrorPage!!!
+			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+			return -1;
+		}
 
-		request_handler->handleRedirect(*route, client);
+		getNextHandler().handleRedirect(*route, client);
 		client.setRoute(nullptr);
-		return;
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return 0;
 	}
 
 	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
-		return request_handler->serveErrorPage(client, 405);
+	{
+		getNextHandler().serveErrorPage(client, 405); // need to mod serverErrorPage!!!
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return 0;
+	}
 
-	// logik zum handeln von teilweisen requests...
-	request_handler->handleRequest(client);
+	getNextHandler().handleRequest(client);
+	event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+	return 0;
 }

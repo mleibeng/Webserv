@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleGet.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/08 18:26:48 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/29 17:47:21 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,64 +20,42 @@ void		RequestHandler::handleGetRequest(Client& client)
 	const RouteConf* route_conf = client.getRoute();
 	const std::string& parsed = client.getBestPath();
 
-	std::cout << "phys path: "<< parsed << " query: " << client.getRequest().getQuery() << std::endl;
-
 	// Case 1: Specific file check
 	if (std::filesystem::exists(parsed) && !std::filesystem::is_directory(parsed))
 	{
-		std::cout << "option 1 direct resource request" << std::endl;
+		// std::cout << "case 1" << std::endl;
 		std::string extension = getFileExtension(parsed);
-		if (!extension.empty() &&  extension == ".php")
-		{
-			std::cout << "option 1 php cgi" << std::endl;
-			handleCGI(client, parsed);
-			return;
-		}
-		std::cout << "option 1 static file" << std::endl;
-		sendFile(client, parsed);
-		return;
+		if (!extension.empty() && (!route_conf->cgi_extensions.empty() &&
+			std::find(route_conf->cgi_extensions.begin(),
+			route_conf->cgi_extensions.end(),
+			extension) != route_conf->cgi_extensions.end()))
+			return handleCGI(client, parsed);
+		return sendFile(client, parsed);
 	}
 
 	// Case 2 Directory handling
-	std::string path_check = parsed;
-
-	// probably unecessary now since being utilizied in parsed already.
-	// if (path_check.back() != '/')
-	// 	path_check += '/';
-
-	if (std::filesystem::is_directory(path_check))
+	// std::cout << "case 2" << std::endl;
+	if (std::filesystem::is_directory(parsed))
 	{
-		std::cout << "option 2: default file" << std::endl;
 		// Default file check : Either PHP or static
 		if (!route_conf->default_file.empty())
 		{
-			std::string default_path = path_check + route_conf->default_file;
-			std::cout << "default path opt 2: " << default_path << std::endl;
+			std::string default_path = parsed + route_conf->default_file;
 			if (std::filesystem::exists(default_path))
 			{
 				std::string extension = getFileExtension(default_path);
-				if (!route_conf->cgi_extension.empty() && extension == route_conf->cgi_extension)
-				{
-					std::cout << "option 2 cgi handler called" << std::endl;
-					handleCGI(client, default_path);
-					return;
-				}
-				sendFile(client, default_path);
-				return;
+				if (!route_conf->cgi_extensions.empty() && std::find(route_conf->cgi_extensions.begin(), route_conf->cgi_extensions.end(), extension) != route_conf->cgi_extensions.end()) //here doesn't work for example because extension is string and cgi_extensions is vector<string>
+					return handleCGI(client, default_path);
+				return sendFile(client, default_path);
 			}
 		}
+		// std::cout << "case 3" << std::endl;
 		// Directory listing
 		if (route_conf->dir_listing_active)
-		{
-			std::cout << "option 3: Dir_listing" << std::endl;
-			sendDirListing(client, path_check);
-			return;
-		}
-		serveErrorPage(client, 403);
-		return;
+			return sendDirListing(client, parsed);
+		return serveErrorPage(client, 403);
 	}
-	std::cout << "option 4: Not found" << std::endl;
-	// Case not foundq
+	// std::cout << "case 4 error" << std::endl;
 	serveErrorPage(client, 404);
 }
 
@@ -115,7 +93,8 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 	response.setStatus(200);
 	response.setBody(html.str());
 	response.setMimeType(getFileExtension(".html"));
-	client.send_response(response.buildResponse());
+	client.setResponseString(response.buildResponse());
+	// client.send_response(response.buildResponse());
 }
 
 /// @brief Function to send back a static file response that was requested by the browser.
@@ -124,6 +103,7 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 void RequestHandler::sendFile(Client& client, const std::string& file_path)
 {
 	HttpResponse response;
+	const HttpRequest& request = client.getRequest();
 
 	std::ifstream file(file_path, std::ios::binary);
 	if (!file.is_open())
@@ -136,8 +116,22 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	fileBuf << file.rdbuf();
 	file.close();
 
+	//Cookie tryout
+	int visit_count;
+	std::string visit_counter = request.getCookie("visit_count");
+	if (visit_counter.empty())
+		visit_count = 1;
+	else
+	{
+		visit_count = std::stoi(visit_counter);
+		if (getFileExtension(file_path) == ".html")
+			visit_count++;
+	}
 	response.setStatus(200);
+	response.setCookie("visit_count", std::to_string(visit_count));
+	response.setCookie("lastVisit", getTime());
 	response.setBody(fileBuf.str());
 	response.setMimeType(getFileExtension(file_path));
-	client.send_response(response.buildResponse());
+	// client.send_response(response.buildResponse());
+	client.setResponseString(response.buildResponse());
 }

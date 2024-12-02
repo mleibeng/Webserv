@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/11/07 06:03:02 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/11/28 23:36:54 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,13 @@ class Client {
 		Client& operator=(const Client& other) = delete;
 
 		const HttpRequest& getRequest() const;
+		const std::string& getResponseString() const;
+		void  setResponseString(const std::string& built_response);
 		const int& getFd() const;
+		bool  hasResponse();
+
+		//bool checks
+		// bool hasResponse();
 
 		ssize_t read_request();
 		ssize_t send_response(const std::string& response_string);
@@ -41,20 +47,18 @@ class Client {
 
 		void setRoute(const RouteConf* route);
 
-		ssize_t processChunk(const std::string& chunky);
-
 		//incrementers
 		void increaseRedirectCount();
 		void setBuffer(size_t buffersize);
 
-		bool isFileUpload() const;
-		bool needsRouteResolution() const;
-
+		//connection checkers
 		bool keepAlive() const;
+		bool checkKeepAliveHeaders();
+
+		//route mngmt
+		int setCourse();
 		const RouteConf* getRoute() const;
 		const std::string& getBestPath() const;
-
-		int setCourse();
 		const ServerConf *findServerConf(const HttpRequest &request);
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
 		std::string parsePath(const RouteConf& route_conf, const HttpRequest& request);
@@ -69,6 +73,7 @@ class Client {
 		const RouteConf *_route;
 		bool _keep_alive;
 		std::string _best_path;
+		std::string _response_to_send;
 };
 
 #endif // CLIENT_H

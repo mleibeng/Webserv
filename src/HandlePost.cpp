@@ -3,14 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   HandlePost.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/11/08 18:30:59 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/28 23:09:08 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "RequestHandler.hpp"
+
+
 
 /// @brief
 /// @param client
@@ -23,13 +25,8 @@ void	RequestHandler::handlePostRequest(Client& client)
 	const std::string& content_type = client.getRequest().getHeader("Content-Type");
 	const std::string& body = client.getRequest().getBody();
 
-	(void)route_conf;
-	std::string fileextension = getFileExtension(parsed);
-	// if (!route_conf.cgi_extension.empty() && getFileExtension(parsed) == route_conf.cgi_extension) {
-	// if (fileextension == ".php") {
-	// 	handleCGI(client, parsed);
-	// }
-	if (!route_conf->cgi_extension.empty() && getFileExtension(parsed) == route_conf->cgi_extension)
+	std::string file_extension = getFileExtension(parsed);
+	if (!route_conf->cgi_extensions.empty() && std::find(route_conf->cgi_extensions.begin(), route_conf->cgi_extensions.end(), file_extension) != route_conf->cgi_extensions.end())
 	{
 		handleCGI(client, parsed);
 	}
@@ -80,9 +77,11 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 
 		HttpResponse response;
 		response.setStatus(201);
+		response.setCookie("lastPostRequest", getTime());
 		response.setBody("upload successful");
 		response.setMimeType(".html");
-		client.send_response(response.buildResponse());
+		client.setResponseString(response.buildResponse());
+		// client.send_response(response.buildResponse());
 	}
 	else {
 		return serveErrorPage(client, 500); // Internal Server Error if file creation fails
@@ -143,6 +142,8 @@ std::string RequestHandler::extractFileData(const std::string& file)
 	return file.substr(content_start);
 }
 
+
+
 void	RequestHandler::handleFormSubmission(Client& client, const std::string& body)
 {
 	size_t pos_name = body.find("name=");
@@ -153,7 +154,9 @@ void	RequestHandler::handleFormSubmission(Client& client, const std::string& bod
 
 	HttpResponse response;
 	response.setStatus(201);
+	response.setCookie("lastPostRequest", getTime());
 	response.setBody("name: " + name + "<br>" + "message: " + message);
 	response.setMimeType(".html");
-	client.send_response(response.buildResponse());
+	client.setResponseString(response.buildResponse());
+	// client.send_response(response.buildResponse());
 }

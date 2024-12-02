@@ -3,14 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/05 15:31:22 by mott             ###   ########.fr       */
+/*   Updated: 2024/11/25 17:06:52 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
+
+//utils
+std::string getTime()
+{
+	std::time_t now = std::time(nullptr);
+	std::string form_time = std::ctime(&now);
+	form_time.erase(form_time.find_first_not_of("\n") + 1);
+	return form_time;
+}
 
 HttpRequest::HttpRequest()
 {
@@ -96,5 +105,7 @@ bool	HttpRequest::parse(const std::string& rawmsg)
 
 	std::string body((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
 	setBody(trimStr(body));
+
+	parseCookies();
 	return (true);
 }

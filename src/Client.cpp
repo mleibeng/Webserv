@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/11/12 18:02:04 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/02 14:14:19 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,38 +27,63 @@ Client::~Client()
 	close(_client_fd);
 }
 
+const	std::string& Client::getResponseString() const
+{
+	return _response_to_send;
+}
+
+void	Client::setResponseString(const std::string& built_response)
+{
+	_response_to_send = built_response;
+}
+
 void Client::setBuffer(size_t buffersize)
 {
 	_buffersize = buffersize;
+}
+
+bool Client::hasResponse()
+{
+	return !_response_to_send.empty();
 }
 
 /// @brief reads in the clientside data sent from the webbrowser
 /// @return returns length of request or -1 in case of error
 ssize_t Client::read_request()
 {
-	ssize_t nbytes;
-	char buffer[_buffersize + 1];
-	std::string request;
+	std::vector<char> buffer(_buffersize + 1);
+	ssize_t total_read = 0;
 
-	// do {
-		nbytes = read(_client_fd, buffer, sizeof(buffer));
-	// } while (nbytes == -1 && (errno == EAGAIN || errno == EWOULDBLOCK));
-
-	if (nbytes == -1)
-		std::cerr << RED << "read(): " << strerror(errno) << DEFAULT << std::endl;
-	else if (nbytes == 0)
-		close(_client_fd);
-	else if (nbytes == static_cast<ssize_t>(_buffersize + 1))
-		return -1;
-	else
+	while (true)
 	{
-		request.assign(buffer, nbytes);
-		std::cout << YELLOW << request << DEFAULT << std::endl;
+		ssize_t bytes = read(_client_fd,
+							buffer.data() + total_read,
+							buffer.size() - total_read);
+
+		if (bytes <= 0)
+		{
+			_keep_alive = false;
+			break;
+		}
+
+		total_read += bytes;
+		if (total_read >= static_cast<ssize_t>(_buffersize)) {
+			return -1;  // Request too large
+		}
+	}
+
+	if (total_read > 0)
+	{
+		std::string request(buffer.data(), total_read);
 		bool ok = _request.parse(request);
 		if (!ok)
 			return -1;
+
+		// Update keep-alive based on HTTP headers
+		_keep_alive = checkKeepAliveHeaders();
 	}
-	return nbytes;
+
+	return total_read;
 }
 
 int Client::getNumRedirects() const
@@ -78,6 +103,14 @@ void Client::setRoute(const RouteConf* route)
 
 bool Client::keepAlive() const
 {return _keep_alive;}
+
+bool Client::checkKeepAliveHeaders()
+{
+	auto connection = _request.getHeader("Connection");
+	if (!connection.empty())
+		return std::strcmp(connection.c_str(), "close") != 0;
+	return _request.getHttpVersion() == "HTTP/1.1";
+}
 
 const RouteConf* Client::getRoute() const
 {return _route;}
@@ -106,15 +139,24 @@ int Client::setCourse()
 /// @return returns length of string sent or -1 in case of write error
 ssize_t Client::send_response(const std::string& response_string)
 {
-	ssize_t nbytes;
+	ssize_t total_sent = 0;
+	size_t remaining = response_string.size();
 
-	// std::cout << response_string << std::endl;
-	nbytes = write(_client_fd, response_string.c_str(), response_string.size());
-	if (nbytes == -1) {
-		std::cerr << RED << "write(): " << strerror(errno) << DEFAULT << std::endl;
+	while (total_sent < static_cast<ssize_t>(response_string.size())) {
+		ssize_t sent = write(_client_fd,
+							response_string.c_str() + total_sent,
+							remaining);
+
+		if (sent <= 0)
+			return -1;
+
+		total_sent += sent;
+		remaining -= sent;
 	}
 
-	return nbytes;
+	close(_client_fd);
+
+	return total_sent;
 }
 
 /// @brief get fd of client
@@ -130,7 +172,6 @@ const HttpRequest& Client::getRequest() const
 {
 	return _request;
 }
-
 
 /// @brief find host:port combination and split
 /// @param host host:port combination to split
