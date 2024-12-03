@@ -13,6 +13,7 @@ RUN apt-get update && apt-get upgrade -y && \
     php \
     php-cgi \
     curl \
+    siege \
     python3 && \
     apt-get clean && \
     rm -fr /var/lib/apt/lists/*

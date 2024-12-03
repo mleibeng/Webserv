@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/03 16:58:10 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/03 21:08:49 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,39 +180,35 @@ std::string HttpResponse::stostr() const
 	switch(_status)
 	{
 		case StatusCode::OK:
-			return("OK");
+			return ("OK");
 		case StatusCode::CREATED:
-			return("Created");
-		case StatusCode::ACCEPTED:
-			return("Accepted");
+			return ("Created");
 		case StatusCode::NOCONTENT:
-			return("No Content");
+			return ("No Content");
 		case StatusCode::MOVED_PERM:
-			return("Moved Permanently");
+			return ("Moved Permanently");
 		case StatusCode::MOVED_TEMP:
-			return("Moved temporarily");
+			return ("Moved temporarily");
 		case StatusCode::NOT_MODIFIED:
-			return("Not Modified");
+			return ("Not Modified");
 		case StatusCode::BAD_REQUEST:
-			return("Bad Request");
-		case StatusCode::UNAUTHORIZED:
-			return("Unauthorized");
+			return ("Bad Request");
 		case StatusCode::FORBIDDEN:
-			return("Forbidden");
+			return ("Forbidden");
 		case StatusCode::NOT_FOUND:
-			return("Not Found");
+			return ("Not Found");
+		case StatusCode::METH_NOT_ALLOWED:
+			return ("Method Not Allowed");
+		case StatusCode::CONFLICT:
+			return ("Conflict");
 		case StatusCode::INTERNAL_SERV_ERR:
-			return("Internal Server Error");
+			return ("Internal Server Error");
 		case StatusCode::NOT_IMPLEMENTED:
-			return("Not implemented");
-		case StatusCode::BAD_GATEWAY:
-			return("Bad Gateway");
-		case StatusCode::SERVICE_UNAVAIL:
-			return("Service Unavailable");
+			return ("Not implemented");
 		case StatusCode::ENDLESS_LOOP:
-			return("Redirection Loop");
+			return ("Redirection Loop");
 		default:
-			return("Unknown Status");
+			return ("Unknown Status");
 	}
 }
 

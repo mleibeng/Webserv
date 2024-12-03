@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/03 16:43:44 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/03 21:10:53 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ void WebServer::setupListeners()
 			if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
 				std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
 
+//
 			struct addrinfo addr, *res;
 			memset(&addr, 0, sizeof addr);
 			addr.ai_family = AF_INET;
@@ -88,17 +89,21 @@ void WebServer::setupListeners()
 			}
 
 			freeaddrinfo(res);
+//
 
-			// struct sockaddr_in addr;
-			// addr.sin_family = AF_INET;
-			// addr.sin_addr.s_addr = INADDR_ANY;
-			// addr.sin_port = htons(port);
 
-			// if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
-			// {
-			// 	close(fd);
-			// 	throw std::runtime_error("Failed to bind socket");
-			// }
+// //
+// 			struct sockaddr_in addr;
+// 			addr.sin_family = AF_INET;
+// 			addr.sin_addr.s_addr = INADDR_ANY;
+// 			addr.sin_port = htons(port);
+
+// 			if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
+// 			{
+// 				close(fd);
+// 				throw std::runtime_error("Failed to bind socket");
+// 			}
+// //
 
 			if (listen(fd, SOMAXCONN) < 0)
 			{

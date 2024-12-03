@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGICreator.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/31 22:52:24 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/07 01:16:36 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/03 19:29:08 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,7 @@ class PythonHandler : public CGIHandler
 	std::string getDefaultContent() const override;
 };
 
-//class perlhandler
 
-//class rubyhandler
-
-//class etc...
 
 class CGIHandleCreator
 {

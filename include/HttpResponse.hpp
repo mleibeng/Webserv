@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/10 03:53:56 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/03 21:04:34 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,20 +44,17 @@ enum class StatusCode
 {
 	OK = 200,
 	CREATED = 201,
-	ACCEPTED = 202,
 	NOCONTENT = 204,
 	MOVED_PERM = 301,
-	MOVED_TEMP = 302,
-	NOT_MODIFIED = 304,
+	MOVED_TEMP = 302, // do we even need this?
+	NOT_MODIFIED = 304, // do we even need this?
 	BAD_REQUEST = 400,
-	UNAUTHORIZED = 401,
 	FORBIDDEN = 403,
 	NOT_FOUND = 404,
 	METH_NOT_ALLOWED = 405,
+	CONFLICT = 409,
 	INTERNAL_SERV_ERR = 500,
-	NOT_IMPLEMENTED = 501,
-	BAD_GATEWAY = 502,
-	SERVICE_UNAVAIL = 503,
+	NOT_IMPLEMENTED = 501, // test this need changes maybe
 	ENDLESS_LOOP = 508
 };
 

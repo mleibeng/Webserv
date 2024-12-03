@@ -41,4 +41,11 @@ curl -X GET -v http://127.0.0.1:8081/
 curl -X GET -v http://localhost:8080/
 curl -X GET -v http://localhost:8081/
 curl -X GET -v --resolve www.42webserv.de:8080:127.0.0.1 http://www.42webserv.de:8080
-curl -X GET -v --resolve www.43webserv.de:8081:127.0.0.1 http://www.43webserv.de:8081
+curl -X GET -v --resolve www.43webserv.de:8081:127.0.0.2 http://www.43webserv.de:8081
+
+curl -X POST -F "file=@$HOME/file.txt" http://127.0.0.1:8080/uploads // 400 Bad Request wegen curl
+
+curl -O http://127.0.0.1:8080/uploads/file.txt
+
+curl -X PUT -v http://localhost:8080/
+curl -X DELETE http://localhost:8080/index_de.html // 405
