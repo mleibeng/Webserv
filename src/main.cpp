@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:06 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/15 03:48:08 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/03 16:38:10 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ int main(int argc, char** argv)
 		config_file = argv[1];
 	try
 	{
-		// std::cout << "concurrency: " << std::thread::hardware_concurrency() << std::endl;
 		WebServer MainServ(config_file);
 		g_server_ptr = &MainServ;
 		std::signal(SIGINT, sighandler);

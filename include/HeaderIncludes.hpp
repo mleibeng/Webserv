@@ -3,31 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   HeaderIncludes.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/07 01:10:59 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/25 17:05:40 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/03 17:05:37 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HEADER_INCLUDES
 #define HEADER_INCLUDES
 
-#ifdef __APPLE__
-#include <sys/event.h>
-#define EPOLLIN_FLAG EVFILT_READ
-#define EPOLLERR_FLAG EVFILT_EXCEPT
-#define EPOLLHUP_FLAG EVFILT_READ
-#define EPOLLOUT_FLAG EVFILT_WRITE
-#define EPOLLET_FLAG EV_CLEAR
-#else
 #include <sys/epoll.h>
 #define EPOLLIN_FLAG EPOLLIN
 #define EPOLLERR_FLAG EPOLLERR
 #define EPOLLHUP_FLAG EPOLLHUP
 #define EPOLLOUT_FLAG EPOLLOUT
 #define EPOLLET_FLAG EPOLLET
-#endif
 
 #include <vector>
 #include <unordered_map>
@@ -58,9 +49,6 @@
 #include <errno.h>
 #include <thread>
 #include <algorithm>
-
-
-//utils function
 
 std::string getTime();
 

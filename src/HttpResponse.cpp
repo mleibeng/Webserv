@@ -6,15 +6,13 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/02 14:14:45 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/03 16:58:10 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpResponse.hpp"
 
-HttpResponse::HttpResponse() : AHttpMessage()
-{
-}
+HttpResponse::HttpResponse() : AHttpMessage() {}
 
 HttpResponse::HttpResponse(const HttpResponse &other) : AHttpMessage()
 {
@@ -32,33 +30,29 @@ HttpResponse& HttpResponse::operator=(const HttpResponse &other)
 	return *this;
 }
 
-HttpResponse::~HttpResponse()
-{
-}
+HttpResponse::~HttpResponse() {}
 
-//SETTERS
-void	HttpResponse::setStatus(int status)
+void HttpResponse::setStatus(int status)
 {
 	_status = HttpResponse::itos(status);
 }
 
-void	HttpResponse::setStatus(StatusCode status)
+void HttpResponse::setStatus(StatusCode status)
 {
 	_status = status;
 }
 
-void		HttpResponse::setMimeType(std::string extension)
+void HttpResponse::setMimeType(std::string extension)
 {
 	this->setHeader("Content-Type", getMimeType(extension));
 }
 
-//GETTERS
-int	HttpResponse::getStatus() const
+int HttpResponse::getStatus() const
 {
-	return (HttpResponse::stoi());
+	return HttpResponse::stoi();
 }
 
-std::string		HttpResponse::getMimeType(const std::string extension)
+std::string HttpResponse::getMimeType(const std::string extension)
 {
 	static const std::map<std::string, std::string> mimeTypes =
 	{
@@ -90,7 +84,7 @@ std::string		HttpResponse::getMimeType(const std::string extension)
 	return (iter->second);
 }
 
-bool	HttpResponse::parse(const std::string& rawmsg)
+bool HttpResponse::parse(const std::string& rawmsg)
 {
 	std::istringstream	input(rawmsg);
 	std::string			line;
@@ -137,14 +131,8 @@ void HttpResponse::removeCookie(const std::string& key, const std::string& path)
 	setCookie(key, "", 0, path);
 }
 
-void HttpResponse::setCookie(const std::string& key, const std::string& value,
-	int maxAge,
-	const std::string &path,
-	bool secure,
-	bool HttpOnly)
+void HttpResponse::setCookie(const std::string& key, const std::string& value, int maxAge, const std::string &path, bool secure, bool HttpOnly)
 {
-
-
 	std::ostringstream cookie;
 	cookie << key << "=" << value;
 	if (!path.empty())
@@ -159,8 +147,7 @@ void HttpResponse::setCookie(const std::string& key, const std::string& value,
 	_response_cookies.push_back(cookie.str());
 }
 
-
-std::string	HttpResponse::buildResponse() const
+std::string HttpResponse::buildResponse() const
 {
 	std::ostringstream	response;
 
@@ -188,7 +175,7 @@ std::string	HttpResponse::buildResponse() const
 	return (response.str());
 }
 
-std::string	HttpResponse::stostr() const
+std::string HttpResponse::stostr() const
 {
 	switch(_status)
 	{
@@ -234,7 +221,7 @@ StatusCode HttpResponse::itos(int code) const
 	return static_cast<StatusCode>(code);
 }
 
-int		HttpResponse::stoi() const
+int HttpResponse::stoi() const
 {
-	return (static_cast<int>(_status));
+	return static_cast<int>(_status);
 }

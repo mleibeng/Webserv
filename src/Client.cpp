@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/02 14:14:19 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/03 16:42:27 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,11 @@
 
 // HTTP Functionalities -> ErrorPages, FileUpload, CGIs
 // Should to run through REQUEST and RESPONSE Classes
-// -----------------------------------------------------------------------------
 
-Client::Client(int client_fd, const Config& config) : _client_fd(client_fd),
-													  _config(config),
-													  _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE))),
-													  redirect_count(0), _route(nullptr), _keep_alive(true), _best_path()
-{}
+Client::Client(int client_fd, const Config& config) : _client_fd(client_fd), _config(config), _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE))), redirect_count(0), _route(nullptr), _keep_alive(true), _best_path()
+{
+
+}
 
 Client::~Client()
 {
@@ -102,7 +100,9 @@ void Client::setRoute(const RouteConf* route)
 }
 
 bool Client::keepAlive() const
-{return _keep_alive;}
+{
+	return _keep_alive;
+}
 
 bool Client::checkKeepAliveHeaders()
 {
@@ -113,10 +113,14 @@ bool Client::checkKeepAliveHeaders()
 }
 
 const RouteConf* Client::getRoute() const
-{return _route;}
+{
+	return _route;
+}
 
 const std::string& Client::getBestPath() const
-{return _best_path;}
+{
+	return _best_path;
+}
 
 int Client::setCourse()
 {
@@ -161,7 +165,7 @@ ssize_t Client::send_response(const std::string& response_string)
 
 /// @brief get fd of client
 /// @return returns an integer
-const int& Client::getFd() const
+int Client::getFd() const
 {
 	return _client_fd;
 }

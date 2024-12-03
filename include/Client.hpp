@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/11/28 23:36:54 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/03 16:42:03 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,9 @@ class Client {
 
 		const HttpRequest& getRequest() const;
 		const std::string& getResponseString() const;
-		void  setResponseString(const std::string& built_response);
-		const int& getFd() const;
-		bool  hasResponse();
+		void setResponseString(const std::string& built_response);
+		int getFd() const;
+		bool hasResponse();
 
 		//bool checks
 		// bool hasResponse();

@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/02 14:14:55 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/03 16:43:44 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,7 +181,6 @@ void WebServer::stop()
 /// @brief server loop waiting for events to happen and process
 void WebServer::runLoop() // maybe need to modify for more clear subject rules
 {
-
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
@@ -246,7 +245,9 @@ void WebServer::initialize(size_t pool)
 }
 
 WebServer::ClientInfo::ClientInfo(int fd, const Config& config) : client(std::make_unique<Client>(fd, config)), last_active(std::time(nullptr))
-{}
+{
+
+}
 
 void WebServer::cleanInactiveClients()
 {
