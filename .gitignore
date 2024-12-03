@@ -37,3 +37,4 @@ build
 webserv
 docker-compose.yml
 html_pages/uploads/*
+test.txt

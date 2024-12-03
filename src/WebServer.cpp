@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/03 21:10:53 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 00:21:21 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -301,7 +301,7 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 	}
 	// Logik zum finden der korrekten Route nach dem einlesen der header
 	int error = 0;
-	if ((error = client.setCourse()) && error != 0)
+	if ((error = client.setCourse()) && error)
 	{
 		getNextHandler().serveErrorPage(client, error); // need to mod serverErrorPage!!!
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
@@ -324,9 +324,9 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 		return 0;
 	}
 
-	if (!client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod()))
+	if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
 	{
-		getNextHandler().serveErrorPage(client, 405); // need to mod serverErrorPage!!!
+		getNextHandler().serveErrorPage(client, error); // need to mod serverErrorPage!!!
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 		return 0;
 	}

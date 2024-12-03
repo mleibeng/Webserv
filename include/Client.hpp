@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/12/03 16:42:03 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/03 23:47:13 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ class Client {
 		const ServerConf *findServerConf(const HttpRequest &request);
 		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
 		std::string parsePath(const RouteConf& route_conf, const HttpRequest& request);
-		bool isMethodAllowed(const RouteConf &route_conf, const std::string& method);
+		int isMethodAllowed(const RouteConf &route_conf, const std::string& method);
 
 	private:
 		int _client_fd;

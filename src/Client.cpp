@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/03 18:28:46 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 00:17:30 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,11 +249,17 @@ bool startsWith(const std::string& str, const std::string& prefix)
 /// @param route_conf route to check
 /// @param method to check
 /// @return  true/false
-bool Client::isMethodAllowed(const RouteConf &route_conf, const std::string &method)
+int Client::isMethodAllowed(const RouteConf &route_conf, const std::string &method)
 {
+	std::vector<std::string> implemented;
+	implemented.push_back("DELETE");
+	implemented.push_back("POST");
+	implemented.push_back("GET");
+	if (std::find(implemented.begin(), implemented.end(), method) == implemented.end())
+		return (501);
 	if (std::find(route_conf.methods.begin(), route_conf.methods.end(), method) == route_conf.methods.end())
-		return false;
-	return true;
+		return (405);
+	return (0);
 }
 
 /// @brief finds best complete path to file
