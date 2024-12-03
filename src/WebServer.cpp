@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/04 00:21:21 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 00:27:43 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,7 +303,7 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 	int error = 0;
 	if ((error = client.setCourse()) && error)
 	{
-		getNextHandler().serveErrorPage(client, error); // need to mod serverErrorPage!!!
+		getNextHandler().serveErrorPage(client, error);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 		return -1;
 	}
@@ -313,7 +313,7 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 	{
 		if (client.getNumRedirects() >= route->max_redirects)
 		{
-			getNextHandler().serveErrorPage(client, 508); // need to mod serverErrorPage!!!
+			getNextHandler().serveErrorPage(client, 508);
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 			return -1;
 		}
@@ -326,7 +326,7 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 
 	if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
 	{
-		getNextHandler().serveErrorPage(client, error); // need to mod serverErrorPage!!!
+		getNextHandler().serveErrorPage(client, error);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 		return 0;
 	}

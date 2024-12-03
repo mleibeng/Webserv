@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/04 00:17:30 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 00:33:07 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,8 +133,9 @@ int Client::setCourse()
 		return 404;
 
 	_route = route_conf;
+	// std::cout << "route to follow: " << _route->path << std::endl;
 	_best_path = parsePath(*route_conf, _request);
-
+	// std::cout << "Parsed path to follow: " <<_best_path << std::endl;
 	return 0;
 }
 
