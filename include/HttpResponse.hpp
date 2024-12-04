@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/04 03:21:00 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 05:07:02 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ enum class StatusCode
 	FORBIDDEN = 403,
 	NOT_FOUND = 404,
 	METH_NOT_ALLOWED = 405,
-	CONFLICT = 409,
 	INTERNAL_SERV_ERR = 500,
 	NOT_IMPLEMENTED = 501, // test this need changes maybe
 	ENDLESS_LOOP = 508
