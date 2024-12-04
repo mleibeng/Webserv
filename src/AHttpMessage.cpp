@@ -111,7 +111,8 @@ const std::unordered_map<std::string, std::string>&	AHttpMessage::getAllHeaders(
 bool	AHttpMessage::parseHeader(std::istringstream& input)
 {
 	std::string line;
-	while (std::getline(input, line) && !line.empty() && line != "\r") {
+	while (std::getline(input, line) && !line.empty() && line != "\r")
+	{
 		size_t separator = line.find(':');
 		if (separator != std::string::npos) {
 			std::string key = trimStr(line.substr(0, separator));
@@ -119,23 +120,23 @@ bool	AHttpMessage::parseHeader(std::istringstream& input)
 			setHeader(key,value);
 		}
 	}
-	return true;
+	return (true);
 }
 
 std::string AHttpMessage::getCookie(const std::string& key) const
 {
 	auto it = _cookies.find(key);
-	return (it != _cookies.end()) ? it->second : "";
+	return ((it != _cookies.end()) ? it->second : "");
 }
 
 const std::unordered_map<std::string, std::string>& AHttpMessage::getAllCookies() const
 {
-	return _cookies;
+	return (_cookies);
 }
 
 bool AHttpMessage::hasCookie(const std::string& key) const
 {
-	return _cookies.find(key) != _cookies.end();
+	return (_cookies.find(key) != _cookies.end());
 }
 
 void AHttpMessage::parseCookiePair(const std::string &pair)
@@ -153,7 +154,7 @@ void AHttpMessage::parseCookies()
 {
 	auto it = _header.find("Cookie");
 	if (it == _header.end())
-		return;
+		return ;
 
 	const std::string& cookieHeader = it->second;
 	size_t start = 0;
@@ -176,8 +177,8 @@ std::string	AHttpMessage::trimStr(const std::string& str)
 {
 	size_t first = str.find_first_not_of(" \t\n\r");
 	if (first == std::string::npos)
-		return "";
+		return ("");
 
 	size_t last = str.find_last_not_of(" \t\n\r");
-	return str.substr(first, (last - first + 1));
+	return (str.substr(first, (last - first + 1)));
 }

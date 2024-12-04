@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGIEnv.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/01 00:55:12 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/05 15:12:05 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/04 02:03:16 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,6 @@ char** RequestHandler::CGIEnv::getEnv()
 void RequestHandler::CGIEnv::setEnviron(const HttpRequest& request, const std::string& cgi_path, const CGIHandler& handler)
 {
 	std::string method = request.getMethod();
-
-	//Python specific
 	addEnvStuff("PYTHONPATH", "html_pages"); // <--- could use improvement not hardcoding it
 	// addEnvStuff("PYTHONUNBUFFERED", "1"); // logging for immediate print output
 
@@ -99,10 +97,10 @@ void RequestHandler::CGIEnv::addEnvStuff(const std::string &name, const std::str
 void RequestHandler::CGIEnv::debugPrintEnv() const
 {
 	std::cout << "=== CGI Environment Variables ===" << std::endl;
-	for (size_t i = 0; i < env_array.size() - 1; ++i) {
-		if (env_array[i]) {
+	for (size_t i = 0; i < env_array.size() - 1; ++i)
+	{
+		if (env_array[i])
 			std::cout << env_array[i] << std::endl;
-		}
 	}
 	std::cout << "===============================" << std::endl;
 }

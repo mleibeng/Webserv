@@ -35,3 +35,12 @@ Aborted - keine ahnung wie ich das reproduziere, habe das problem nicht gehabt d
 
 - Setup multiple servers with different ports. - funkt
 	port 8080/8081
+
+
+
+
+
+new TODO:
+
+Loop.cpp Line 19 -> 	loop_fd = epoll_create1(0); not allowed
+

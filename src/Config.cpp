@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:15 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/29 00:47:17 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/04 01:51:05 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,17 +36,16 @@ size_t parseSizeNotation(const std::string& sizeStr)
 		{
 			char unit = std::toupper(c);
 			if (multipliers.find(unit) == multipliers.end())
-				throw std::runtime_error("Invalid size unit: " + std::string(1, c));
+				throw (std::runtime_error("Invalid size unit: " + std::string(1, c)));
 			size += currentNumber * multipliers[unit];
 			currentNumber = 0;
 		}
 		else if (c != ' ' && c != '\t')
-			throw std::runtime_error("Invalid character in size notation: " + std::string(1, c));
+			throw (std::runtime_error("Invalid character in size notation: " + std::string(1, c)));
 	}
-	if (currentNumber > 0) {
+	if (currentNumber > 0)
 		size += currentNumber;
-	}
-	return size;
+	return (size);
 }
 
 /// @brief trim string when finding whitespace
@@ -74,7 +73,7 @@ void Config::parseServerBlock(ServerConf& conf, const std::string& key, const st
 	else if (key == "default_error_pages")
 		conf.default_error_pages = values[0];
 	else
-		throw std::runtime_error("Unknown Server Configuration key");
+		throw (std::runtime_error("Unknown Server Configuration key"));
 }
 
 /// @brief saves information for the route block
@@ -118,7 +117,7 @@ void Config::parseRouteBlock(RouteConf& conf, const std::string& key, const std:
 	else if (key == "max_connects")
 		conf.max_connects = std::stoi(values[0]);
 	else
-		throw std::runtime_error("Unknown Route Configuration key");
+		throw (std::runtime_error("Unknown Route Configuration key"));
 }
 
 /// @brief saves global values
@@ -136,7 +135,7 @@ void Config::parseGlobalBlock(GlobalConf& conf, const std::string& key, const st
 	else if (key == "max_header_size")
 		conf.g_max_header_size = parseSizeNotation(values[0]);
 	else
-		throw std::runtime_error("Unknown Global Configuration key");
+		throw (std::runtime_error("Unknown Global Configuration key"));
 }
 
 std::variant<int,size_t> GlobalConf::getConfig(ConfigKey key) const
@@ -144,21 +143,21 @@ std::variant<int,size_t> GlobalConf::getConfig(ConfigKey key) const
 	switch (key)
 	{
 		case ConfigKey::MAX_HEADER_SIZE:
-			return g_max_header_size;
+			return (g_max_header_size);
 		case ConfigKey::MAX_BODY_SIZE:
-			return g_max_body_size;
+			return (g_max_body_size);
 		case ConfigKey::MAX_CONNECTIONS:
-			return g_max_connects;
+			return (g_max_connects);
 		case ConfigKey::TIMEOUT:
-			return g_timeout;
+			return (g_timeout);
 		default:
-			throw std::invalid_argument("invalid global config key");
+			throw (std::invalid_argument("invalid global config key"));
 	}
 }
 
 std::variant<int, size_t> Config::getGlobalConf(GlobalConf::ConfigKey key) const
 {
-	 return globuli.getConfig(key);
+	 return (globuli.getConfig(key));
 }
 
 /// @brief parses the config file to save appropriate information
@@ -169,7 +168,7 @@ Config Config::parse(const std::string& conf_file)
 	Config config;
 	std::ifstream file(conf_file);
 	if (!file.is_open())
-		throw std::runtime_error("Unable to open config file!");
+		throw (std::runtime_error("Unable to open config file!"));
 
 	std::string line;
 	ServerConf current_server;
@@ -184,7 +183,7 @@ Config Config::parse(const std::string& conf_file)
 		line_number++;
 		line = trim(line);
 		if (line.empty() || line[0] == '#')
-			continue;
+			continue ;
 		if (line == "server {")
 		{
 			in_server_block = true;
@@ -193,7 +192,7 @@ Config Config::parse(const std::string& conf_file)
 		else if (line.substr(0,6) == "route " && line.back() == '{')
 		{
 			if (!in_server_block)
-				throw std::runtime_error("route block outside of server block at line: " + std::to_string(line_number));
+				throw (std::runtime_error("route block outside of server block at line: " + std::to_string(line_number)));
 			in_route_block = true;
 			current_route = RouteConf();
 			current_route_path = trim(line.substr(6, line.find('{') - 7));
@@ -213,7 +212,7 @@ Config Config::parse(const std::string& conf_file)
 				config.servers.push_back(current_server);
 			}
 			else
-				throw std::runtime_error("Unexpected closing brace at line: " + std::to_string(line_number));
+				throw (std::runtime_error("Unexpected closing brace at line: " + std::to_string(line_number)));
 		}
 		else
 		{
@@ -233,7 +232,7 @@ Config Config::parse(const std::string& conf_file)
 					parseGlobalBlock(config.globuli, key, values);
 			}
 			else
-				throw std::runtime_error("invalid config line at: "  + std::to_string(line_number));
+				throw (std::runtime_error("invalid config line at: "  + std::to_string(line_number)));
 		}
 	}
 	for (auto& server : config.servers)
@@ -249,14 +248,14 @@ Config Config::parse(const std::string& conf_file)
 			if (!route.port) route.port = server.port;
 		}
 	}
-	return config;
+	return (config);
 }
 
 /// @brief vector of server configurations
 /// @return std::vector of server conf struct
 const std::vector<ServerConf>& Config::getServerConfs() const
 {
-	return servers;
+	return (servers);
 }
 
 /// @brief prints the parsed config file

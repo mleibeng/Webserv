@@ -6,14 +6,11 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/04 00:33:07 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 02:02:20 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
-
-// HTTP Functionalities -> ErrorPages, FileUpload, CGIs
-// Should to run through REQUEST and RESPONSE Classes
 
 Client::Client(int client_fd, const Config& config) : _client_fd(client_fd), _config(config), _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE))), redirect_count(0), _route(nullptr), _keep_alive(true), _best_path()
 {
@@ -27,7 +24,7 @@ Client::~Client()
 
 const	std::string& Client::getResponseString() const
 {
-	return _response_to_send;
+	return (_response_to_send);
 }
 
 void	Client::setResponseString(const std::string& built_response)
@@ -42,7 +39,7 @@ void Client::setBuffer(size_t buffersize)
 
 bool Client::hasResponse()
 {
-	return !_response_to_send.empty();
+	return (!_response_to_send.empty());
 }
 
 /// @brief reads in the clientside data sent from the webbrowser
@@ -61,13 +58,11 @@ ssize_t Client::read_request()
 		if (bytes <= 0)
 		{
 			_keep_alive = false;
-			break;
+			break ;
 		}
-
 		total_read += bytes;
-		if (total_read >= static_cast<ssize_t>(_buffersize)) {
-			return -1;  // Request too large
-		}
+		if (total_read >= static_cast<ssize_t>(_buffersize))
+			return (-1);
 	}
 
 	if (total_read > 0)
@@ -75,13 +70,10 @@ ssize_t Client::read_request()
 		std::string request(buffer.data(), total_read);
 		bool ok = _request.parse(request);
 		if (!ok)
-			return -1;
-
-		// Update keep-alive based on HTTP headers
+			return (-1);
 		_keep_alive = checkKeepAliveHeaders();
 	}
-
-	return total_read;
+	return (total_read);
 }
 
 int Client::getNumRedirects() const
@@ -101,42 +93,40 @@ void Client::setRoute(const RouteConf* route)
 
 bool Client::keepAlive() const
 {
-	return _keep_alive;
+	return (_keep_alive);
 }
 
 bool Client::checkKeepAliveHeaders()
 {
 	auto connection = _request.getHeader("Connection");
 	if (!connection.empty())
-		return std::strcmp(connection.c_str(), "close") != 0;
-	return _request.getHttpVersion() == "HTTP/1.1";
+		return (std::strcmp(connection.c_str(), "close") != 0);
+	return (_request.getHttpVersion() == "HTTP/1.1");
 }
 
 const RouteConf* Client::getRoute() const
 {
-	return _route;
+	return (_route);
 }
 
 const std::string& Client::getBestPath() const
 {
-	return _best_path;
+	return (_best_path);
 }
 
 int Client::setCourse()
 {
 	const ServerConf* server_conf = findServerConf(_request);
 	if (!server_conf)
-		return 404;
+		return (404);
 
 	const RouteConf* route_conf = findRouteConf(*server_conf, _request);
 	if (!route_conf)
-		return 404;
+		return (404);
 
 	_route = route_conf;
-	// std::cout << "route to follow: " << _route->path << std::endl;
 	_best_path = parsePath(*route_conf, _request);
-	// std::cout << "Parsed path to follow: " <<_best_path << std::endl;
-	return 0;
+	return (0);
 }
 
 /// @brief sends a response back to the client side
@@ -147,35 +137,32 @@ ssize_t Client::send_response(const std::string& response_string)
 	ssize_t total_sent = 0;
 	size_t remaining = response_string.size();
 
-	while (total_sent < static_cast<ssize_t>(response_string.size())) {
+	while (total_sent < static_cast<ssize_t>(response_string.size()))
+	{
 		ssize_t sent = write(_client_fd,
 							response_string.c_str() + total_sent,
 							remaining);
-
 		if (sent <= 0)
-			return -1;
-
+			return (-1);
 		total_sent += sent;
 		remaining -= sent;
 	}
-
 	close(_client_fd);
-
-	return total_sent;
+	return (total_sent);
 }
 
 /// @brief get fd of client
 /// @return returns an integer
 int Client::getFd() const
 {
-	return _client_fd;
+	return (_client_fd);
 }
 
 /// @brief get parsed request as object
 /// @return returns an HttpRequest object
 const HttpRequest& Client::getRequest() const
 {
-	return _request;
+	return (_request);
 }
 
 /// @brief find host:port combination and split
@@ -184,8 +171,8 @@ const HttpRequest& Client::getRequest() const
 std::string extractHostname(const std::string& host)
 {
 	if (size_t pos = host.find(':'); pos != std::string::npos)
-		return host.substr(0, pos);
-	return host;
+		return (host.substr(0, pos));
+	return (host);
 }
 
 /// @brief find and extract correct server configuration out of vector of server configs for sent request
@@ -199,9 +186,9 @@ const ServerConf *Client::findServerConf(const HttpRequest &request)
 	{
 		if (conf.hostname == hostname ||
 			std::find(conf.server_names.begin(), conf.server_names.end(), hostname) != conf.server_names.end())
-			return &conf;
+			return (&conf);
 	}
-	return nullptr;
+	return (nullptr);
 }
 
 /// @brief find longest matching string from uri to route.path
@@ -225,13 +212,13 @@ const RouteConf *Client::findRouteConf(const ServerConf &server_conf, const Http
 		}
 	}
 	if (best_match)
-		return best_match;
+		return (best_match);
 	else
 	{
 		if(server_conf.routes.count("/"))
-			return &server_conf.routes.at("/");
+			return (&server_conf.routes.at("/"));
 		else
-			return nullptr;
+			return (nullptr);
 	}
 }
 
@@ -242,8 +229,8 @@ const RouteConf *Client::findRouteConf(const ServerConf &server_conf, const Http
 bool startsWith(const std::string& str, const std::string& prefix)
 {
 	if (prefix.size() > str.size())
-		return false;
-	return str.compare(0, prefix.size(), prefix) == 0;
+		return (false);
+	return (str.compare(0, prefix.size(), prefix) == 0);
 }
 
 /// @brief check whether or not configured route allows request method to be processed
@@ -272,34 +259,25 @@ std::string Client::parsePath(const RouteConf& route_conf, const HttpRequest& re
 	std::string phys_path;
 	std::string uri = request.getUri();
 
-	// std::cout << "Uri: " << uri <<std::endl;
-	//set phys path to default path of the route_conf
 	phys_path = route_conf.root;
 	if (phys_path.back() != '/')
 		phys_path += '/';
 
-	// std::cout << "Phys_path root: " << phys_path << std::endl;
-	// build a file resource request path from default path in config file,
-	// checking for leading "/" in the URI and preventing double "//" appending to the phys_path
 	if (route_conf.path == "/")
 	{
 		if (uri != "/")
 			phys_path += (uri[0] == '/') ? uri.substr(1) : uri;
-		// std::cout << "Phys_path after // mod : " << phys_path << std::endl;
-	}// checks whether or not the uri already leads with route config path and cuts it out, because phys path already includes it.
+	}
 	else if (uri.compare(0, route_conf.path.length(), route_conf.path) == 0)
 	{
 		if (uri.length() == route_conf.path.length() || uri[route_conf.path.length()] == '/')
 		{
 			std::string remain = uri.substr(route_conf.path.length());
-			// std::cout << "remain uri : " << remain << std::endl;
 			if (!remain.empty())
 				phys_path += (remain[0] == '/') ? remain.substr(1) : remain;
-			// std::cout << "phys path after remain uri : " << phys_path << std::endl;
 		}
 		else
 			phys_path += (uri[0] == '/' ? uri.substr(1) : uri);
 	}
-
-	return phys_path;
+	return (phys_path);
 }
