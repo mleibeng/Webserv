@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/11/25 17:06:52 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/04 01:25:49 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,9 +98,8 @@ bool	HttpRequest::parse(const std::string& rawmsg)
 		return (false);
 
 	setMethod(trimStr(method));
-	setQuery(trimStr(uri)); // now splits query from uri and sets both.
+	setQuery(trimStr(uri));
 	setHttpVersion(trimStr(vers));
-
 	parseHeader(input);
 
 	std::string body((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());

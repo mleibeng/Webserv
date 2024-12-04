@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/03 16:34:42 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/04 01:23:06 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ Loop::Loop()
 {
 	loop_fd = epoll_create1(0);
 	if (loop_fd == -1)
-		throw std::runtime_error("Couldn't create loop fd");
+		throw (std::runtime_error("Couldn't create loop fd"));
 }
 
 /// @brief close epoll file descriptor
@@ -37,7 +37,7 @@ void Loop::addFd(int fd, uint32_t event)
 	ev.events = event;
 	ev.data.fd = fd;
 	if (epoll_ctl(loop_fd, EPOLL_CTL_ADD, fd, &ev) == -1)
-		throw std::runtime_error("Couldn't add fd to epoll");
+		throw (std::runtime_error("Couldn't add fd to epoll"));
 	events[fd] = ev;
 }
 
@@ -62,7 +62,7 @@ std::vector<std::pair<int, uint32_t>> Loop::wait(int timeout)
 		uint32_t events = event_list[i].events;
 		result.emplace_back(fd, events);
 	}
-	return result;
+	return (result);
 }
 
 void Loop::modifyFd(int fd, uint32_t event)
@@ -71,6 +71,6 @@ void Loop::modifyFd(int fd, uint32_t event)
 	ev.events = event;
 	ev.data.fd = fd;
 	if (epoll_ctl(loop_fd, EPOLL_CTL_MOD, fd, &ev) == -1)
-		throw std::runtime_error("cant mod fd");
+		throw (std::runtime_error("cant mod fd"));
 	events[fd] = ev;
 }

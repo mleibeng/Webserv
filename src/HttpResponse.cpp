@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/03 21:08:49 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 01:25:15 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ HttpResponse& HttpResponse::operator=(const HttpResponse &other)
 		setStatus(other.getStatus());
 		setMimeType(other._mimeType);
 	}
-	return *this;
+	return (*this);
 }
 
 HttpResponse::~HttpResponse() {}
@@ -49,7 +49,7 @@ void HttpResponse::setMimeType(std::string extension)
 
 int HttpResponse::getStatus() const
 {
-	return HttpResponse::stoi();
+	return (HttpResponse::stoi());
 }
 
 std::string HttpResponse::getMimeType(const std::string extension)
@@ -122,7 +122,6 @@ bool HttpResponse::parse(const std::string& rawmsg)
 		body = body_stream.str();
 	}
 	setBody(body);
-
 	return (true);
 }
 
@@ -153,17 +152,10 @@ std::string HttpResponse::buildResponse() const
 
 	response << "HTTP/1.1 " << HttpResponse::stoi() << " " << HttpResponse::stostr() << "\r\n";
 
-	// std::cout << RED << this->getHeader("Content-Type") << RESET << std::endl;
 	for (const auto& header : _header)
-	{
 		response << header.first << ": " << header.second << "\r\n";
-		// std::cout << header.first << std::endl;
-		// std::cout << header.second << std::endl;
-	}
 	for (const auto& cookie: _response_cookies)
-	{
 		response << "Set-Cookie: " << cookie << "\r\n";
-	}
 
 	if (_header.find("Content-Length") == _header.end())
 		response << "Content-Length: " << _body.size() << "\r\n";
@@ -214,10 +206,10 @@ std::string HttpResponse::stostr() const
 
 StatusCode HttpResponse::itos(int code) const
 {
-	return static_cast<StatusCode>(code);
+	return (static_cast<StatusCode>(code));
 }
 
 int HttpResponse::stoi() const
 {
-	return static_cast<int>(_status);
+	return (static_cast<int>(_status));
 }

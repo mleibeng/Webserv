@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleGet.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 02:39:54 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/29 17:47:21 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/04 01:36:02 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,24 +20,19 @@ void		RequestHandler::handleGetRequest(Client& client)
 	const RouteConf* route_conf = client.getRoute();
 	const std::string& parsed = client.getBestPath();
 
-	// Case 1: Specific file check
 	if (std::filesystem::exists(parsed) && !std::filesystem::is_directory(parsed))
 	{
-		// std::cout << "case 1" << std::endl;
 		std::string extension = getFileExtension(parsed);
 		if (!extension.empty() && (!route_conf->cgi_extensions.empty() &&
 			std::find(route_conf->cgi_extensions.begin(),
 			route_conf->cgi_extensions.end(),
 			extension) != route_conf->cgi_extensions.end()))
-			return handleCGI(client, parsed);
-		return sendFile(client, parsed);
+			return (handleCGI(client, parsed));
+		return (sendFile(client, parsed));
 	}
 
-	// Case 2 Directory handling
-	// std::cout << "case 2" << std::endl;
 	if (std::filesystem::is_directory(parsed))
 	{
-		// Default file check : Either PHP or static
 		if (!route_conf->default_file.empty())
 		{
 			std::string default_path = parsed + route_conf->default_file;
@@ -45,17 +40,15 @@ void		RequestHandler::handleGetRequest(Client& client)
 			{
 				std::string extension = getFileExtension(default_path);
 				if (!route_conf->cgi_extensions.empty() && std::find(route_conf->cgi_extensions.begin(), route_conf->cgi_extensions.end(), extension) != route_conf->cgi_extensions.end()) //here doesn't work for example because extension is string and cgi_extensions is vector<string>
-					return handleCGI(client, default_path);
-				return sendFile(client, default_path);
+					return (handleCGI(client, default_path));
+				return (sendFile(client, default_path));
 			}
 		}
-		// std::cout << "case 3" << std::endl;
-		// Directory listing
+
 		if (route_conf->dir_listing_active)
-			return sendDirListing(client, parsed);
-		return serveErrorPage(client, 403);
+			return (sendDirListing(client, parsed));
+		return (serveErrorPage(client, 403));
 	}
-	// std::cout << "case 4 error" << std::endl;
 	serveErrorPage(client, 404);
 }
 
@@ -85,16 +78,14 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 	{
 		std::cerr << "Directory listing error: " << e.what() << std::endl;
 		serveErrorPage(client, 500);
-		return;
+		return ;
 	}
-
 	html << "</ul></body></html>";
 
 	response.setStatus(200);
 	response.setBody(html.str());
 	response.setMimeType(getFileExtension(".html"));
 	client.setResponseString(response.buildResponse());
-	// client.send_response(response.buildResponse());
 }
 
 /// @brief Function to send back a static file response that was requested by the browser.
@@ -110,7 +101,7 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	{
 		std::cerr << "Could not open file in sendFile func: " << file_path << std::endl;
 		serveErrorPage(client, 500);
-		return;
+		return ;
 	}
 	std::stringstream fileBuf;
 	fileBuf << file.rdbuf();
@@ -132,6 +123,5 @@ void RequestHandler::sendFile(Client& client, const std::string& file_path)
 	response.setCookie("lastVisit", getTime());
 	response.setBody(fileBuf.str());
 	response.setMimeType(getFileExtension(file_path));
-	// client.send_response(response.buildResponse());
 	client.setResponseString(response.buildResponse());
 }

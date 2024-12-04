@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleCGI.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/02 14:14:34 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/04 01:44:51 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,9 +30,9 @@ bool RequestHandler::setupPipes(PipeDescriptors &pipes, Client& client)
 	if (pipe(pipes.in_pipe) == -1 || pipe (pipes.out_pipe) == -1)
 	{
 		serveErrorPage(client, 500);
-		return false;
+		return (false);
 	}
-	return true;
+	return (true);
 }
 
 /// @brief close all pipes
@@ -65,25 +65,21 @@ void RequestHandler::PipeDescriptors::closeChildPipes()
 void RequestHandler::handleCGI(Client& client, const std::string& cgi_path)
 {
 	std::string file_extension = getFileExtension(cgi_path);
-	// std::cout << file_extension << std::endl;
-	// std::cout << "cgi path: " << cgi_path << std::endl;
 	try
 	{
 		auto handler = CGIHandleCreator::createHandler(file_extension);
 
 		PipeDescriptors pipes;
 		if (!setupPipes(pipes, client))
-			return;
+			return ;
 
 		const HttpRequest& request = client.getRequest();
-		// std::cout << request.getQuery() << std::endl;
-		// std::cout << request.getUri() << std::endl;
 		pid_t pid = fork();
 		if (pid == -1)
 		{
 			pipes.closeAll();
 			serveErrorPage(client, 500);
-			return;
+			return ;
 		}
 
 		if (pid == 0)
@@ -106,28 +102,21 @@ void RequestHandler::handleCGIChild(PipeDescriptors& pipes, const std::string& c
 {
 	pipes.closeChildPipes();
 
-	dup2(pipes.in_pipe[0], STDIN_FILENO); //read from here from in_pipe[1] in main process (used by cgi program in execve)
-	dup2(pipes.out_pipe[1], STDOUT_FILENO); // write to here for outpipe[0] read in main process (result of cgi program in execve)
+	dup2(pipes.in_pipe[0], STDIN_FILENO);
+	dup2(pipes.out_pipe[1], STDOUT_FILENO);
 
-	CGIEnv env(request, cgi_path, handler); // sets up cgi environment variables
+	CGIEnv env(request, cgi_path, handler);
 
 	std::vector<std::string> args_str = {handler.getCGIName(), cgi_path};
-	// python specific below
 	auto extra_args = handler.getArgList();
 	args_str.insert(args_str.begin() + 1, extra_args.begin(), extra_args.end());
-
-	// if/else GET POST
 
 	std::vector<char*> argv;
 	for (const auto& arg : args_str)
 		argv.push_back(strdup(arg.c_str()));
 
 	argv.push_back(nullptr);
-	execve(handler.getCGIPath().c_str(), argv.data(), env.getEnv()); // executes the CGI program with set values
-
-	// std::perror("execve error");
-	for (char *arg : argv)
-		free(arg);
+	execve(handler.getCGIPath().c_str(), argv.data(), env.getEnv());
 	std::exit(1);
 }
 
@@ -144,7 +133,7 @@ void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, con
 	close(pipes.in_pipe[1]);
 
 	std::string output = readCGIOutput(pipes.out_pipe[0]); // read from child process CGI
-	std::cout << "CGI Output: "<< output << std::endl;
+	// std::cout << "CGI Output: "<< output << std::endl;
 	close(pipes.out_pipe[0]);
 
 	int status;
@@ -154,9 +143,7 @@ void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, con
 	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) // if ok format response for sending
 		buildCGIResponse(output, response);
 	else
-		return serveErrorPage(client, 500);
-
-	// client.send_response(response.buildResponse()); // build response and send
+		return (serveErrorPage(client, 500));
 	client.setResponseString(response.buildResponse());
 }
 
@@ -180,11 +167,9 @@ std::string RequestHandler::readCGIOutput(int pipe_fd)
 		output.append(buffer, nbytes);
 
 	if (nbytes == -1)
-		throw std::runtime_error("Error in reading CGI Output");
-	return output;
+		throw (std::runtime_error("Error in reading CGI Output"));
+	return (output);
 }
-
-// not sure about function below, may need optimization
 
 /// @brief build a correctly formatted response for sending back to client
 /// @param out output to process
@@ -206,7 +191,7 @@ void RequestHandler::buildCGIResponse(const std::string& out, HttpResponse& resp
 		if (line.empty())
 		{
 			headers_done = true;
-			break;
+			break ;
 		}
 	}
 
@@ -217,7 +202,6 @@ void RequestHandler::buildCGIResponse(const std::string& out, HttpResponse& resp
 		std::string header_value = line.substr(cl_pos + 1);
 
 		header_value = response.trimStr(header_value);
-
 		if (header_name == "Status")
 		{
 			size_t s_pos = header_value.find(' ');
