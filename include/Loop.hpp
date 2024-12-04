@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 02:58:49 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/03 16:36:51 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/04 03:22:40 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,17 +25,18 @@ class Loop
 	public:
 		Loop();
 		~Loop();
-		void addFd(int fd, uint32_t events);
-		void removeFd(int fd);
+
+		void	addFd(int fd, uint32_t events);
+		void	removeFd(int fd);
+		void	modifyFd(int fd, uint32_t event);
+
 		std::vector<std::pair<int, uint32_t>> wait(int timeout = -1);
-		void modifyFd(int fd, uint32_t event);
-		bool hasFd(int fd) const;
 
 	private:
-		int loop_fd;
-		static const int MAX_EVENTS = 1024;
-		std::unordered_map<int, epoll_event> events;
-		epoll_event event_list[MAX_EVENTS];
+		int										loop_fd;
+		static const int						MAX_EVENTS = 1024;
+		std::unordered_map<int, epoll_event>	events;
+		epoll_event								event_list[MAX_EVENTS];
 };
 
 #endif

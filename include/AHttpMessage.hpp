@@ -27,31 +27,29 @@ class AHttpMessage
 		AHttpMessage& operator=(const AHttpMessage &other);
 		virtual ~AHttpMessage();
 
-		//setters
-		void	setHttpVersion(const std::string& vers);
-		void	setHeader(const std::string& key, const std::string& val);
-		void	setAllHeaders(const std::unordered_map<std::string, std::string>& headers);
-		void	setBody(const std::string& body);
+		void			setHttpVersion(const std::string& vers);
+		void			setHeader(const std::string& key, const std::string& val);
+		void			setAllHeaders(const std::unordered_map<std::string, std::string>& headers);
+		void			setBody(const std::string& body);
 
-		//getters
 		std::string		getHttpVersion() const;
 		std::string		getBody() const;
 		std::string		getHeader(const std::string& key) const;
 		std::string		getCookie(const std::string& key) const;
-		const std::unordered_map<std::string, std::string>&	getAllHeaders() const;
-		const std::unordered_map<std::string, std::string>& getAllCookies() const;
 
-		//parse
+		const std::unordered_map<std::string, std::string>&	getAllHeaders() const;
+		const std::unordered_map<std::string, std::string>&	getAllCookies() const;
+
 		bool			parseHeader(std::istringstream& input);
 		void			parseCookies();
 		void			parseCookiePair(const std::string& pair);
 		bool			hasCookie(const std::string &name) const;
-		// virtual bool	parse(const std::string& rawMessage) = 0;
+
 		static std::string	trimStr(const std::string& str);
 
 	protected:
-		std::string							_httpVersion;
-		std::string							_body;
+		std::string										_httpVersion;
+		std::string										_body;
 		std::unordered_map<std::string, std::string>	_header;
 		std::unordered_map<std::string, std::string>	_cookies;
 };

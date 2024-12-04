@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/29 17:44:32 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/04 03:28:26 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ class WebServer
 		explicit WebServer(const std::string& conf_file);
 		~WebServer();
 
-		void initialize(size_t pool_size);
-		RequestHandler& getNextHandler();
-		void start();
-		void stop();
+		void	initialize(size_t pool_size);
+		void	start();
+		void	stop();
+		RequestHandler&	getNextHandler();
 
 	private:
 		struct ClientInfo
@@ -53,22 +53,21 @@ class WebServer
 
 		std::map<int, ClientInfo> active_clients;
 
-		Config config;
-		std::unordered_map<std::string, std::vector<int>> server_listeners;
-		Loop event_loop;
-		std::atomic<bool> running;
-		// std::unique_ptr<RequestHandler> request_handler;
-		std::vector<std::unique_ptr<RequestHandler>> handler_pool;
-		std::atomic<size_t> current_handler{0};
+		Config												config;
+		Loop												event_loop;
+		std::atomic<bool>									running;
+		std::atomic<size_t>									current_handler{0};
+		std::vector<std::unique_ptr<RequestHandler>>		handler_pool;
+		std::unordered_map<std::string, std::vector<int>>	server_listeners;
 
-		void setupListeners();
-		void runLoop();
-		void acceptConnections(int listener_fd);
-		int	 createNonBlockingSocket();
-		void cleanInactiveClients();
-		ssize_t handleClientRequest(int client_fd);
-		void redirectTraffic(Client& client);
-		bool portInUse(int port);
+		void	setupListeners();
+		void	runLoop();
+		void	acceptConnections(int listener_fd);
+		void	cleanInactiveClients();
+		void	redirectTraffic(Client& client);
+		int		createNonBlockingSocket();
+		bool	portInUse(int port);
+		ssize_t	handleClientRequest(int client_fd);
 };
 
 #endif

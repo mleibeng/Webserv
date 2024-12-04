@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/12/03 23:47:13 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 03:15:14 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,49 +31,46 @@ class Client {
 		Client(const Client& other) = delete;
 		Client& operator=(const Client& other) = delete;
 
-		const HttpRequest& getRequest() const;
-		const std::string& getResponseString() const;
-		void setResponseString(const std::string& built_response);
-		int getFd() const;
-		bool hasResponse();
+		const HttpRequest&	getRequest() const;
+		const std::string&	getResponseString() const;
+		void				setResponseString(const std::string& built_response);
+		int					getFd() const;
+		bool				hasResponse();
 
-		//bool checks
-		// bool hasResponse();
+		ssize_t				read_request();
+		ssize_t				send_response(const std::string& response_string);
 
-		ssize_t read_request();
-		ssize_t send_response(const std::string& response_string);
+		int					getNumRedirects() const;
 
-		int getNumRedirects() const;
-
-		void setRoute(const RouteConf* route);
+		void				setRoute(const RouteConf* route);
 
 		//incrementers
-		void increaseRedirectCount();
-		void setBuffer(size_t buffersize);
+		void				increaseRedirectCount();
+		void				setBuffer(size_t buffersize);
 
 		//connection checkers
-		bool keepAlive() const;
-		bool checkKeepAliveHeaders();
+		bool				keepAlive() const;
+		bool				checkKeepAliveHeaders();
 
 		//route mngmt
-		int setCourse();
-		const RouteConf* getRoute() const;
-		const std::string& getBestPath() const;
-		const ServerConf *findServerConf(const HttpRequest &request);
-		const RouteConf *findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
-		std::string parsePath(const RouteConf& route_conf, const HttpRequest& request);
-		int isMethodAllowed(const RouteConf &route_conf, const std::string& method);
+		int					setCourse();
+		const RouteConf*	getRoute() const;
+		const std::string&	getBestPath() const;
+		const ServerConf	*findServerConf(const HttpRequest &request);
+		const RouteConf		*findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
+		std::string			parsePath(const RouteConf& route_conf, const HttpRequest& request);
+		int					isMethodAllowed(const RouteConf &route_conf, const std::string& method);
 
 	private:
-		int _client_fd;
-		const Config& _config;
-		HttpRequest _request;
-		size_t _buffersize;
-		size_t redirect_count;
-		const RouteConf *_route;
-		bool _keep_alive;
-		std::string _best_path;
-		std::string _response_to_send;
+		int				_client_fd;
+		const Config&	_config;
+		HttpRequest		_request;
+		size_t			_buffersize;
+		size_t			redirect_count;
+		const RouteConf	*_route;
+		bool			_keep_alive;
+		std::string		_best_path;
+		std::string		_response_to_send;
 };
 
 #endif // CLIENT_H
