@@ -6,7 +6,7 @@
 /*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 17:57:22 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/04 04:49:15 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/12/04 04:51:48 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 void	RequestHandler::handleDeleteRequest(Client& client)
 {
 	std::filesystem::path	file_path = client.getBestPath();
-	const RouteConf* 		route_conf = client.getRoute();
 
 	if (!std::filesystem::exists(file_path))
 		return (serveErrorPage(client, 404));
