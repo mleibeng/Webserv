@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/03 21:04:34 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 02:11:47 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ enum class StatusCode
 	NOCONTENT = 204,
 	MOVED_PERM = 301,
 	MOVED_TEMP = 302, // do we even need this?
-	NOT_MODIFIED = 304, // do we even need this?
+	NOT_MODIFIED = 304, // do we even need this? we dont even have error page
 	BAD_REQUEST = 400,
 	FORBIDDEN = 403,
 	NOT_FOUND = 404,
