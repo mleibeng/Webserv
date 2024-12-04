@@ -6,20 +6,11 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:45 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/04 01:25:49 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 03:06:46 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "HttpRequest.hpp"
-
-//utils
-std::string getTime()
-{
-	std::time_t now = std::time(nullptr);
-	std::string form_time = std::ctime(&now);
-	form_time.erase(form_time.find_first_not_of("\n") + 1);
-	return form_time;
-}
 
 HttpRequest::HttpRequest()
 {
@@ -46,19 +37,29 @@ HttpRequest::~HttpRequest()
 {
 }
 
-const std::string& HttpRequest::getMethod() const
+const	std::string& HttpRequest::getMethod() const
 {
 	return (_method);
 }
 
-const std::string&	HttpRequest::getUri() const
+const	std::string&	HttpRequest::getUri() const
 {
 	return (_uri);
 }
 
-const std::string& HttpRequest::getQuery() const
+const	std::string& HttpRequest::getQuery() const
 {
 	return (_query);
+}
+
+HttpRequest::State	HttpRequest::getState() const
+{
+	return (_state);
+}
+
+const std::string&	HttpRequest::getUploadPath() const
+{
+	return (_upload_path);
 }
 
 void	HttpRequest::setMethod(const std::string& method)
@@ -79,6 +80,16 @@ void	HttpRequest::setQuery(const std::string& uri)
 		_query.clear();
 		_uri = uri;
 	}
+}
+
+void	HttpRequest::setState(State state)
+{
+	_state = state;
+}
+
+bool	HttpRequest::Complete() const
+{
+	return (_state == State::COMPLETE);
 }
 
 bool	HttpRequest::parse(const std::string& rawmsg)
@@ -107,4 +118,12 @@ bool	HttpRequest::parse(const std::string& rawmsg)
 
 	parseCookies();
 	return (true);
+}
+
+std::string	getTime()
+{
+	std::time_t now = std::time(nullptr);
+	std::string form_time = std::ctime(&now);
+	form_time.erase(form_time.find_first_not_of("\n") + 1);
+	return (form_time);
 }

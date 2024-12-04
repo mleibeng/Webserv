@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/04 02:11:47 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 03:02:15 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,28 +66,27 @@ class HttpResponse : public AHttpMessage
 		HttpResponse& operator=(const HttpResponse &other);
 		~HttpResponse();
 
-		void setCookie(const std::string& key, const std::string& value,
+		void		setCookie(const std::string& key, const std::string& value,
 									int maxAge = -1, const std::string &path = "/",
 									bool secure = false, bool HttpOnly = false);
-		void removeCookie(const std::string& key, const std::string& path = "/");
+		void		removeCookie(const std::string& key, const std::string& path = "/");
 		std::string	buildResponse() const;
 
-		bool	parse(const std::string& rawmsg) override;
+		std::string	getMimeType(const std::string extension);
+		int			getStatus() const;
 
 		void		setStatus(int status);
 		void		setStatus(StatusCode status);
 		void		setMimeType(std::string extension);
-		std::string	getMimeType(const std::string extension);
-		int	getStatus() const;
 
 	private:
 		std::string	stostr() const;
 		int			stoi() const;
 		StatusCode	itos(int code) const;
 
-		StatusCode	_status;
-		std::string	_mimeType;
-		std::vector<std::string> _response_cookies;
+		StatusCode					_status;
+		std::string					_mimeType;
+		std::vector<std::string>	_response_cookies;
 };
 
 #endif // HTTPRESPONSE_H

@@ -46,7 +46,7 @@ class AHttpMessage
 		void			parseCookies();
 		void			parseCookiePair(const std::string& pair);
 		bool			hasCookie(const std::string &name) const;
-		virtual bool	parse(const std::string& rawMessage) = 0;
+		// virtual bool	parse(const std::string& rawMessage) = 0;
 		static std::string	trimStr(const std::string& str);
 
 	protected:

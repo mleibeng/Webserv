@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/12/04 01:32:13 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 03:03:42 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 	std::filesystem::path upload_dir = std::filesystem::current_path() / "html_pages/uploads";
 	std::filesystem::path file_path = upload_dir / filename;
 	if (std::filesystem::exists(file_path))
-		return serveErrorPage((client, 409));
+		return (serveErrorPage(client, 409));
 
 	std::ofstream new_file(file_path, std::ios::binary);
 	if (new_file) {
