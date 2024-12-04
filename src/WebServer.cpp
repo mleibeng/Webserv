@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/04 01:20:27 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 03:48:55 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,42 +67,42 @@ void WebServer::setupListeners()
 				std::cerr << RED << "setsockopt(): " << strerror(errno) << DEFAULT << std::endl;
 
 //
-			struct addrinfo addr, *res;
-			memset(&addr, 0, sizeof addr);
-			addr.ai_family = AF_INET;
-			addr.ai_socktype = SOCK_STREAM;
-			addr.ai_flags = AI_PASSIVE;
+			// struct addrinfo addr, *res;
+			// memset(&addr, 0, sizeof addr);
+			// addr.ai_family = AF_INET;
+			// addr.ai_socktype = SOCK_STREAM;
+			// addr.ai_flags = AI_PASSIVE;
 
-			int status = getaddrinfo(server.hostname.c_str(), std::to_string(port).c_str(), &addr, &res);
-			if (status != 0)
-			{
-				close(fd);
-				throw (std::runtime_error("Could not resolve hostname: " + server.hostname));
-			}
+			// int status = getaddrinfo(server.hostname.c_str(), std::to_string(port).c_str(), &addr, &res);
+			// if (status != 0)
+			// {
+			// 	close(fd);
+			// 	throw (std::runtime_error("Could not resolve hostname: " + server.hostname));
+			// }
 
-			if (bind(fd, res->ai_addr, res->ai_addrlen) < 0)
-			{
-				std::cerr << "Failed to bind address to" << server.hostname << std::endl;
-				close(fd);
-				freeaddrinfo(res);
-				throw (std::runtime_error("Failed to bind socket"));
-			}
+			// if (bind(fd, res->ai_addr, res->ai_addrlen) < 0)
+			// {
+			// 	std::cerr << "Failed to bind address to" << server.hostname << std::endl;
+			// 	close(fd);
+			// 	freeaddrinfo(res);
+			// 	throw (std::runtime_error("Failed to bind socket"));
+			// }
 
-			freeaddrinfo(res);
+			// freeaddrinfo(res);
 //
 
 
 // //
-// 			struct sockaddr_in addr;
-// 			addr.sin_family = AF_INET;
-// 			addr.sin_addr.s_addr = INADDR_ANY;
-// 			addr.sin_port = htons(port);
+			struct sockaddr_in addr;
+			addr.sin_family = AF_INET;
+			addr.sin_addr.s_addr = INADDR_ANY;
+			addr.sin_port = htons(port);
 
-// 			if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
-// 			{
-// 				close(fd);
-// 				throw std::runtime_error("Failed to bind socket");
-// 			}
+			if (bind(fd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
+			{
+				close(fd);
+				throw std::runtime_error("Failed to bind socket");
+			}
 // //
 
 			if (listen(fd, SOMAXCONN) < 0)
@@ -315,7 +315,7 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 		{
 			getNextHandler().serveErrorPage(client, 508);
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return (-1);
+			return (0);
 		}
 
 		getNextHandler().handleRedirect(*route, client);
