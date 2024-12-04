@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandlerSetup.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/11/28 03:29:41 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/04 01:16:55 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,13 @@ void RequestHandler::loadErrorPages() // now this works for more than 1 page but
 
 				std::stringstream filebuf;
 				filebuf << content.rdbuf();
-				// std::cout << filebuf.str() << std::endl; // debugging
-				_error_pages[error_code] = filebuf.str(); // <--- need to modify this into a vector of unordered maps for multiple server blocks
+				_error_pages[error_code] = filebuf.str();
 
 				content.close();
 			}
 			catch(const std::exception& e)
 			{
-				std::cerr << e.what() << '\n';
+				std::cerr << e.what() << std::endl;
 				continue;
 			}
 		}

@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/04 00:23:34 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 01:16:14 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,7 @@ std::string RequestHandler::buildRedirWQuery(const RouteConf& route_conf, const 
 		else
 			redirect_with_query += "&" + request.getQuery();
 	}
-
-	return redirect_with_query;
+	return (redirect_with_query);
 }
 
 void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
@@ -32,14 +31,12 @@ void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 	HttpResponse response;
 
 	client.increaseRedirectCount();
-
 	std::string redirect = buildRedirWQuery(route_conf, client.getRequest());
 
 	response.setStatus(*route_conf.redirect_code);
 	response.setHeader("Location", redirect);
 	response.setBody("Redirecting to " + redirect);
 	client.setResponseString(response.buildResponse());
-	// client.send_response(response.buildResponse());
 }
 
 /// @brief Entrypoint and management function for sorting Requests.
@@ -47,7 +44,6 @@ void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 /// @param client client including the fd and request. Ultimately receives requests and sends the response.
 void		RequestHandler::handleRequest(Client& client)
 {
-
 	const std::string& method = client.getRequest().getMethod();
 
 	if (method == "GET")
@@ -56,8 +52,6 @@ void		RequestHandler::handleRequest(Client& client)
 		handlePostRequest(client);
 	else if (method == "DELETE")
 		handleDeleteRequest(client);
-	else
-		serveErrorPage(client, 501);
 }
 
 // UTILS
@@ -66,6 +60,6 @@ std::string		getFileExtension(const std::string& filepath)
 {
 	size_t dot_pos = filepath.find_last_of(".");
 		if (dot_pos != std::string::npos)
-			return filepath.substr(dot_pos);
-		return "";
+			return (filepath.substr(dot_pos));
+		return ("");
 }

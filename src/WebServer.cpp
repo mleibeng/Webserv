@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/04 00:27:43 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/04 01:20:27 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,10 @@ bool WebServer::portInUse(int port)
 		{
 			int blocked_port = std::stoi(key.substr(pos + 1));
 			if (blocked_port == port)
-				return true;
+				return (true);
 		}
 	}
-	return false;
+	return (false);
 }
 
 /// @brief set up ports to listen for connections on each server
@@ -56,7 +56,7 @@ void WebServer::setupListeners()
 			if (portInUse(port))
 			{
 				std::cerr << "port: " << port << " already in use" << std::endl;
-				continue;
+				continue ;
 			}
 			std::string server_key = server.hostname + ":" + std::to_string(port);
 
@@ -77,7 +77,7 @@ void WebServer::setupListeners()
 			if (status != 0)
 			{
 				close(fd);
-				throw std::runtime_error("Could not resolve hostname: " + server.hostname);
+				throw (std::runtime_error("Could not resolve hostname: " + server.hostname));
 			}
 
 			if (bind(fd, res->ai_addr, res->ai_addrlen) < 0)
@@ -85,7 +85,7 @@ void WebServer::setupListeners()
 				std::cerr << "Failed to bind address to" << server.hostname << std::endl;
 				close(fd);
 				freeaddrinfo(res);
-				throw std::runtime_error("Failed to bind socket");
+				throw (std::runtime_error("Failed to bind socket"));
 			}
 
 			freeaddrinfo(res);
@@ -147,17 +147,17 @@ int WebServer::createNonBlockingSocket()
 {
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
 	if (fd < 0)
-		throw std::runtime_error("Couldn't open socket");
+		throw (std::runtime_error("Couldn't open socket"));
 	int flags = fcntl(fd, F_GETFL, 0);
 	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-	return fd;
+	return (fd);
 }
 
 /// @brief check for set up server listeners and start loop
 void WebServer::start()
 {
 	if (server_listeners.empty())
-		throw std::runtime_error("No listeners set up.");
+		throw (std::runtime_error("No listeners set up."));
 	running = true;
 	runLoop();
 }
@@ -191,7 +191,7 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 		std::cout << "waiting for connection" << std::endl;
 		auto events = event_loop.wait(5000);
 		if (!running)
-			break;
+			break ;
 
 		cleanInactiveClients();
 
@@ -211,7 +211,7 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 					{
 						acceptConnections(fd);
 						is_listener = true;
-						break;
+						break ;
 					}
 				}
 				if (!is_listener)
@@ -238,7 +238,7 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 
 RequestHandler& WebServer::getNextHandler()
 {
-	return *handler_pool[current_handler++ % handler_pool.size()];
+	return (*handler_pool[current_handler++ % handler_pool.size()]);
 }
 
 /// @brief initializes epoll_fd and sets up the listening socket fds. Also loads the error pages into the WebServer class
@@ -297,7 +297,7 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 	{
 		getNextHandler().serveErrorPage(client, 400);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return -1;
+		return (-1);
 	}
 	// Logik zum finden der korrekten Route nach dem einlesen der header
 	int error = 0;
@@ -305,7 +305,7 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 	{
 		getNextHandler().serveErrorPage(client, error);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return -1;
+		return (-1);
 	}
 
 	const RouteConf* route = client.getRoute();
@@ -315,23 +315,23 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 		{
 			getNextHandler().serveErrorPage(client, 508);
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return -1;
+			return (-1);
 		}
 
 		getNextHandler().handleRedirect(*route, client);
 		client.setRoute(nullptr);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return 0;
+		return (0);
 	}
 
 	if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
 	{
 		getNextHandler().serveErrorPage(client, error);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return 0;
+		return (0);
 	}
 
 	getNextHandler().handleRequest(client);
 	event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-	return 0;
+	return (0);
 }
