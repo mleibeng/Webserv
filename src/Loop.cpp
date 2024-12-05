@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Loop.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 03:00:30 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/04 01:52:29 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/05 19:47:49 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 /// @brief create epoll file descriptor / throw error in case of failure
 Loop::Loop()
 {
-	loop_fd = epoll_create1(0);
+	loop_fd = epoll_create(1024);
 	if (loop_fd == -1)
 		throw (std::runtime_error("Couldn't create loop fd"));
 }

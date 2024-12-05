@@ -50,7 +50,6 @@ void	AHttpMessage::setHttpVersion(const std::string& vers)
 void	AHttpMessage::setBody(const std::string& body)
 {
 	_body = body;
-	setHeader("Content-Length", std::to_string(body.length()));
 }
 
 /// @brief set message headers as key[value] pair

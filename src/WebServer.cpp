@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/04 03:48:55 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/05 19:57:29 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,21 +135,19 @@ void WebServer::acceptConnections(int fd)
 			std::cerr << "Couldn't accept connection" << strerror(errno) << std::endl;
 		return;
 	}
-	int flags = fcntl(client_fd, F_GETFL, 0);
-	fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);
+	// int flags = fcntl(client_fd, F_GETFL, 0);
+	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	event_loop.addFd(client_fd, EPOLLIN_FLAG);
-	//event_loop.addClient(client_fd, std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)));
+	// //event_loop.addClient(client_fd, std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)));
 }
 
 /// @brief create and set sockets non blocking
 /// @return integer socket fd
 int WebServer::createNonBlockingSocket()
 {
-	int fd = socket(AF_INET, SOCK_STREAM, 0);
+	int fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (fd < 0)
 		throw (std::runtime_error("Couldn't open socket"));
-	int flags = fcntl(fd, F_GETFL, 0);
-	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 	return (fd);
 }
 
