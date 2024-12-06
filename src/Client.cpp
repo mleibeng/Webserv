@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/06 18:14:31 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/06 19:54:43 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,11 @@ void Client::setBuffer(size_t buffersize)
 bool Client::hasResponse()
 {
 	return (!_response_to_send.empty());
+}
+
+void 	Client::setCurrentRequest(const HttpRequest& request)
+{
+	_request = request;
 }
 
 /// @brief reads in the clientside data sent from the webbrowser
@@ -298,29 +303,36 @@ std::string Client::parsePath(const RouteConf& route_conf, const HttpRequest& re
 	return (phys_path);
 }
 
+// void Client::split_request(const std::string& raw_data) {
+// 	size_t start = 0;
+// 	size_t separator_pos;
 
+// 	while ((separator_pos = raw_data.find("\r\n\r\n", start)) != std::string::npos)
+// 	{
+// 		size_t request_length = separator_pos + 4 - start; // +4 for "\r\n\r\n"
+// 		std::string single_request = raw_data.substr(start, request_length);
+// 		_request_list.push_back(single_request);
 
+// 		start = separator_pos + 4;
+// 	}
+// }
 
-void Client::split_request(const std::string& raw_data) {
-    size_t start = 0;
-    size_t separator_pos;
+// const std::vector<std::string>& Client::getRequest_list() const
+// {
+// 	return (_request_list);
+// }
 
-    while ((separator_pos = raw_data.find("\r\n\r\n", start)) != std::string::npos)
-	{
-        size_t request_length = separator_pos + 4 - start; // +4 for "\r\n\r\n"
-        std::string single_request = raw_data.substr(start, request_length);
-        _request_list.push_back(single_request);
+// const std::string& Client::getRaw_data() const
+// {
+// 	return _raw_data;
+// }
 
-        start = separator_pos + 4;
-    }
+void Client::clearRequestList()
+{
+	_request_list.clear();
 }
 
-const std::vector<std::string>& Client::getRequest_list() const
+void Client::clearRawData()
 {
-	return (_request_list);
-}
-
-const std::string& Client::getRaw_data() const
-{
-    return _raw_data;
+	_raw_data.clear();
 }

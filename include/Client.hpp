@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/12/06 18:02:39 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/06 19:11:48 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ class Client {
 
 		const HttpRequest&	getRequest() const;
 		HttpRequest& 		getRequest();
+		void 				setCurrentRequest(const HttpRequest& request);
 		const std::string&	getResponseString() const;
 		void				setResponseString(const std::string& built_response);
 		int					getFd() const;
@@ -67,6 +68,8 @@ class Client {
 		void								split_request(const std::string& raw_data);
 		const std::vector<std::string>&		getRequest_list() const;
 		const std::string&					getRaw_data() const;
+		void 								clearRequestList();
+		void 								clearRawData();
 
 	private:
 		static int		client_counter;
@@ -79,9 +82,10 @@ class Client {
 		bool			_keep_alive;
 		std::string		_best_path;
 		std::string		_response_to_send;
-};
+
 		std::string					_raw_data;
 		std::vector<std::string>	_request_list;
-		std::vector<HttpRequest>	_request; // -> split request -> splittet den request_to append und parsed && speicherts dann im vector;
+		HttpRequest					_request;
+};
 
 #endif // CLIENT_H

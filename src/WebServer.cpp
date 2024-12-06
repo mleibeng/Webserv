@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/06 18:03:13 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/06 19:49:52 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,6 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 		for (const auto& [fd, event] : events) {
 			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
 			{
-				std::cout << "oh no!" << std::endl;
 				active_clients.erase(fd);
 				close(fd);
 				event_loop.removeFd(fd);
@@ -225,13 +224,13 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 			}
 			if (event & EPOLLOUT_FLAG)
 			{
-				std::cout << "out" << std::endl;
 				auto it = active_clients.find(fd);
 				if (it != active_clients.end() && it->second->hasResponse())
 				{
-					ssize_t status = it->second->send_response(it->second->getResponseString());
-					if (status == -1)
-						event_loop.modifyFd(fd, EPOLLERR_FLAG);
+					it->second->send_response(it->second->getResponseString());
+					active_clients.erase(fd);
+					close(fd);
+					event_loop.removeFd(fd);
 				}
 			}
 		}
@@ -276,33 +275,36 @@ void WebServer::initialize(size_t pool)
 
 bool WebServer::isComplete(const std::string& request)
 {
-	std::cout << "complete1" << std::endl;
+
 	size_t header_end = request.find("\r\n\r\n");
-	std::cout << "complete2" << std::endl;
+
 	if (header_end == std::string::npos)
 		return false;
-	std::cout << "complete3" << std::endl;
+
 	size_t content_length_pos = request.find("Content-Length");
-	std::cout << "complete4" << std::endl;
+
 	if (content_length_pos != std::string::npos)
 	{
-		std::cout << "complete5" << std::endl;
+
 		size_t length_start = request.find(':', content_length_pos) + 1;
-		std::cout << "complete6" << std::endl;
+
 		size_t length_end = request.find("\r\n", length_start);
-		std::cout << "complete7" << std::endl;
+
 		if (length_start != std::string::npos && length_end != std::string::npos)
 		{
-			std::cout << "complete8" << std::endl;
+
 			size_t content_length = std::stoul(request.substr(length_start, length_end - length_start));
-			std::cout << "complete9" << std::endl;
+
 			size_t body_start = request.find("\r\n\r\n") + 4;
-			std::cout << "complete10" << std::endl;
-			return request.length() >= (body_start + content_length);
-			std::cout << "complete11" << std::endl;
+
+			std::cout << body_start << " :: " << content_length << std::endl;
+			bool returnvalue = request.length() >= (body_start + content_length);
+			std::cout << returnvalue << std::endl;
+			return returnvalue;
+
 		}
 	}
-	std::cout << "complete12" << std::endl;
+
 	return true;
 }
 
@@ -324,62 +326,57 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 
 	try
 	{
-		// std::cout << "Hello" << std::endl;
 
 		ssize_t read_result = client.read_request();
 		if (read_result <= 0)
 			return 0;
-		// std::cout << "Hello1" << std::endl;
-		std::cout << client.getRequestToAppend() << std::endl;
+
+		// std::cout << client.getRaw_data() << std::endl;
+
 		if (!isComplete(client.getRaw_data()))
 			return 0;
-		// std::cout << "Hello2" << std::endl;
 
-		client.split_request(client.getRaw_data()); // checkt obs was zu splitten gibt/splittet und speichert und dann
+		client.getRequest().parse(client.getRaw_data());
 
-		for (const auto& request : client.getRequest_list()) {
-			client.getRequest().parse(request);
-			// std::cout << "Hello3" << std::endl;
-			int error = 0;
-			if ((error = client.setCourse()) && error)
-			{
-				getNextHandler().serveErrorPage(client, error);
-				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-				return (-1);
-			}
-
-			const RouteConf* route = client.getRoute();
-			if (route && route->redirect.has_value())
-			{
-				if (client.getNumRedirects() >= route->max_redirects)
-				{
-					getNextHandler().serveErrorPage(client, 508);
-					event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-					return (0);
-				}
-
-				getNextHandler().handleRedirect(*route, client);
-				client.setRoute(nullptr);
-				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-				return (0);
-			}
-
-			if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
-			{
-				getNextHandler().serveErrorPage(client, error);
-				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-				return (0);
-			}
-
-			getNextHandler().handleRequest(client);
-			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return (0);
-		}
-		catch (std::exception &e)
+		int error = 0;
+		if ((error = client.setCourse()) && error)
 		{
-			getNextHandler().serveErrorPage(client, 400);
+			getNextHandler().serveErrorPage(client, error);
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 			return (-1);
 		}
+
+		const RouteConf* route = client.getRoute();
+		if (route && route->redirect.has_value())
+		{
+			if (client.getNumRedirects() >= route->max_redirects)
+			{
+				getNextHandler().serveErrorPage(client, 508);
+				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+				return (0);
+			}
+
+			getNextHandler().handleRedirect(*route, client);
+			client.setRoute(nullptr);
+			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+			return (0);
+		}
+
+		if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
+		{
+			getNextHandler().serveErrorPage(client, error);
+			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+			return (0);
+		}
+
+		getNextHandler().handleRequest(client);
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return (0);
+	}
+	catch (std::exception &e)
+	{
+		getNextHandler().serveErrorPage(client, 400);
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return (-1);
 	}
 }
