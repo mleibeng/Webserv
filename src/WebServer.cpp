@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/06 19:49:52 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/06 20:01:08 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,7 +205,6 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 				{
 					if (std::find(fds.begin(), fds.end(), fd) != fds.end())
 					{
-						std::cout << "connect" << std::endl;
 						acceptConnections(fd);
 						is_listener = true;
 						break ;
@@ -213,7 +212,6 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 				}
 				if (!is_listener)
 				{
-					std::cout << "in" << std::endl;
 					int status = handleClientRequest(fd);
 					if (status == -1)
 					{
@@ -227,7 +225,11 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 				auto it = active_clients.find(fd);
 				if (it != active_clients.end() && it->second->hasResponse())
 				{
-					it->second->send_response(it->second->getResponseString());
+					ssize_t read_or_remaining = it->second->send_response(it->second->getResponseString());
+					if (read_or_remaining == -202)
+					{
+						event_loop.modifyFd(it->first, EPOLLOUT_FLAG);
+					}
 					active_clients.erase(fd);
 					close(fd);
 					event_loop.removeFd(fd);

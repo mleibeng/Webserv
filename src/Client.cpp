@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/06 19:54:43 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/06 19:58:10 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -153,17 +153,21 @@ ssize_t Client::send_response(const std::string& response_string)
 	ssize_t total_sent = 0;
 	size_t remaining = response_string.size();
 
-	while (total_sent < static_cast<ssize_t>(response_string.size()))
+	// while (total_sent < static_cast<ssize_t>(response_string.size()))
+	// {
+	ssize_t sent = write(_client_fd,
+						response_string.c_str() + total_sent,
+						remaining);
+	if (sent <= 0)
+		return (-1);
+	total_sent += sent;
+	remaining -= sent;
+	// }
+
+	if (remaining > 0)
 	{
-		ssize_t sent = write(_client_fd,
-							response_string.c_str() + total_sent,
-							remaining);
-		if (sent <= 0)
-			return (-1);
-		total_sent += sent;
-		remaining -= sent;
+		return -202;
 	}
-	close(_client_fd);
 	return (total_sent);
 }
 
@@ -322,10 +326,10 @@ std::string Client::parsePath(const RouteConf& route_conf, const HttpRequest& re
 // 	return (_request_list);
 // }
 
-// const std::string& Client::getRaw_data() const
-// {
-// 	return _raw_data;
-// }
+const std::string& Client::getRaw_data() const
+{
+	return _raw_data;
+}
 
 void Client::clearRequestList()
 {
