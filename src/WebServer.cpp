@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/05 20:02:11 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/06 05:10:54 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,6 +270,38 @@ void WebServer::cleanInactiveClients()
 	}
 }
 
+bool WebServer::isComplete(const std::string& request)
+{
+	std::cout << "complete1" << std::endl;
+	size_t header_end = request.find("\r\n\r\n");
+	std::cout << "complete2" << std::endl;
+	if (header_end == std::string::npos)
+		return false;
+	std::cout << "complete3" << std::endl;
+	size_t content_length_pos = request.find("Content-Length");
+	std::cout << "complete4" << std::endl;
+	if (content_length_pos != std::string::npos)
+	{
+		std::cout << "complete5" << std::endl;
+		size_t length_start = request.find(':', content_length_pos) + 1;
+		std::cout << "complete6" << std::endl;
+		size_t length_end = request.find("\r\n", length_start);
+		std::cout << "complete7" << std::endl;
+		if (length_start != std::string::npos && length_end != std::string::npos)
+		{
+			std::cout << "complete8" << std::endl;
+			size_t content_length = std::stoul(request.substr(length_start, length_end - length_start));
+			std::cout << "complete9" << std::endl;
+			size_t body_start = request.find("\r\n\r\n") + 4;
+			std::cout << "complete10" << std::endl;
+			return request.length() >= (body_start + content_length);
+			std::cout << "complete11" << std::endl;
+		}
+	}
+	std::cout << "complete12" << std::endl;
+	return true;
+}
+
 /// @brief read request from client and either serve error or process it
 /// @param client_fd client to process
 /// @param handler handler instance for all processes
@@ -290,46 +322,62 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 
 	Client& client = *it->second.client;
 
-	// std::cout << "request from " << client_fd << std::endl;
-	if (client.read_request() == -1) // should read in headers
+	try
+	{
+		std::cout << "Hello" << std::endl;
+
+		ssize_t read_result = client.read_request();
+		if (read_result <= 0)
+			return 0;
+		std::cout << "Hello1" << std::endl;
+		std::cout << client.getRequestToAppend() << std::endl;
+		if (!isComplete(client.getRequestToAppend()))
+		{
+			event_loop.modifyFd(client_fd, EPOLLIN_FLAG);
+			return 0; 
+		}
+		std::cout << "Hello3" << std::endl;
+		client.getRequest().parse(client.getRequestToAppend());
+		std::cout << "Hello4" << std::endl;
+		int error = 0;
+		if ((error = client.setCourse()) && error)
+		{
+			getNextHandler().serveErrorPage(client, error);
+			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+			return (-1);
+		}
+
+		const RouteConf* route = client.getRoute();
+		if (route && route->redirect.has_value())
+		{
+			if (client.getNumRedirects() >= route->max_redirects)
+			{
+				getNextHandler().serveErrorPage(client, 508);
+				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+				return (0);
+			}
+
+			getNextHandler().handleRedirect(*route, client);
+			client.setRoute(nullptr);
+			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+			return (0);
+		}
+
+		if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
+		{
+			getNextHandler().serveErrorPage(client, error);
+			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+			return (0);
+		}
+
+		getNextHandler().handleRequest(client);
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return (0);
+	} 
+	catch (std::exception &e)
 	{
 		getNextHandler().serveErrorPage(client, 400);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 		return (-1);
 	}
-	// Logik zum finden der korrekten Route nach dem einlesen der header
-	int error = 0;
-	if ((error = client.setCourse()) && error)
-	{
-		getNextHandler().serveErrorPage(client, error);
-		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return (-1);
-	}
-
-	const RouteConf* route = client.getRoute();
-	if (route && route->redirect.has_value())
-	{
-		if (client.getNumRedirects() >= route->max_redirects)
-		{
-			getNextHandler().serveErrorPage(client, 508);
-			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return (0);
-		}
-
-		getNextHandler().handleRedirect(*route, client);
-		client.setRoute(nullptr);
-		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return (0);
-	}
-
-	if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
-	{
-		getNextHandler().serveErrorPage(client, error);
-		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return (0);
-	}
-
-	getNextHandler().handleRequest(client);
-	event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-	return (0);
 }

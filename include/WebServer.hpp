@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/05 20:02:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/06 04:30:57 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ class WebServer
 		int		createNonBlockingSocket();
 		bool	portInUse(int port);
 		ssize_t	handleClientRequest(int client_fd);
+		bool	isComplete(const std::string& request);
 };
 
 #endif

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/12/04 03:15:14 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/06 04:52:06 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Client {
 		Client& operator=(const Client& other) = delete;
 
 		const HttpRequest&	getRequest() const;
+		HttpRequest& 		getRequest();
 		const std::string&	getResponseString() const;
 		void				setResponseString(const std::string& built_response);
 		int					getFd() const;
@@ -56,6 +57,7 @@ class Client {
 		int					setCourse();
 		const RouteConf*	getRoute() const;
 		const std::string&	getBestPath() const;
+		const std::string&	getRequestToAppend() const;
 		const ServerConf	*findServerConf(const HttpRequest &request);
 		const RouteConf		*findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
 		std::string			parsePath(const RouteConf& route_conf, const HttpRequest& request);
@@ -70,6 +72,7 @@ class Client {
 		const RouteConf	*_route;
 		bool			_keep_alive;
 		std::string		_best_path;
+		std::string		_request_to_append;
 		std::string		_response_to_send;
 };
 

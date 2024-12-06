@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/04 02:02:20 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/06 04:52:03 by marvinleibe      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,38 +42,33 @@ bool Client::hasResponse()
 	return (!_response_to_send.empty());
 }
 
+const std::string& Client::getRequestToAppend() const
+{
+    return _request_to_append;
+}
+
 /// @brief reads in the clientside data sent from the webbrowser
 /// @return returns length of request or -1 in case of error
 ssize_t Client::read_request()
 {
-	std::vector<char> buffer(_buffersize + 1);
-	ssize_t total_read = 0;
+	std::vector<char> buffer(_buffersize + 1, 0);
 
-	while (true)
+	ssize_t bytes = read(_client_fd, buffer.data(), buffer.size());
+
+	if (bytes < 0)
 	{
-		ssize_t bytes = read(_client_fd,
-							buffer.data() + total_read,
-							buffer.size() - total_read);
-
-		if (bytes <= 0)
-		{
-			_keep_alive = false;
-			break ;
-		}
-		total_read += bytes;
-		if (total_read >= static_cast<ssize_t>(_buffersize))
-			return (-1);
+		_keep_alive = false;
+		throw std::runtime_error("Read error");
+	}
+	if (bytes == 0)
+	{
+		_keep_alive = false;
+		throw std::runtime_error("Connection closed");
 	}
 
-	if (total_read > 0)
-	{
-		std::string request(buffer.data(), total_read);
-		bool ok = _request.parse(request);
-		if (!ok)
-			return (-1);
-		_keep_alive = checkKeepAliveHeaders();
-	}
-	return (total_read);
+	_request_to_append.append(buffer.data(), bytes);
+	
+	return (bytes);
 }
 
 int Client::getNumRedirects() const
@@ -161,6 +156,11 @@ int Client::getFd() const
 /// @brief get parsed request as object
 /// @return returns an HttpRequest object
 const HttpRequest& Client::getRequest() const
+{
+	return (_request);
+}
+
+HttpRequest& Client::getRequest()
 {
 	return (_request);
 }
