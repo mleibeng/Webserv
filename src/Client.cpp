@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/06 16:31:25 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/06 18:14:31 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,16 +55,11 @@ bool Client::hasResponse()
 	return (!_response_to_send.empty());
 }
 
-const std::string& Client::getRequestToAppend() const
-{
-    return _request_to_append;
-}
-
 /// @brief reads in the clientside data sent from the webbrowser
 /// @return returns length of request or -1 in case of error
 ssize_t Client::read_request()
 {
-	std::vector<char> buffer(_buffersize + 1, 0);
+	std::vector<char> buffer(4096, 0);
 
 	ssize_t bytes = read(_client_fd, buffer.data(), buffer.size());
 
@@ -79,7 +74,10 @@ ssize_t Client::read_request()
 		throw std::runtime_error("Connection closed");
 	}
 
-	_request_to_append.append(buffer.data(), bytes);
+	// content-length > limitclientbodysize <- _buffersize
+	// thrw error
+
+	_raw_data.append(buffer.data(), bytes);
 
 	return (bytes);
 }
@@ -298,4 +296,31 @@ std::string Client::parsePath(const RouteConf& route_conf, const HttpRequest& re
 			phys_path += (uri[0] == '/' ? uri.substr(1) : uri);
 	}
 	return (phys_path);
+}
+
+
+
+
+void Client::split_request(const std::string& raw_data) {
+    size_t start = 0;
+    size_t separator_pos;
+
+    while ((separator_pos = raw_data.find("\r\n\r\n", start)) != std::string::npos)
+	{
+        size_t request_length = separator_pos + 4 - start; // +4 for "\r\n\r\n"
+        std::string single_request = raw_data.substr(start, request_length);
+        _request_list.push_back(single_request);
+
+        start = separator_pos + 4;
+    }
+}
+
+const std::vector<std::string>& Client::getRequest_list() const
+{
+	return (_request_list);
+}
+
+const std::string& Client::getRaw_data() const
+{
+    return _raw_data;
 }

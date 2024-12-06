@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/06 16:34:36 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/06 18:03:13 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -324,57 +324,62 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 
 	try
 	{
-		std::cout << "Hello" << std::endl;
+		// std::cout << "Hello" << std::endl;
 
 		ssize_t read_result = client.read_request();
 		if (read_result <= 0)
 			return 0;
-		std::cout << "Hello1" << std::endl;
+		// std::cout << "Hello1" << std::endl;
 		std::cout << client.getRequestToAppend() << std::endl;
-		if (!isComplete(client.getRequestToAppend()))
+		if (!isComplete(client.getRaw_data()))
 			return 0;
-		std::cout << "Hello2" << std::endl;
-		// client.getRequest().parse(client.getRequestToAppend());
-		std::cout << "Hello3" << std::endl;
-		int error = 0;
-		if ((error = client.setCourse()) && error)
-		{
-			getNextHandler().serveErrorPage(client, error);
-			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return (-1);
-		}
+		// std::cout << "Hello2" << std::endl;
 
-		const RouteConf* route = client.getRoute();
-		if (route && route->redirect.has_value())
-		{
-			if (client.getNumRedirects() >= route->max_redirects)
+		client.split_request(client.getRaw_data()); // checkt obs was zu splitten gibt/splittet und speichert und dann
+
+		for (const auto& request : client.getRequest_list()) {
+			client.getRequest().parse(request);
+			// std::cout << "Hello3" << std::endl;
+			int error = 0;
+			if ((error = client.setCourse()) && error)
 			{
-				getNextHandler().serveErrorPage(client, 508);
+				getNextHandler().serveErrorPage(client, error);
+				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+				return (-1);
+			}
+
+			const RouteConf* route = client.getRoute();
+			if (route && route->redirect.has_value())
+			{
+				if (client.getNumRedirects() >= route->max_redirects)
+				{
+					getNextHandler().serveErrorPage(client, 508);
+					event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+					return (0);
+				}
+
+				getNextHandler().handleRedirect(*route, client);
+				client.setRoute(nullptr);
 				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 				return (0);
 			}
 
-			getNextHandler().handleRedirect(*route, client);
-			client.setRoute(nullptr);
+			if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
+			{
+				getNextHandler().serveErrorPage(client, error);
+				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+				return (0);
+			}
+
+			getNextHandler().handleRequest(client);
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 			return (0);
 		}
-
-		if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
+		catch (std::exception &e)
 		{
-			getNextHandler().serveErrorPage(client, error);
+			getNextHandler().serveErrorPage(client, 400);
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return (0);
+			return (-1);
 		}
-
-		getNextHandler().handleRequest(client);
-		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return (0);
-	}
-	catch (std::exception &e)
-	{
-		getNextHandler().serveErrorPage(client, 400);
-		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return (-1);
 	}
 }
