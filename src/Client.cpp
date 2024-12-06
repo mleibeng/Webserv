@@ -3,18 +3,31 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/06 04:52:03 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/12/06 16:31:25 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client(int client_fd, const Config& config) : _client_fd(client_fd), _config(config), _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE))), redirect_count(0), _route(nullptr), _keep_alive(true), _best_path()
-{
+int Client::client_counter = 0;
 
+Client::Client(int client_fd, const Config& config) : _client_name(generateUniqueName()), _client_fd(client_fd), _config(config), _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE))), redirect_count(0), _route(nullptr), _keep_alive(true), _best_path()
+{
+	++client_counter;
+}
+
+std::string Client::generateUniqueName()
+{
+	auto now = std::chrono::system_clock::now();
+	auto now_time_t = std::chrono::system_clock::to_time_t(now);
+	auto now_tm = *std::localtime(&now_time_t);
+
+	std::ostringstream oss;
+	oss << std::put_time(&now_tm, "%Y%m%d%H%M%S") << "_" << client_counter;
+	return oss.str();
 }
 
 Client::~Client()
@@ -67,8 +80,13 @@ ssize_t Client::read_request()
 	}
 
 	_request_to_append.append(buffer.data(), bytes);
-	
+
 	return (bytes);
+}
+
+const std::string& Client::getName() const
+{
+	return (_client_name);
 }
 
 int Client::getNumRedirects() const

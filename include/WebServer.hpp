@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/06 04:30:57 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/12/06 16:18:37 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,15 +43,8 @@ class WebServer
 		RequestHandler&	getNextHandler();
 
 	private:
-		struct ClientInfo
-		{
-			std::unique_ptr<Client> client;
-			std::time_t last_active;
 
-			ClientInfo(int fd, const Config& config);
-		};
-
-		std::map<int, ClientInfo> active_clients;
+		std::map<int, std::unique_ptr<Client>> active_clients;
 
 		Config												config;
 		Loop												event_loop;
@@ -63,7 +56,7 @@ class WebServer
 		void	setupListeners();
 		void	runLoop();
 		void	acceptConnections(int listener_fd);
-		void	cleanInactiveClients();
+		// void	cleanInactiveClients();
 		int		createNonBlockingSocket();
 		bool	portInUse(int port);
 		ssize_t	handleClientRequest(int client_fd);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/06 05:10:54 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/12/06 16:34:36 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,10 +135,8 @@ void WebServer::acceptConnections(int fd)
 			std::cerr << "Couldn't accept connection" << strerror(errno) << std::endl;
 		return;
 	}
-	// int flags = fcntl(client_fd, F_GETFL, 0);
 	fcntl(client_fd, F_SETFL, O_NONBLOCK);
 	event_loop.addFd(client_fd, EPOLLIN_FLAG);
-	// //event_loop.addClient(client_fd, std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)));
 }
 
 /// @brief create and set sockets non blocking
@@ -187,15 +185,16 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 	while (running)
 	{
 		std::cout << "waiting for connection" << std::endl;
-		auto events = event_loop.wait(5000);
+		auto events = event_loop.wait();
 		if (!running)
 			break ;
 
-		cleanInactiveClients();
+		// cleanInactiveClients();
 
 		for (const auto& [fd, event] : events) {
 			if (event & EPOLLERR_FLAG || event & EPOLLHUP_FLAG)
 			{
+				std::cout << "oh no!" << std::endl;
 				active_clients.erase(fd);
 				close(fd);
 				event_loop.removeFd(fd);
@@ -207,6 +206,7 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 				{
 					if (std::find(fds.begin(), fds.end(), fd) != fds.end())
 					{
+						std::cout << "connect" << std::endl;
 						acceptConnections(fd);
 						is_listener = true;
 						break ;
@@ -214,18 +214,22 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 				}
 				if (!is_listener)
 				{
+					std::cout << "in" << std::endl;
 					int status = handleClientRequest(fd);
 					if (status == -1)
+					{
+						std::cout << "error coming from handleClient" << std::endl;
 						event_loop.modifyFd(fd, EPOLLERR_FLAG);
+					}
 				}
 			}
 			if (event & EPOLLOUT_FLAG)
 			{
-				std::cout << fd << std::endl;
+				std::cout << "out" << std::endl;
 				auto it = active_clients.find(fd);
-				if (it != active_clients.end() && it->second.client->hasResponse())
+				if (it != active_clients.end() && it->second->hasResponse())
 				{
-					ssize_t status = it->second.client->send_response(it->second.client->getResponseString());
+					ssize_t status = it->second->send_response(it->second->getResponseString());
 					if (status == -1)
 						event_loop.modifyFd(fd, EPOLLERR_FLAG);
 				}
@@ -247,28 +251,28 @@ void WebServer::initialize(size_t pool)
 		handler_pool.push_back(std::make_unique<RequestHandler>(config));
 }
 
-WebServer::ClientInfo::ClientInfo(int fd, const Config& config) : client(std::make_unique<Client>(fd, config)), last_active(std::time(nullptr))
-{
+// WebServer::ClientInfo::ClientInfo(int fd, const Config& config) : client(std::make_unique<Client>(fd, config)), last_active(std::time(nullptr))
+// {
 
-}
+// }
 
-void WebServer::cleanInactiveClients()
-{
-	std::time_t current_time = std::time(nullptr);
-	auto it = active_clients.begin();
-	while (it != active_clients.end())
-	{
-		if (current_time - it->second.last_active > std::get<int>(config.getGlobalConf(GlobalConf::ConfigKey::TIMEOUT)))
-		{
-			std::cout << "Cleaning inactive clients" << it->first << std::endl;
-			event_loop.removeFd(it->first);
-			close(it->first);
-			it = active_clients.erase(it);
-		}
-		else
-			++it;
-	}
-}
+// void WebServer::cleanInactiveClients()
+// {
+// 	std::time_t current_time = std::time(nullptr);
+// 	auto it = active_clients.begin();
+// 	while (it != active_clients.end())
+// 	{
+// 		if (current_time - it->second.last_active > std::get<int>(config.getGlobalConf(GlobalConf::ConfigKey::TIMEOUT)))
+// 		{
+// 			std::cout << "Cleaning inactive clients" << it->first << std::endl;
+// 			event_loop.removeFd(it->first);
+// 			close(it->first);
+// 			it = active_clients.erase(it);
+// 		}
+// 		else
+// 			++it;
+// 	}
+// }
 
 bool WebServer::isComplete(const std::string& request)
 {
@@ -310,17 +314,13 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 	auto it = active_clients.find(client_fd);
 	if (it == active_clients.end())
 	{
-		active_clients.emplace(
-			std::piecewise_construct,
-			std::forward_as_tuple(client_fd),
-			std::forward_as_tuple(client_fd, config)
-		);
+		active_clients[client_fd] = std::make_unique<Client>(client_fd, config);
 		it = active_clients.find(client_fd);
 	}
 
-	it->second.last_active = std::time(nullptr);
+	Client& client = *it->second;
 
-	Client& client = *it->second.client;
+	std::cout << client.getName() << std::endl;
 
 	try
 	{
@@ -332,13 +332,10 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 		std::cout << "Hello1" << std::endl;
 		std::cout << client.getRequestToAppend() << std::endl;
 		if (!isComplete(client.getRequestToAppend()))
-		{
-			event_loop.modifyFd(client_fd, EPOLLIN_FLAG);
-			return 0; 
-		}
+			return 0;
+		std::cout << "Hello2" << std::endl;
+		// client.getRequest().parse(client.getRequestToAppend());
 		std::cout << "Hello3" << std::endl;
-		client.getRequest().parse(client.getRequestToAppend());
-		std::cout << "Hello4" << std::endl;
 		int error = 0;
 		if ((error = client.setCourse()) && error)
 		{
@@ -373,7 +370,7 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 		getNextHandler().handleRequest(client);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 		return (0);
-	} 
+	}
 	catch (std::exception &e)
 	{
 		getNextHandler().serveErrorPage(client, 400);

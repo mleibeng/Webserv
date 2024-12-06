@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/12/06 04:52:06 by marvinleibe      ###   ########.fr       */
+/*   Updated: 2024/12/06 16:30:21 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class Client {
 		bool				checkKeepAliveHeaders();
 
 		//route mngmt
+		const std::string&	getName() const;
 		int					setCourse();
 		const RouteConf*	getRoute() const;
 		const std::string&	getBestPath() const;
@@ -62,8 +63,11 @@ class Client {
 		const RouteConf		*findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
 		std::string			parsePath(const RouteConf& route_conf, const HttpRequest& request);
 		int					isMethodAllowed(const RouteConf &route_conf, const std::string& method);
+		std::string 		generateUniqueName();
 
 	private:
+		static int		client_counter;
+		std::string		_client_name;
 		int				_client_fd;
 		const Config&	_config;
 		HttpRequest		_request;
