@@ -6,7 +6,7 @@
 /*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/04 03:00:48 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/06 19:13:41 by fwahl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,10 +138,6 @@ std::string HttpResponse::stostr() const
 			return ("No Content");
 		case StatusCode::MOVED_PERM:
 			return ("Moved Permanently");
-		case StatusCode::MOVED_TEMP:
-			return ("Moved temporarily");
-		case StatusCode::NOT_MODIFIED:
-			return ("Not Modified");
 		case StatusCode::BAD_REQUEST:
 			return ("Bad Request");
 		case StatusCode::FORBIDDEN:
