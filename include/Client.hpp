@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/12/07 19:38:01 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 21:49:32 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,9 @@ class Client
 		ssize_t				read_request();
 		ssize_t				send_response(const std::string& response_string);
 
-		int					getNumRedirects() const;
-
 		void				setRoute(const RouteConf* route);
 
 		//incrementers
-		void				increaseRedirectCount();
 		void				setBuffer(size_t buffersize);
 
 		//connection checkers

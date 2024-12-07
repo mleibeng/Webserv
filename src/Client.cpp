@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/07 19:46:00 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 22:01:31 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,15 +106,15 @@ const std::string& Client::getName() const
 	return (_client_name);
 }
 
-int Client::getNumRedirects() const
-{
-	return (redirect_count);
-}
+// int Client::getNumRedirects() const
+// {
+// 	return (redirect_count);
+// }
 
-void Client::increaseRedirectCount()
-{
-	redirect_count++;
-}
+// void Client::increaseRedirectCount()
+// {
+// 	redirect_count++;
+// }
 
 void Client::setRoute(const RouteConf* route)
 {

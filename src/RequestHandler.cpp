@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:48 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/06 19:05:00 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 22:02:04 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ void RequestHandler::handleRedirect(const RouteConf& route_conf, Client& client)
 {
 	HttpResponse response;
 
-	client.increaseRedirectCount();
 	std::string redirect = buildRedirWQuery(route_conf, client.getRequest());
 
 	response.setStatus(*route_conf.redirect_code);
