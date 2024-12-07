@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandleCGI.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 21:10:46 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/04 01:44:51 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/07 23:48:28 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void RequestHandler::handleCGI(Client& client, const std::string& cgi_path)
 		if (pid == 0)
 			handleCGIChild(pipes, cgi_path, request, *handler);
 		else
-			handleCGIParent(pipes, client, request);
+			handleCGIParent(pipes, client, request, pid);
 	}
 	catch (const std::exception& e)
 	{
@@ -124,7 +124,7 @@ void RequestHandler::handleCGIChild(PipeDescriptors& pipes, const std::string& c
 /// @param pipes writes to requested data to child process or reads executed data from child process
 /// @param client client sending the request
 /// @param request request for processing in CGI
-void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, const HttpRequest& request)
+void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, const HttpRequest& request, pid_t pid)
 {
 	pipes.closeParentPipes();
 
@@ -132,12 +132,32 @@ void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, con
 		writeCGIInput(pipes.in_pipe[1], request.getBody()); //write to read end of child process pipe for CGI processing
 	close(pipes.in_pipe[1]);
 
+	const std::chrono::seconds timeout(5);
+	auto startTime = std::chrono::steady_clock::now();
+
+	int status;
+	bool timedOut = false;
+
+	while ((waitpid(pid, &status, WNOHANG)) == 0)
+	{
+		if (std::chrono::steady_clock::now() - startTime >= timeout)
+		{
+			timedOut = true;
+			break;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Sleep for a short period before checking again
+	}
+
+	if (timedOut)
+	{
+		kill(pid, SIGKILL);
+		waitpid(pid, &status, 0); // Wait for the child process to terminate
+	}
+
 	std::string output = readCGIOutput(pipes.out_pipe[0]); // read from child process CGI
 	// std::cout << "CGI Output: "<< output << std::endl;
 	close(pipes.out_pipe[0]);
 
-	int status;
-	waitpid(-1, &status, 0); // wait for status information
 
 	HttpResponse response;
 	if (WIFEXITED(status) && WEXITSTATUS(status) == 0) // if ok format response for sending

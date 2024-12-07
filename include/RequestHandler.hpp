@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/12 02:32:57 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/04 03:25:26 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/07 23:35:44 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ class RequestHandler
 
 		bool		setupPipes(PipeDescriptors &pipes, Client& client);
 		void		handleCGIChild(PipeDescriptors &pipes, const std::string& cgi_path, const HttpRequest& request, const CGIHandler& handler);
-		void		handleCGIParent(PipeDescriptors &pipes, Client& client, const HttpRequest& request);
+		void		handleCGIParent(PipeDescriptors &pipes, Client& client, const HttpRequest& request, pid_t pid);
 		std::string	readCGIOutput(int pipe_fd);
 		void		writeCGIInput(int pipe_fd, const std::string& body);
 		void		buildCGIResponse(const std::string& out, HttpResponse& response);
