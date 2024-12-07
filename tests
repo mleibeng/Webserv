@@ -61,8 +61,8 @@ siege -b -c100 -t1m http://127.0.0.1:8080/
 	curl -i -v http://127.0.0.2:8081/
 
 	// 404
-	curl -X GET "http://127.0.0.1:8080/nonexistent"
-	curl -X GET "http://127.0.0.1:8080/cgi-bin/nonexistent.php"
+	curl -X GET -v "http://127.0.0.1:8080/nonexistent"
+	curl -X GET -v "http://127.0.0.1:8080/cgi-bin/nonexistent.php"
 
 	// 405 remove DELETE from default route beforehand
 	curl -X -v DELETE http://localhost:8080/index_de.html
