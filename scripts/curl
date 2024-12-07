@@ -12,7 +12,7 @@ curl - https://curl.se/docs/manpage.html
 	<domain>:<port>:<ip-address>
 
 1. GET-Request
-	curl -X GET http://localhost:8080
+	curl -X GET -v http://localhost:8080
 	curl -X GET http://127.0.0.1:8080
 	curl -X GET -v http://127.0.0.1:8080
 	curl -X GET -v -A "webserv-tester" http://127.0.0.1:8080
@@ -59,3 +59,5 @@ curl -X DELETE http://localhost:8080/index_de.html // 405 remove DELETE from def
 // 409 Conflict with trying to upload a file that already exists, just test on the website
 curl -X PUT "http://127.0.0.1:8080/" // 501
 curl -L "http://127.0.0.1:8080/py" // 508
+
+siege -b -c100 -t1m http://127.0.0.1:8080/

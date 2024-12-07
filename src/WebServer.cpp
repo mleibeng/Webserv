@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/07 19:43:31 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 21:40:33 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,7 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 {
 	while (running)
 	{
-		std::cout << "waiting for connection" << std::endl;
+		// std::cout << "waiting for connection" << std::endl;
 		auto events = event_loop.wait();
 		if (!running)
 			break ;
@@ -218,7 +218,6 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 				auto it = active_clients.find(fd);
 				if (it != active_clients.end() && it->second->hasResponse())
 				{
-					std::cout << it->second->getResponseString();
 					ssize_t read_or_remaining = it->second->send_response(it->second->getResponseString());
 					if (read_or_remaining == -202)
 						event_loop.modifyFd(it->first, EPOLLOUT_FLAG);
@@ -291,9 +290,9 @@ bool WebServer::isComplete(const std::string& request)
 
 			size_t body_start = request.find("\r\n\r\n") + 4;
 
-			std::cout << body_start << " :: " << content_length << std::endl;
+			// std::cout << body_start << " :: " << content_length << std::endl;
 			bool returnvalue = request.length() >= (body_start + content_length);
-			std::cout << returnvalue << std::endl;
+			// std::cout << returnvalue << std::endl;
 			return returnvalue;
 
 		}
@@ -328,11 +327,7 @@ void WebServer::handleClientRequest(int client_fd)
 
 		client.getRequest().parse(client.getRaw_data());
 
-		std::cout << "Wir sind hier" << std::endl;
-
 		client.check_content_length(client.getRequest());
-
-		std::cout << "Wir sind hier 2" << std::endl;
 
 		int error = 0;
 		if ((error = client.setCourse()) && error)
@@ -377,7 +372,6 @@ void WebServer::handleClientRequest(int client_fd)
 	}
 	catch (std::invalid_argument &e)
 	{
-		std::cout << "jo ist passiert" << std::endl;
 		getNextHandler().serveErrorPage(client, 413);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
 		return;

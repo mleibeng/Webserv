@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/12/07 19:29:22 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 21:32:36 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	RequestHandler::handlePostRequest(Client& client)
 	else if (content_type.find("application/x-www-form-urlencoded") != std::string::npos)
 		handleFormSubmission(client, body);
 	else
-		std::cout << RED << "Content-Type not supported" << RESET << std::endl;
+		serveErrorPage(client, 405);
 }
 
 void	RequestHandler::handleFileUpload(Client& client, const std::string& content_type, const std::string& body)
@@ -56,7 +56,6 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 	if (std::filesystem::exists(file_path))
 		return (serveErrorPage(client, 409));
 
-	// std::cout << file_path << std::endl;
 	std::ofstream new_file(file_path, std::ios::binary);
 	if (new_file) {
 		new_file.write(file_data.data(), file_data.size());
@@ -71,7 +70,7 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 	}
 	else
 	{
-		std::cout << "This is the problem" << std::endl;
+		// std::cout << "This is the problem" << std::endl;
 		return (serveErrorPage(client, 500));
 	}
 }

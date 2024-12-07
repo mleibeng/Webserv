@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   RequestHandlerSetup.cpp                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/25 19:28:22 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/04 01:16:55 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/07 21:40:55 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,4 @@ void RequestHandler::serveErrorPage(Client& client, int error_code)
 	client.setResponseString(response.buildResponse());
 }
 
-RequestHandler::~RequestHandler()
-{
-}
+RequestHandler::~RequestHandler() {}
