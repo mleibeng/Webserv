@@ -6,7 +6,7 @@
 /*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/07 22:13:42 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/07 22:39:59 by mott             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,6 +300,41 @@ bool WebServer::isComplete(const std::string& request)
 	return true;
 }
 
+bool WebServer::detectRedirCyc(const RouteConf& route)
+{
+	std::unordered_set<std::string> visited;
+
+	const RouteConf* current = &route;
+	int redir_count = 0;
+
+	int max_redirs = *route.max_redirects;
+
+	while (current && current->redirect.has_value() &&
+		redir_count < max_redirs)
+	{
+		if (visited.count(current->path) > 0)
+			return true;
+
+		visited.insert(current->path);
+
+		current = nullptr;
+		for (const auto& server : config.getServerConfs())
+		{
+			if (route.redirect.has_value())
+			{
+				auto it = server.routes.find(*route.redirect);
+				if (it != server.routes.end())
+				{
+					current = &(it->second);
+					break;
+				}
+			}
+		}
+		redir_count++;
+	}
+	return false;
+}
+
 /// @brief read request from client and either serve error or process it
 /// @param client_fd client to process
 /// @param handler handler instance for all processes
@@ -339,10 +374,12 @@ void WebServer::handleClientRequest(int client_fd)
 		const RouteConf* route = client.getRoute();
 		if (route && route->redirect.has_value())
 		{
-			if (client.getNumRedirects() >= route->max_redirects)
+
+			if (detectRedirCyc(*route))
 			{
 				getNextHandler().serveErrorPage(client, 508);
 				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+				client.setRoute(nullptr);
 				return;
 			}
 

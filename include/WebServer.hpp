@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/07 18:43:38 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 22:12:16 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ Handles: Overall server cycle, including start stop, configurations and sockets
 #include "HttpRequest.hpp"
 #include "HttpResponse.hpp"
 #include "RequestHandler.hpp"
+
 
 class Loop;
 class Client;
@@ -62,6 +63,7 @@ class WebServer
 		bool	portInUse(int port);
 		void	handleClientRequest(int client_fd);
 		bool	isComplete(const std::string& request);
+		bool 	detectRedirCyc(const RouteConf& route);
 };
 
 #endif
