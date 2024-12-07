@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:50 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/06 19:13:41 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/07 20:00:09 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,6 +154,8 @@ std::string HttpResponse::stostr() const
 			return ("Not implemented");
 		case StatusCode::ENDLESS_LOOP:
 			return ("Redirection Loop");
+		case StatusCode::PAYLOAD_TOO_LARGE:
+			return ("Payload too large");
 		default:
 			return ("Unknown Status");
 	}

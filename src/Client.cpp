@@ -3,19 +3,34 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/04 02:02:20 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/07 19:46:00 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client(int client_fd, const Config& config) : _client_fd(client_fd), _config(config), _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE))), redirect_count(0), _route(nullptr), _keep_alive(true), _best_path()
-{
+int Client::client_counter = 0;
 
+Client::Client(int client_fd, const Config& config) : _client_fd(client_fd), _config(config), _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE))), redirect_count(0), _route(nullptr), _keep_alive(true), _best_path()
+{
+	// ++client_counter;
 }
+
+
+// _client_name(generateUniqueName())
+// std::string Client::generateUniqueName()
+// {
+// 	auto now = std::chrono::system_clock::now();
+// 	auto now_time_t = std::chrono::system_clock::to_time_t(now);
+// 	auto now_tm = *std::localtime(&now_time_t);
+
+// 	std::ostringstream oss;
+// 	oss << std::put_time(&now_tm, "%Y%m%d%H%M%S") << "_" << client_counter;
+// 	return oss.str();
+// }
 
 Client::~Client()
 {
@@ -42,38 +57,53 @@ bool Client::hasResponse()
 	return (!_response_to_send.empty());
 }
 
+void 	Client::setCurrentRequest(const HttpRequest& request)
+{
+	_request = request;
+}
+
+bool Client::check_content_length(const HttpRequest& request)
+{
+	std::string content_len = request.getHeader("Content-Length");
+
+	if (!content_len.empty())
+	{
+		size_t content_length = std::stoi(content_len);
+		if (content_length >= std::get<size_t>(_config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE)))
+		{
+			_keep_alive = false;
+			throw std::invalid_argument("request body too large");
+		}
+	}
+	return true;
+}
+
 /// @brief reads in the clientside data sent from the webbrowser
 /// @return returns length of request or -1 in case of error
 ssize_t Client::read_request()
 {
-	std::vector<char> buffer(_buffersize + 1);
-	ssize_t total_read = 0;
+	std::array<char, 4096> buffer;
 
-	while (true)
+	ssize_t bytes = read(_client_fd, buffer.data(), buffer.size());
+
+	if (bytes < 0)
 	{
-		ssize_t bytes = read(_client_fd,
-							buffer.data() + total_read,
-							buffer.size() - total_read);
-
-		if (bytes <= 0)
-		{
-			_keep_alive = false;
-			break ;
-		}
-		total_read += bytes;
-		if (total_read >= static_cast<ssize_t>(_buffersize))
-			return (-1);
+		_keep_alive = false;
+		throw std::runtime_error("Read error");
+	}
+	if (bytes == 0)
+	{
+		_keep_alive = false;
+		throw std::runtime_error("Connection closed");
 	}
 
-	if (total_read > 0)
-	{
-		std::string request(buffer.data(), total_read);
-		bool ok = _request.parse(request);
-		if (!ok)
-			return (-1);
-		_keep_alive = checkKeepAliveHeaders();
-	}
-	return (total_read);
+	_raw_data.append(buffer.data(), bytes);
+	return (bytes);
+}
+
+const std::string& Client::getName() const
+{
+	return (_client_name);
 }
 
 int Client::getNumRedirects() const
@@ -137,17 +167,16 @@ ssize_t Client::send_response(const std::string& response_string)
 	ssize_t total_sent = 0;
 	size_t remaining = response_string.size();
 
-	while (total_sent < static_cast<ssize_t>(response_string.size()))
-	{
-		ssize_t sent = write(_client_fd,
-							response_string.c_str() + total_sent,
-							remaining);
-		if (sent <= 0)
-			return (-1);
-		total_sent += sent;
-		remaining -= sent;
-	}
-	close(_client_fd);
+	ssize_t sent = write(_client_fd,
+						response_string.c_str() + total_sent,
+						remaining);
+	if (sent <= 0)
+		return (-1);
+	total_sent += sent;
+	remaining -= sent;
+
+	if (remaining > 0)
+		return -202;
 	return (total_sent);
 }
 
@@ -161,6 +190,11 @@ int Client::getFd() const
 /// @brief get parsed request as object
 /// @return returns an HttpRequest object
 const HttpRequest& Client::getRequest() const
+{
+	return (_request);
+}
+
+HttpRequest& Client::getRequest()
 {
 	return (_request);
 }
@@ -280,4 +314,38 @@ std::string Client::parsePath(const RouteConf& route_conf, const HttpRequest& re
 			phys_path += (uri[0] == '/' ? uri.substr(1) : uri);
 	}
 	return (phys_path);
+}
+
+// void Client::split_request(const std::string& raw_data) {
+// 	size_t start = 0;
+// 	size_t separator_pos;
+
+// 	while ((separator_pos = raw_data.find("\r\n\r\n", start)) != std::string::npos)
+// 	{
+// 		size_t request_length = separator_pos + 4 - start; // +4 for "\r\n\r\n"
+// 		std::string single_request = raw_data.substr(start, request_length);
+// 		_request_list.push_back(single_request);
+
+// 		start = separator_pos + 4;
+// 	}
+// }
+
+// const std::vector<std::string>& Client::getRequest_list() const
+// {
+// 	return (_request_list);
+// }
+
+const std::string& Client::getRaw_data() const
+{
+	return _raw_data;
+}
+
+void Client::clearRequestList()
+{
+	_request_list.clear();
+}
+
+void Client::clearRawData()
+{
+	_raw_data.clear();
 }

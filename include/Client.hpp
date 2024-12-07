@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/12/04 03:15:14 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/07 19:38:01 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@
 #define RED			"\033[31m"
 #define YELLOW		"\033[33m"
 
-class Client {
+class Client
+{
 	public:
 		Client(int client_fd, const Config& config);
 		~Client();
@@ -32,6 +33,8 @@ class Client {
 		Client& operator=(const Client& other) = delete;
 
 		const HttpRequest&	getRequest() const;
+		HttpRequest& 		getRequest();
+		void 				setCurrentRequest(const HttpRequest& request);
 		const std::string&	getResponseString() const;
 		void				setResponseString(const std::string& built_response);
 		int					getFd() const;
@@ -53,6 +56,7 @@ class Client {
 		bool				checkKeepAliveHeaders();
 
 		//route mngmt
+		const std::string&	getName() const;
 		int					setCourse();
 		const RouteConf*	getRoute() const;
 		const std::string&	getBestPath() const;
@@ -60,17 +64,28 @@ class Client {
 		const RouteConf		*findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
 		std::string			parsePath(const RouteConf& route_conf, const HttpRequest& request);
 		int					isMethodAllowed(const RouteConf &route_conf, const std::string& method);
+		// std::string 		generateUniqueName();
+
+		const std::string&					getRaw_data() const;
+		void 								clearRequestList();
+		void 								clearRawData();
+		bool 								check_content_length(const HttpRequest& request);
 
 	private:
+		static int		client_counter;
+		std::string		_client_name;
 		int				_client_fd;
 		const Config&	_config;
-		HttpRequest		_request;
 		size_t			_buffersize;
 		size_t			redirect_count;
 		const RouteConf	*_route;
 		bool			_keep_alive;
 		std::string		_best_path;
 		std::string		_response_to_send;
+
+		std::string					_raw_data;
+		std::vector<std::string>	_request_list;
+		HttpRequest					_request;
 };
 
 #endif // CLIENT_H

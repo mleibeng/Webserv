@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+         #
+#    By: marvinleibenguth <marvinleibenguth@stud    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/20 13:55:42 by mott              #+#    #+#              #
-#    Updated: 2024/11/28 04:04:53 by mleibeng         ###   ########.fr        #
+#    Updated: 2024/12/06 05:00:43 by marvinleibe      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,7 +31,7 @@
 # Compiler and flags
 CPP = c++
 CPPFLAGS = -Wall -Wextra -Werror -Iinclude -std=c++17
-CPPFLAGS += -g -fsanitize=address
+# CPPFLAGS += -g -fsanitize=address
 RM = rm -rf
 
 # Project names and directories

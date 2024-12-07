@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/05 20:02:13 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 18:43:38 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,16 +43,10 @@ class WebServer
 		RequestHandler&	getNextHandler();
 
 	private:
-		struct ClientInfo
-		{
-			std::unique_ptr<Client> client;
-			std::time_t last_active;
 
-			ClientInfo(int fd, const Config& config);
-		};
+		std::map<int, std::unique_ptr<Client>> active_clients;
 
-		std::map<int, ClientInfo> active_clients;
-
+		// std::unique_ptr<Client> 				active_client;
 		Config												config;
 		Loop												event_loop;
 		std::atomic<bool>									running;
@@ -63,10 +57,11 @@ class WebServer
 		void	setupListeners();
 		void	runLoop();
 		void	acceptConnections(int listener_fd);
-		void	cleanInactiveClients();
+		// void	cleanInactiveClients();
 		int		createNonBlockingSocket();
 		bool	portInUse(int port);
-		ssize_t	handleClientRequest(int client_fd);
+		void	handleClientRequest(int client_fd);
+		bool	isComplete(const std::string& request);
 };
 
 #endif

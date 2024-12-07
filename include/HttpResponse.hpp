@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HttpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/06 19:11:14 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/07 19:59:59 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ enum class StatusCode
 	NOT_FOUND = 404,
 	METH_NOT_ALLOWED = 405,
 	CONFLICT = 409,
+	PAYLOAD_TOO_LARGE = 413,
 	INTERNAL_SERV_ERR = 500,
 	NOT_IMPLEMENTED = 501,
 	ENDLESS_LOOP = 508

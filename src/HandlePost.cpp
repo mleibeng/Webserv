@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   HandlePost.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: fwahl <fwahl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 18:54:25 by mott              #+#    #+#             */
-/*   Updated: 2024/12/04 03:03:42 by fwahl            ###   ########.fr       */
+/*   Updated: 2024/12/07 19:29:22 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,15 +41,12 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 	std::string boundary = extractBoundary(content_type);
 	if (boundary.empty())
 		return (serveErrorPage(client, 400));
-
 	std::string file = extractFile(body, boundary);
 	if (file.empty())
 		return (serveErrorPage(client, 400));
-
 	std::string filename = extractFilename(file);
 	if (filename.empty())
 		return (serveErrorPage(client, 400));
-
 	std::string file_data = extractFileData(file);
 	if (file_data.empty())
 		return (serveErrorPage(client, 400));
@@ -59,6 +56,7 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 	if (std::filesystem::exists(file_path))
 		return (serveErrorPage(client, 409));
 
+	// std::cout << file_path << std::endl;
 	std::ofstream new_file(file_path, std::ios::binary);
 	if (new_file) {
 		new_file.write(file_data.data(), file_data.size());
@@ -72,7 +70,10 @@ void	RequestHandler::handleFileUpload(Client& client, const std::string& content
 		client.setResponseString(response.buildResponse());
 	}
 	else
+	{
+		std::cout << "This is the problem" << std::endl;
 		return (serveErrorPage(client, 500));
+	}
 }
 
 std::string RequestHandler::extractBoundary(const std::string& content_type)
