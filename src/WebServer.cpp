@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   WebServer.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mott <mott@student.42heilbronn.de>         +#+  +:+       +#+        */
+/*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/07 22:39:59 by mott             ###   ########.fr       */
+/*   Updated: 2024/12/07 22:44:25 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -352,9 +352,7 @@ void WebServer::handleClientRequest(int client_fd)
 	try
 	{
 
-		ssize_t read_result = client.read_request();
-		if (read_result <= 0)
-			return;
+		client.read_request();
 
 		if (!isComplete(client.getRaw_data()))
 			return;
