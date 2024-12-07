@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 15:56:37 by fwahl             #+#    #+#             */
-/*   Updated: 2024/12/04 18:49:30 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 19:27:12 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ enum class StatusCode
 	NOT_FOUND = 404,
 	METH_NOT_ALLOWED = 405,
 	CONFLICT = 409,
+	PAYLOAD_TOO_LARGE = 413,
 	INTERNAL_SERV_ERR = 500,
 	NOT_IMPLEMENTED = 501, // test this need changes maybe
 	ENDLESS_LOOP = 508

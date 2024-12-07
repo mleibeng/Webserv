@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/20 00:05:53 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/06 20:01:08 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 19:43:31 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,25 +211,17 @@ void WebServer::runLoop() // maybe need to modify for more clear subject rules
 					}
 				}
 				if (!is_listener)
-				{
-					int status = handleClientRequest(fd);
-					if (status == -1)
-					{
-						std::cout << "error coming from handleClient" << std::endl;
-						event_loop.modifyFd(fd, EPOLLERR_FLAG);
-					}
-				}
+					handleClientRequest(fd);
 			}
 			if (event & EPOLLOUT_FLAG)
 			{
 				auto it = active_clients.find(fd);
 				if (it != active_clients.end() && it->second->hasResponse())
 				{
+					std::cout << it->second->getResponseString();
 					ssize_t read_or_remaining = it->second->send_response(it->second->getResponseString());
 					if (read_or_remaining == -202)
-					{
 						event_loop.modifyFd(it->first, EPOLLOUT_FLAG);
-					}
 					active_clients.erase(fd);
 					close(fd);
 					event_loop.removeFd(fd);
@@ -313,7 +305,7 @@ bool WebServer::isComplete(const std::string& request)
 /// @brief read request from client and either serve error or process it
 /// @param client_fd client to process
 /// @param handler handler instance for all processes
-ssize_t WebServer::handleClientRequest(int client_fd)
+void WebServer::handleClientRequest(int client_fd)
 {
 	auto it = active_clients.find(client_fd);
 	if (it == active_clients.end())
@@ -324,28 +316,30 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 
 	Client& client = *it->second;
 
-	std::cout << client.getName() << std::endl;
-
 	try
 	{
 
 		ssize_t read_result = client.read_request();
 		if (read_result <= 0)
-			return 0;
-
-		// std::cout << client.getRaw_data() << std::endl;
+			return;
 
 		if (!isComplete(client.getRaw_data()))
-			return 0;
+			return;
 
 		client.getRequest().parse(client.getRaw_data());
+
+		std::cout << "Wir sind hier" << std::endl;
+
+		client.check_content_length(client.getRequest());
+
+		std::cout << "Wir sind hier 2" << std::endl;
 
 		int error = 0;
 		if ((error = client.setCourse()) && error)
 		{
 			getNextHandler().serveErrorPage(client, error);
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return (-1);
+			return;
 		}
 
 		const RouteConf* route = client.getRoute();
@@ -355,30 +349,37 @@ ssize_t WebServer::handleClientRequest(int client_fd)
 			{
 				getNextHandler().serveErrorPage(client, 508);
 				event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-				return (0);
+				return;
 			}
 
 			getNextHandler().handleRedirect(*route, client);
 			client.setRoute(nullptr);
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return (0);
+			return;
 		}
 
 		if ((error = client.isMethodAllowed(*client.getRoute(), client.getRequest().getMethod())) && error)
 		{
 			getNextHandler().serveErrorPage(client, error);
 			event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-			return (0);
+			return;
 		}
 
 		getNextHandler().handleRequest(client);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return (0);
+		return;
 	}
-	catch (std::exception &e)
+	catch (std::runtime_error &e)
 	{
-		getNextHandler().serveErrorPage(client, 400);
+		getNextHandler().serveErrorPage(client, 500);
 		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
-		return (-1);
+		return;
+	}
+	catch (std::invalid_argument &e)
+	{
+		std::cout << "jo ist passiert" << std::endl;
+		getNextHandler().serveErrorPage(client, 413);
+		event_loop.modifyFd(client_fd, EPOLLOUT_FLAG);
+		return;
 	}
 }

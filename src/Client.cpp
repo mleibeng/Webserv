@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:09:03 by mott              #+#    #+#             */
-/*   Updated: 2024/12/06 19:58:10 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 19:46:00 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,21 +14,23 @@
 
 int Client::client_counter = 0;
 
-Client::Client(int client_fd, const Config& config) : _client_name(generateUniqueName()), _client_fd(client_fd), _config(config), _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE)) + std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE))), redirect_count(0), _route(nullptr), _keep_alive(true), _best_path()
+Client::Client(int client_fd, const Config& config) : _client_fd(client_fd), _config(config), _buffersize(std::get<size_t>(config.getGlobalConf(GlobalConf::ConfigKey::MAX_HEADER_SIZE))), redirect_count(0), _route(nullptr), _keep_alive(true), _best_path()
 {
-	++client_counter;
+	// ++client_counter;
 }
 
-std::string Client::generateUniqueName()
-{
-	auto now = std::chrono::system_clock::now();
-	auto now_time_t = std::chrono::system_clock::to_time_t(now);
-	auto now_tm = *std::localtime(&now_time_t);
 
-	std::ostringstream oss;
-	oss << std::put_time(&now_tm, "%Y%m%d%H%M%S") << "_" << client_counter;
-	return oss.str();
-}
+// _client_name(generateUniqueName())
+// std::string Client::generateUniqueName()
+// {
+// 	auto now = std::chrono::system_clock::now();
+// 	auto now_time_t = std::chrono::system_clock::to_time_t(now);
+// 	auto now_tm = *std::localtime(&now_time_t);
+
+// 	std::ostringstream oss;
+// 	oss << std::put_time(&now_tm, "%Y%m%d%H%M%S") << "_" << client_counter;
+// 	return oss.str();
+// }
 
 Client::~Client()
 {
@@ -60,11 +62,27 @@ void 	Client::setCurrentRequest(const HttpRequest& request)
 	_request = request;
 }
 
+bool Client::check_content_length(const HttpRequest& request)
+{
+	std::string content_len = request.getHeader("Content-Length");
+
+	if (!content_len.empty())
+	{
+		size_t content_length = std::stoi(content_len);
+		if (content_length >= std::get<size_t>(_config.getGlobalConf(GlobalConf::ConfigKey::MAX_BODY_SIZE)))
+		{
+			_keep_alive = false;
+			throw std::invalid_argument("request body too large");
+		}
+	}
+	return true;
+}
+
 /// @brief reads in the clientside data sent from the webbrowser
 /// @return returns length of request or -1 in case of error
 ssize_t Client::read_request()
 {
-	std::vector<char> buffer(4096, 0);
+	std::array<char, 4096> buffer;
 
 	ssize_t bytes = read(_client_fd, buffer.data(), buffer.size());
 
@@ -79,11 +97,7 @@ ssize_t Client::read_request()
 		throw std::runtime_error("Connection closed");
 	}
 
-	// content-length > limitclientbodysize <- _buffersize
-	// thrw error
-
 	_raw_data.append(buffer.data(), bytes);
-
 	return (bytes);
 }
 
@@ -153,8 +167,6 @@ ssize_t Client::send_response(const std::string& response_string)
 	ssize_t total_sent = 0;
 	size_t remaining = response_string.size();
 
-	// while (total_sent < static_cast<ssize_t>(response_string.size()))
-	// {
 	ssize_t sent = write(_client_fd,
 						response_string.c_str() + total_sent,
 						remaining);
@@ -162,12 +174,9 @@ ssize_t Client::send_response(const std::string& response_string)
 		return (-1);
 	total_sent += sent;
 	remaining -= sent;
-	// }
 
 	if (remaining > 0)
-	{
 		return -202;
-	}
 	return (total_sent);
 }
 

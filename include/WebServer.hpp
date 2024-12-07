@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/18 02:43:14 by mleibeng          #+#    #+#             */
-/*   Updated: 2024/12/06 19:29:58 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 18:43:38 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ class WebServer
 		// void	cleanInactiveClients();
 		int		createNonBlockingSocket();
 		bool	portInUse(int port);
-		ssize_t	handleClientRequest(int client_fd);
+		void	handleClientRequest(int client_fd);
 		bool	isComplete(const std::string& request);
 };
 

@@ -6,7 +6,7 @@
 /*   By: mleibeng <mleibeng@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/11 15:08:55 by mott              #+#    #+#             */
-/*   Updated: 2024/12/06 19:11:48 by mleibeng         ###   ########.fr       */
+/*   Updated: 2024/12/07 19:38:01 by mleibeng         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@
 #define RED			"\033[31m"
 #define YELLOW		"\033[33m"
 
-class Client {
+class Client
+{
 	public:
 		Client(int client_fd, const Config& config);
 		~Client();
@@ -63,13 +64,12 @@ class Client {
 		const RouteConf		*findRouteConf(const ServerConf &server_conf, const HttpRequest& request);
 		std::string			parsePath(const RouteConf& route_conf, const HttpRequest& request);
 		int					isMethodAllowed(const RouteConf &route_conf, const std::string& method);
-		std::string 		generateUniqueName();
+		// std::string 		generateUniqueName();
 
-		void								split_request(const std::string& raw_data);
-		const std::vector<std::string>&		getRequest_list() const;
 		const std::string&					getRaw_data() const;
 		void 								clearRequestList();
 		void 								clearRawData();
+		bool 								check_content_length(const HttpRequest& request);
 
 	private:
 		static int		client_counter;
