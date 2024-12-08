@@ -31,15 +31,15 @@ siege -b -c100 -t1m http://127.0.0.1:8080/
 
 	curl -X POST -v -d "name=42&message=Hello" http://localhost:8080
 
-	curl -X POST -v -F "file=@/Users/mott/Desktop/42_logo.png" http://localhost:8080/uploads
-	curl -X POST -v -H "Expect:" -F "file=@/Users/mott/Desktop/42_logo.png" http://localhost:8080/uploads
+	curl -X POST -v -F "file=/Users/fwahl/test.txt" http://localhost:8080/uploads
+	curl -X POST -v -H "Expect:" -F "file=@/Users/fwahl/test.txt" http://localhost:8080/uploads
 
 	curl -O -v http://127.0.0.1:8080/uploads/file.txt
 
 3. DELETE-Methode
 
-	curl -X -v DELETE http://localhost:8080/uploads/delete.me
-	curl -X -v DELETE http://localhost:8080/delete.me
+	curl -X DELETE -v http://localhost:8080/uploads/delete.me
+	curl -X DELETE -v http://localhost:8080/delete.me
 
 4. CGI
 
@@ -55,7 +55,7 @@ siege -b -c100 -t1m http://127.0.0.1:8080/
 	curl -i -v http://127.0.0.1:8080/andir
 
 	// 400 BAD REQUEST with missing or invalid boundary in content-type
-	curl -X -v POST http://localhost:8080/uploads -H "Content-Type: multipart/form-data" -F "file=@test.txt"
+	curl -X POST -v http://localhost:8080/uploads -H "Content-Type: multipart/form-data" -F "file=@test.txt"
 
 	// 403 -- comment out default_file in server hostname 127.0.0.2
 	curl -i -v http://127.0.0.2:8081/
@@ -65,7 +65,7 @@ siege -b -c100 -t1m http://127.0.0.1:8080/
 	curl -X GET -v "http://127.0.0.1:8080/cgi-bin/nonexistent.php"
 
 	// 405 remove DELETE from default route beforehand
-	curl -X -v DELETE http://localhost:8080/index_de.html
+	curl -X DELETE -v http://localhost:8080/index_de.html
 
 	// 409 Conflict with trying to upload a file that already exists, just test on the website
 	curl -X POST -v -F "file=@/Users/mott/Desktop/42_logo.png" http://localhost:8080/uploads
@@ -82,4 +82,4 @@ siege -b -c100 -t1m http://127.0.0.1:8080/
 	curl -X PUT -v "http://127.0.0.1:8080/"
 
 	// 508 siehe configfile andir <-> diffdir
-	curl -X GET -v "http://127.0.0.1:8080/py"
+	curl -X GET -v "http://127.0.0.1:8080/andir"
