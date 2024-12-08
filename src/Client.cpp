@@ -294,7 +294,7 @@ std::string Client::parsePath(const RouteConf& route_conf, const HttpRequest& re
 	std::string uri = request.getUri();
 
 	phys_path = route_conf.root;
-	if (phys_path.back() != '/')
+	if (!phys_path.empty() && phys_path.back() != '/')
 		phys_path += '/';
 
 	if (route_conf.path == "/")

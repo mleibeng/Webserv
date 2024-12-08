@@ -68,7 +68,7 @@ void RequestHandler::sendDirListing(Client& client, const std::string& dir_path)
 		{
 			std::string name = entry.path().filename().string();
 			std::string path = client.getRequest().getUri();
-			if (path.back() != '/') path += '/';
+			if (!path.empty() && path.back() != '/') path += '/';
 
 			html << "<li><a href=\"" << path << name << "\">"
 					<< name << "</a></li>";
