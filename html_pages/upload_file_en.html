@@ -36,7 +36,7 @@
 	<script>
 		async function deleteFile(filename) {
 			try {
-				const response = await fetch(`/${filename}`, {
+				const response = await fetch(`/uploads/${filename}`, {
 					method: 'DELETE',
 				});
 
