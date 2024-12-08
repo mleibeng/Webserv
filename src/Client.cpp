@@ -82,7 +82,7 @@ bool Client::check_content_length(const HttpRequest& request)
 /// @return returns length of request or -1 in case of error
 ssize_t Client::read_request()
 {
-	std::array<char, 4096> buffer;
+	std::array<char, 4096> buffer = {};
 
 	ssize_t bytes = read(_client_fd, buffer.data(), buffer.size());
 

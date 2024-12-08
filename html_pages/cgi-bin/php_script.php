@@ -1,3 +1,5 @@
+#!/usr/bin/php-cgi
+
 <?php
 // No headers output - let the server handle it
 echo "<html><body>\n";

@@ -155,7 +155,7 @@ void RequestHandler::handleCGIParent(PipeDescriptors& pipes, Client& client, con
 	}
 
 	std::string output = readCGIOutput(pipes.out_pipe[0]); // read from child process CGI
-	// std::cout << "CGI Output: "<< output << std::endl;
+	std::cout << "CGI Output: "<< output << std::endl;
 	close(pipes.out_pipe[0]);
 
 
